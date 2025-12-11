@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon TCG Pocket Sim</title>
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/768px-Pok%C3%A9_Ball_icon.svg.png?20161023215848"/>
+<style>
+body {
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:radial-gradient(circle at top,#2b2f34,#1c1f24);
+  color:#e5e7eb;
+  margin:0; padding:0; min-height:100vh;
+}
+h1 {
+  text-align:center; margin:0; padding:1rem 0;
+  background:linear-gradient(135deg,#e3350d,#0074d9);
+  color:#fff; font-weight:600;
+}
+.container {
+  display:flex; justify-content:space-between;
+  align-items:flex-start; gap:1rem; padding:1rem;
+}
+.player {
+  flex:1;
+  background:#2a2f36;
+  border-radius:12px;
+  padding:1rem;
+  box-shadow:0 0 8px rgba(0,0,0,0.5);
+}
+.player h2 {
+  margin-top:0; text-align:center; color:#facc15;
+}
+textarea {
+  width:100%; height:160px;
+  background:#1e2227; color:#e5e7eb;
+  border:1px solid #3f444b; border-radius:8px;
+  padding:6px; font-family:monospace;
+  resize:vertical;
+}
+button, #startBattle {
+  display:block;
+  margin:0.75rem auto;
+  padding:8px 16px;
+  background:linear-gradient(135deg,#e3350d,#0074d9);
+  border:none; color:white; border-radius:8px;
+  font-weight:600; cursor:pointer;
+  transition:transform .1s ease-in-out;
+  position:relative; overflow:hidden;
+}
+button:hover, #startBattle:hover {
+  transform:scale(1.05);
+  box-shadow:0 0 12px rgba(0,116,217,0.6),0 0 12px rgba(227,53,13,0.6);
+}
+button::before, #startBattle::before {
+  content:""; position:absolute; top:0; left:0; right:0; bottom:0;
+  background:linear-gradient(135deg,#e3350d,#0074d9);
+  filter:blur(8px); opacity:0; transition:opacity .3s ease-in-out;
+  z-index:-1;
+}
+button:hover::before, #startBattle:hover::before { opacity:0.6; }
+
+.status-line { text-align:center; font-size:14px; margin:6px 0; }
+.status-ok { color:#22c55e; }
+.status-warn { color:#f87171; }
+.deckContainer {
+  display:flex; flex-wrap:wrap; justify-content:center;
+  gap:10px; margin-top:10px;
+}
+.card {
+  width:100px; text-align:center; background:#1e2227;
+  border-radius:10px; box-shadow:0 0 6px rgba(0,0,0,0.4);
+  padding:6px;
+}
+.card img { width:100%; border-radius:6px; }
+.hint { font-size:12px; color:#9ca3af; }
+#startBattle {
+  padding:12px 20px; font-size:16px;
+  border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.5);
+}
+details.unparsed summary {cursor:pointer;color:#93c5fd;}
+
+/* energy selector grid */
+.energy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 40px); /* 4 per row */
+  justify-content: center;
+  gap: 12px 16px; /* row and column spacing */
+  margin-top: 8px;
+}
+
+.energy-pip {
+  width:36px; height:36px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  background:#1e2227;
+  border:2px solid transparent;
+  transition:transform .1s ease, border .2s ease;
+}
+.energy-pip:hover { transform:scale(1.1); }
+.energy-pip.selected { border:2px solid #facc15; box-shadow:0 0 8px #facc15; }
+.energy-pip img { width:26px; height:26px; pointer-events:none; }
+</style>
+</head>
+<body>
+<h1>Pokémon TCG Pocket Sim</h1>
+
+<div class="container">
+  <div class="player" id="player1">
+    <h2>Player 1</h2>
+    <textarea id="deckInput1" placeholder="Paste Player 1 decklist here..."></textarea>
+    <div class="energy-wrap">
+      <label><strong>Energy Types (max 3)</strong></label>
+      <div class="energy-grid" id="energyGrid1"></div>
+      <div class="hint">Click to toggle up to three energy types.</div>
+    </div>
+    <button id="parseBtn1">Load Deck</button>
+    <div id="status1" class="loading"></div>
+    <div id="count1" class="status-line"></div>
+    <details id="unparsed1" class="unparsed" hidden>
+      <summary>Unparsed lines</summary>
+      <ul id="unparsedList1"></ul>
+    </details>
+    <div id="deckContainer1" class="deckContainer"></div>
+  </div>
+
+  <div class="player" id="player2">
+    <h2>Player 2</h2>
+    <textarea id="deckInput2" placeholder="Paste Player 2 decklist here..."></textarea>
+    <div class="energy-wrap">
+      <label><strong>Energy Types (max 3)</strong></label>
+      <div class="energy-grid" id="energyGrid2"></div>
+      <div class="hint">Click to toggle up to three energy types.</div>
+    </div>
+    <button id="parseBtn2">Load Deck</button>
+    <div id="status2" class="loading"></div>
+    <div id="count2" class="status-line"></div>
+    <details id="unparsed2" class="unparsed" hidden>
+      <summary>Unparsed lines</summary>
+      <ul id="unparsedList2"></ul>
+    </details>
+    <div id="deckContainer2" class="deckContainer"></div>
+  </div>
+</div>
+
+<button id="startBattle">Start Battle</button>
+
+<script type="module">
+import { parseDecklist, fetchCardData, loadPocketSets } from './deckParser.js';
+
+/* --- Energy pips --- */
+const ENERGY_ICONS={
+  fire:'https://archives.bulbagarden.net/media/upload/thumb/a/ad/Fire-attack.png/20px-Fire-attack.png',
+  water:'https://archives.bulbagarden.net/media/upload/thumb/1/11/Water-attack.png/20px-Water-attack.png',
+  grass:'https://archives.bulbagarden.net/media/upload/thumb/2/2e/Grass-attack.png/20px-Grass-attack.png',
+  lightning:'https://archives.bulbagarden.net/media/upload/thumb/0/04/Lightning-attack.png/20px-Lightning-attack.png',
+  psychic:'https://archives.bulbagarden.net/media/upload/thumb/e/ef/Psychic-attack.png/20px-Psychic-attack.png',
+  fighting:'https://archives.bulbagarden.net/media/upload/thumb/4/48/Fighting-attack.png/20px-Fighting-attack.png',
+  darkness:'https://archives.bulbagarden.net/media/upload/thumb/a/ab/Darkness-attack.png/20px-Darkness-attack.png',
+  metal:'https://archives.bulbagarden.net/media/upload/thumb/6/64/Metal-attack.png/20px-Metal-attack.png',
+};
+const MAX_ENERGIES=3;
+
+function initEnergyGrid(gridId){
+  const grid=document.getElementById(gridId);
+  Object.entries(ENERGY_ICONS).forEach(([type,url])=>{
+    const div=document.createElement('div');
+    div.className='energy-pip';
+    div.dataset.type=type;
+    div.innerHTML=`<img src="${url}" alt="${type}">`;
+    grid.appendChild(div);
+  });
+  grid.addEventListener('click',e=>{
+    const pip=e.target.closest('.energy-pip');
+    if(!pip)return;
+    const selected=[...grid.querySelectorAll('.energy-pip.selected')];
+    if(pip.classList.contains('selected')){pip.classList.remove('selected');return;}
+    if(selected.length>=MAX_ENERGIES){alert(`You can select up to ${MAX_ENERGIES} energy types.`);return;}
+    pip.classList.add('selected');
+  });
+}
+function attachEnergySave(gridId, playerNum) {
+  const grid = document.getElementById(gridId);
+  grid.addEventListener('click', () => {
+    const selected = getSelectedEnergies(gridId);
+    localStorage.setItem(`player${playerNum}Energy`, JSON.stringify(selected));
+  });
+}
+
+attachEnergySave('energyGrid1', 1);
+attachEnergySave('energyGrid2', 2);
+
+function getSelectedEnergies(gridId){
+  return [...document.querySelectorAll(`#${gridId} .energy-pip.selected`)]
+    .map(d=>d.dataset.type);
+}
+initEnergyGrid('energyGrid1');
+initEnergyGrid('energyGrid2');
+
+/* --- Deck parsing --- */
+async function loadDeck(num){
+  const area=document.getElementById(`player${num}`);
+  const textArea=area.querySelector('textarea');
+  const status=area.querySelector('.loading');
+  const container=area.querySelector('.deckContainer');
+  const countLine=area.querySelector('.status-line');
+  const unparsedBox=area.querySelector('details');
+  const unparsedList=area.querySelector('ul');
+
+  container.innerHTML=''; countLine.textContent='';
+  unparsedList.innerHTML=''; unparsedBox.hidden=true;
+  status.textContent='Loading deck...';
+  await loadPocketSets();
+
+let text = textArea.value.trim();
+
+// detect Energy: line like "Energy: Water" or multiple separated by commas
+const energyMatch = text.match(/^\s*Energy:\s*(.+)$/im);
+if (energyMatch) {
+  const raw = energyMatch[1].split(/[,/]/).map(w => w.trim().toLowerCase());
+  const valid = Object.keys(ENERGY_ICONS);
+  const chosen = raw.filter(w => valid.includes(w)).slice(0, MAX_ENERGIES);
+
+  // auto-select matching pips visually
+  const grid = document.getElementById(`energyGrid${num}`);
+  [...grid.querySelectorAll('.energy-pip')].forEach(p => {
+    p.classList.toggle('selected', chosen.includes(p.dataset.type));
+  });
+
+  // save immediately for Start Battle use
+  localStorage.setItem(`player${num}Energy`, JSON.stringify(chosen));
+
+  // remove that line from the deck text before parsing
+  text = text.replace(/^\s*Energy:\s*.+$/im, '').trim();
+}
+
+  const parsed=parseDecklist(text);
+  if(!parsed.length){status.textContent='No valid cards found.';return;}
+
+  const fetched=[];
+  for(const c of parsed){
+    const card=await fetchCardData(c);
+    if(card&&card.name){card.quantity=Number(c.quantity)||1;fetched.push(card);}
+  }
+
+  status.textContent='';
+  container.innerHTML=fetched.map(c=>`
+    <div class="card">
+      ${c.image?`<img src="${c.image}" alt="${c.name}">`:'<div>No image</div>'}
+      <div><strong>${c.quantity}×</strong> ${c.name}</div>
+      <div>${c.set}-${c.number}</div>
+    </div>`).join('');
+
+  const total=fetched.reduce((s,c)=>s+(c.quantity||0),0);
+  if(total===20){countLine.textContent='Total cards parsed: 20';countLine.className='status-line status-ok';}
+  else{countLine.textContent=`Total cards parsed: ${total} (expected 20)`;countLine.className='status-line status-warn';}
+
+  localStorage.setItem(`player${num}Deck`,JSON.stringify(fetched));
+  const energies=getSelectedEnergies(`energyGrid${num}`);
+  localStorage.setItem(`player${num}Energy`,JSON.stringify(energies));
+  status.textContent='Deck ready.';
+}
+
+document.getElementById('parseBtn1').onclick=()=>loadDeck(1);
+document.getElementById('parseBtn2').onclick=()=>loadDeck(2);
+
+document.getElementById('startBattle').onclick=()=>{
+  const p1=JSON.parse(localStorage.getItem('player1Deck')||'[]');
+  const p2=JSON.parse(localStorage.getItem('player2Deck')||'[]');
+  const e1=JSON.parse(localStorage.getItem('player1Energy')||'[]');
+  const e2=JSON.parse(localStorage.getItem('player2Energy')||'[]');
+  const count=a=>a.reduce((s,c)=>s+(c.quantity||0),0);
+
+  if(!p1.length||!p2.length){alert('Both decks must be loaded first.');return;}
+  if(!e1.length||!e2.length){alert('Select at least one energy type for each player.');return;}
+  if(count(p1)!==20||count(p2)!==20){alert(`Each deck must total 20 cards. Current: P1=${count(p1)}, P2=${count(p2)}`);return;}
+
+  window.location.href='battle.html';
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  ['1','2'].forEach(num => {
+    const saved = JSON.parse(localStorage.getItem(`player${num}Energy`) || '[]');
+    const grid = document.getElementById(`energyGrid${num}`);
+    saved.forEach(t => {
+      const pip = grid.querySelector(`.energy-pip[data-type="${t}"]`);
+      if (pip) pip.classList.add('selected');
+    });
+  });
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+	"name": "@cachex/core",
+	"version": "1.0.1",
+	"description": "CacheX is a simple, easy to use and meant to be replaceable Cache library for most usage",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "rm -rf dist && tsup ./src/index.ts --format cjs,esm --dts --clean --dts-resolve",
+		"prepublish": "rm -rf dist && tsup ./src/index.ts --format cjs,esm --dts --clean --dts-resolve"
+	},
+	"repository": "https://github.com/dzeiocom/cachex.git",
+	"homepage": "https://github.com/dzeiocom/cachex",
+	"author": "Aviortheking",
+	"keywords": [
+		"cache",
+		"cachex"
+	],
+	"license": "MIT",
+	"dependencies": {
+		"@dzeio/object-util": "^1.8.3"
+	},
+	"devDependencies": {
+		"tsup": "^8.3.5",
+		"typescript": "^5.6.3"
+	},
+	"exports": {
+		".": {
+			"require": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"import": {
+				"types": "./dist/index.d.mts",
+				"default": "./dist/index.mjs"
+			}
+		}
+	},
+	"files": [
+		"dist"
+	]
+}

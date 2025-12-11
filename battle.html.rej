@@ -1,0 +1,26 @@
+--- a/battle.html
++++ b/battle.html
+@@ -1829,20 +1829,6 @@ async function evolveCard(state, pk, oldImg, newCard) {
+   const slot = oldImg.closest('.card-slot');
+ 
+   /* -----------------------------
+-    ATTACHMENT TRANSFER (broken)
+-    moveBack(slot, slot) does nothing.
+-  ------------------------------ */
+-  const moveBack = (from, to) => {
+-    const energyBox = from.querySelector('.energy-pips');
+-    const hpOverlay = from.querySelector('.hp-overlay');
+-    const toolThumb = from.querySelector('.tool-thumb');
+-    if (energyBox) to.appendChild(energyBox);
+-    if (hpOverlay) to.appendChild(hpOverlay);
+-    if (toolThumb) to.appendChild(toolThumb);
+-    const tool = getToolDataFromSlot(from);
+-    if (tool) {
+-      setToolDataOnSlot(to, tool);
+-      setToolDataOnSlot(from, null);
+-    }
+-  };
+-  moveBack(slot, slot);
++    ATTACHMENT TRANSFER — correct + minimal
++  ------------------------------ */
++  const energyBox = slot.querySelector('.energy-pips');

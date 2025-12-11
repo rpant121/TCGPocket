@@ -1,0 +1,13 @@
+{
+  "name": "pokemon-deck-parser",
+  "version": "1.0.0",
+  "description": "Parser for Pokémon TCG Pocket decklists",
+  "main": "deckParser.js",
+  "type": "module",
+  "scripts": {
+    "start": "node deckParser.js"
+  },
+  "dependencies": {
+    "@tcgdex/sdk": "^2.7.1"
+  }
+}

@@ -1,0 +1,129 @@
+set,number,pokemonName,abilityName,abilityType,effect_type,param1,param2,text
+A1,007,Butterfree,Powder Heal,active,heal_all,20,,"Once during your turn, you may heal 20 damage from each of your Pokémon."
+A1,020,Victreebel,Fragrance Trap,active,force_switch_opponent_basic,,,"If this Pokémon is in the Active Spot, once during your turn, you may switch in 1 of your opponent's Benched Basic Pokémon to the Active Spot."
+A1,061,Poliwrath,Counterattack,passive,counter_on_hit,20,,"If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon, do 20 damage to the Attacking Pokémon."
+A1,067,Cloyster,Shell Armor,passive,reduce_incoming_damage,10,,This Pokémon takes -10 damage from attacks.
+A1,089,Greninja,Water Shuriken,active,deal_damage_any,20,,"Once during your turn, you may do 20 damage to 1 of your opponent's Pokémon."
+A1,098,Magneton,Volt Charge,active,attach_energy_from_zone,lightning,1,"Once during your turn, you may take a {L} Energy from your Energy Zone and attach it to this Pokémon."
+A1,123,Gengar ex,Shadowy Spellbind,passive,block_supporters,,,"As long as this Pokémon is in the Active Spot, your opponent can't use any Supporter cards from their hand."
+A1,125,Hypno,Sleep Pendulum,active,flip_inflict_status,asleep,,"Once during your turn, you may flip a coin. If heads, your opponent's Active Pokémon is now Asleep."
+A1,132,Gardevoir,Psy Shadow,active,attach_energy_from_zone_to_active,psychic,1,"Once during your turn, you may take 1 {P} Energy from your Energy Zone and attach it to the {P} Pokémon in the Active Spot."
+A1,177,Weezing,Gas Leak,active,inflict_status,poisoned,,"Once during your turn, if this Pokémon is in the Active Spot, you may make your opponent's Active Pokémon Poisoned."
+A1,182,Melmetal,Hard Coat,passive,reduce_incoming_damage,20,,This Pokémon takes -20 damage from attacks.
+A1,188,Pidgeot,Drive Off,active,force_opponent_switch,,,"Once during your turn, you may switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)"
+A1,209,Porygon,Data Scan,active,peek_topdeck,1,,"Once during your turn, you may look at the top card of your deck."
+A1,243,Weezing,Gas Leak,active,inflict_status,poisoned,,"Once during your turn, if this Pokémon is in the Active Spot, you may make your opponent's Active Pokémon Poisoned."
+A1,245,Pidgeot,Drive Off,active,force_opponent_switch,,,"Once during your turn, you may switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)"
+A1,249,Porygon,Data Scan,active,peek_topdeck,1,,"Once during your turn, you may look at the top card of your deck."
+A1,261,Gengar ex,Shadowy Spellbind,passive,block_supporters,,,"As long as this Pokémon is in the Active Spot, your opponent can't use any Supporter cards from their hand."
+A1,277,Gengar ex,Shadowy Spellbind,passive,block_supporters,,,"As long as this Pokémon is in the Active Spot, your opponent can't use any Supporter cards from their hand."
+A1a,006,Serperior,Jungle Totem,passive,double_energy_type,grass,,Each {G} Energy attached to your {G} Pokémon provides 2 {G} Energy. This effect doesn't stack.
+A1a,019,Vaporeon,Wash Out,active,move_energy_type_to_active,water,unlimited,"As often as you like during your turn, you may move a {W} Energy from 1 of your Benched {W} Pokémon to your Active {W} Pokémon."
+A1a,046,Aerodactyl ex,Primeval Law,passive,block_evolution,opponent,,Your opponent can't play any Pokémon from their hand to evolve their Active Pokémon.
+A1a,056,Druddigon,Rough Skin,passive,counter_on_hit,20,,"If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon, do 20 damage to the Attacking Pokémon."
+A1a,070,Serperior,Jungle Totem,passive,double_energy_type,grass,,Each {G} Energy attached to your {G} Pokémon provides 2 {G} Energy. This effect doesn't stack.
+A1a,072,Vaporeon,Wash Out,active,move_energy_type_to_active,water,unlimited,"As often as you like during your turn, you may move a {W} Energy from 1 of your Benched {W} Pokémon to your Active {W} Pokémon."
+A1a,078,Aerodactyl ex,Primeval Law,passive,block_evolution,opponent,,Your opponent can't play any Pokémon from their hand to evolve their Active Pokémon.
+A1a,084,Aerodactyl ex,Primeval Law,passive,block_evolution,opponent,,Your opponent can't play any Pokémon from their hand to evolve their Active Pokémon.
+A2,022,Shaymin,Fragrant Flower Garden,active,heal_all,10,,"Once during your turn, you may heal 10 damage from each of your Pokémon."
+A2,032,Piloswine,Thick Fat,passive,reduce_damage_from_types,fire;water,20,This Pokémon takes −20 damage from attacks from {R} or {W} Pokémon.
+A2,033,Mamoswine,Thick Fat,passive,reduce_damage_from_types,fire;water,30,This Pokémon takes −30 damage from attacks from {R} or {W} Pokémon.
+A2,034,Regice,Crystal Body,passive,block_attack_effects,,,Prevent all effects of attacks used by your opponent's Pokémon done to this Pokémon.
+A2,072,Dusknoir,Shadow Void,active,move_all_damage,unlimited,,"As often as you like during your turn, you may choose 1 of your Pokémon that has damage on it, and move all of its damage to this Pokémon."
+A2,078,Giratina,Levitate,passive,zero_retreat_if_energy,,,"If this Pokémon has any Energy attached, it has no Retreat Cost."
+A2,087,Regirock,Exoskeleton,passive,reduce_incoming_damage,20,,This Pokémon takes −20 damage from attacks.
+A2,092,Lucario,Fighting Coach,passive,boost_type_damage,fighting,20,Attacks used by your {F} Pokémon do +20 damage to your opponent's Active Pokémon.
+A2,110,Darkrai ex,Nightmare Aura,passive,damage_on_energy_attach,darkness,20,"Whenever you attach a {D} Energy from your Energy Zone to this Pokémon, do 20 damage to your opponent's Active Pokémon."
+A2,114,Bastiodon,Guarded Grill,passive,flip_reduce_damage,100,,"If any damage is done to this Pokémon by attacks, flip a coin. If heads, this Pokémon takes −100 damage from that attack."
+A2,123,Garchomp,Reckless Shearing,active,discard_to_draw,1,1,"You must discard a card from your hand in order to use this Ability. Once during your turn, you may draw a card."
+A2,159,Shaymin,Fragrant Flower Garden,active,heal_all,10,,"Once during your turn, you may heal 10 damage from each of your Pokémon."
+A2,160,Mamoswine,Thick Fat,passive,reduce_damage_from_types,fire;water,30,This Pokémon takes −30 damage from attacks from {R} or {W} Pokémon.
+A2,167,Giratina,Levitate,passive,zero_retreat_if_energy,,,"If this Pokémon has any Energy attached, it has no Retreat Cost."
+A2,170,Lucario,Fighting Coach,passive,boost_type_damage,fighting,20,Attacks used by your {F} Pokémon do +20 damage to your opponent's Active Pokémon.
+A2,175,Garchomp,Reckless Shearing,active,discard_to_draw,1,1,"You must discard a card from your hand in order to use this Ability. Once during your turn, you may draw a card."
+A2,187,Darkrai ex,Nightmare Aura,passive,damage_on_energy_attach,darkness,20,"Whenever you attach a {D} Energy from your Energy Zone to this Pokémon, do 20 damage to your opponent's Active Pokémon."
+A2,202,Darkrai ex,Nightmare Aura,passive,damage_on_energy_attach,darkness,20,"Whenever you attach a {D} Energy from your Energy Zone to this Pokémon, do 20 damage to your opponent's Active Pokémon."
+A2a,009,Carnivine,Power Link,passive,boost_damage_if_arceus,30,,"If you have Arceus or Arceus ex in play, attacks used by this Pokémon do +30 damage to your opponent's Active Pokémon."
+A2a,010,Leafeon ex,Forest Breath,active,attach_energy_from_zone_to_type,grass,grass,"Once during your turn, if this Pokémon is in the Active Spot, you may take a {G} Energy from your Energy Zone and attach it to 1 of your {G} Pokémon."
+A2a,013,Heatran,Speed Link,passive,zero_retreat_if_arceus,,,"If you have Arceus or Arceus ex in play, this Pokémon has no Retreat Cost."
+A2a,021,Abomasnow,Vigor Link,passive,reduce_attack_cost_if_arceus,1,,"If you have Arceus or Arceus ex in play, attacks used by this Pokémon cost 1 less {C} Energy."
+A2a,022,Glaceon ex,Snowy Terrain,passive,damage_during_checkup,10,,"During Pokémon Checkup, if this Pokémon is in the Active Spot, do 10 damage to your opponent's Active Pokémon."
+A2a,026,Raichu,Resilience Link,passive,reduce_damage_if_arceus,30,,"If you have Arceus or Arceus ex in play, this Pokémon takes −30 damage from attacks."
+A2a,034,Unown,CHECK,active,peek_topdeck_either_player,1,,"Once during your turn, you may choose either player. Look at the top card of that player's deck."
+A2a,035,Rotom,Speed Link,passive,zero_retreat_if_arceus,,,"If you have Arceus or Arceus ex in play, this Pokémon has no Retreat Cost."
+A2a,041,Tyranitar,Power Link,passive,boost_damage_if_arceus,30,,"If you have Arceus or Arceus ex in play, attacks used by this Pokémon do +30 damage to your opponent's Active Pokémon."
+A2a,050,Crobat,Cunning Link,active,deal_damage_if_arceus,30,,"Once during your turn, if you have Arceus or Arceus ex in play, you may do 30 damage to your opponent's Active Pokémon."
+A2a,055,Magnezone,Resilience Link,passive,reduce_damage_if_arceus,30,,"If you have Arceus or Arceus ex in play, this Pokémon takes −30 damage from attacks."
+A2a,069,Shaymin,Sky Support,passive,reduce_active_basic_retreat_cost,1,,"As long as this Pokémon is on your Bench, your Active Basic Pokémon's Retreat Cost is 1 less."
+A2a,071,Arceus ex,Fabled Luster,passive,immune_to_special_conditions,,,This Pokémon can't be affected by any Special Conditions.
+A2a,078,Unown,CHECK,active,peek_topdeck_either_player,1,,"Once during your turn, you may choose either player. Look at the top card of that player's deck."
+A2a,081,Shaymin,Sky Support,passive,reduce_active_basic_retreat_cost,1,,"As long as this Pokémon is on your Bench, your Active Basic Pokémon's Retreat Cost is 1 less."
+A2a,082,Leafeon ex,Forest Breath,active,attach_energy_from_zone_to_type,grass,grass,"Once during your turn, if this Pokémon is in the Active Spot, you may take a {G} Energy from your Energy Zone and attach it to 1 of your {G} Pokémon."
+A2a,083,Glaceon ex,Snowy Terrain,passive,damage_during_checkup,10,,"During Pokémon Checkup, if this Pokémon is in the Active Spot, do 10 damage to your opponent's Active Pokémon."
+A2a,086,Arceus ex,Fabled Luster,passive,immune_to_special_conditions,,,This Pokémon can't be affected by any Special Conditions.
+A2a,091,Leafeon ex,Forest Breath,active,attach_energy_from_zone_to_type,grass,grass,"Once during your turn, if this Pokémon is in the Active Spot, you may take a {G} Energy from your Energy Zone and attach it to 1 of your {G} Pokémon."
+A2a,092,Glaceon ex,Snowy Terrain,passive,damage_during_checkup,10,,"During Pokémon Checkup, if this Pokémon is in the Active Spot, do 10 damage to your opponent's Active Pokémon."
+A2a,095,Arceus ex,Fabled Luster,passive,immune_to_special_conditions,,,This Pokémon can't be affected by any Special Conditions.
+A2a,096,Arceus ex,Fabled Luster,passive,immune_to_special_conditions,,,This Pokémon can't be affected by any Special Conditions.
+A2b,021,Tatsugiri,Retreat Directive,passive,zero_retreat_named,Dondozo,,Your Active Dondozo has no Retreat Cost.
+A2b,028,Pawmot,Counterattack,passive,counter_on_hit,20,,"If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon, do 20 damage to the Attacking Pokémon."
+A2b,035,Giratina ex,Broken-Space Bellow,active,attach_energy_end_turn,psychic,1,"Once during your turn, you may take a {P} Energy from your Energy Zone and attach it to this Pokémon. If you use this Ability, your turn ends."
+A2b,051,Grafaiai,Poison Coating,active,flip_inflict_status,poisoned,,"Once during your turn, you may flip a coin. If heads, your opponent's Active Pokémon is now Poisoned."
+A2b,061,Wigglytuff,Comforting Song,active,heal_active,20,,"Once during your turn, you may heal 20 damage from your Active Pokémon."
+A2b,075,Tatsugiri,Retreat Directive,passive,zero_retreat_named,Dondozo,,Your Active Dondozo has no Retreat Cost.
+A2b,076,Grafaiai,Poison Coating,active,flip_inflict_status,poisoned,,"Once during your turn, you may flip a coin. If heads, your opponent's Active Pokémon is now Poisoned."
+A2b,078,Wigglytuff,Comforting Song,active,heal_active,20,,"Once during your turn, you may heal 20 damage from your Active Pokémon."
+A2b,083,Giratina ex,Broken-Space Bellow,active,attach_energy_end_turn,psychic,1,"Once during your turn, you may take a {P} Energy from your Energy Zone and attach it to this Pokémon. If you use this Ability, your turn ends."
+A2b,096,Giratina ex,Broken-Space Bellow,active,attach_energy_end_turn,psychic,1,"Once during your turn, you may take a {P} Energy from your Energy Zone and attach it to this Pokémon. If you use this Ability, your turn ends."
+A3,021,Wimpod,Wimp Out,passive,zero_retreat_first_turn,,,During your first turn this Pokémon has no Retreat Cost.
+A3,048,Primarina,Melodious Healing,active,heal_type_pokemon,30,water,"Once during your turn, you may heal 30 damage from each of your {W} Pokémon."
+A3,054,Pyukumuku,Innards Out,passive,counter_on_knockout,50,,"If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, do 50 damage to the Attacking Pokémon."
+A3,066,Oricorio,Safeguard,passive,prevent_damage_from_ex,,,Prevent all damage done to this Pokémon by attacks from your opponent's Pokémon ex.
+A3,080,Comfey,Flower Shield,passive,cure_and_prevent_status_with_energy,psychic,,Each of your Pokémon that has any {P} Energy attached recovers from all Special Conditions and can't be affected by any Special Conditions.
+A3,087,Lunala ex,Psychic Connect,active,move_all_energy_type,psychic,,"Once during your turn, you may move all {P} Energy from 1 of your Benched {P} Pokémon to your Active Pokémon."
+A3,096,Conkeldurr,Guts,passive,flip_avoid_knockout,,,"If this Pokémon would be Knocked Out by damage from an attack, flip a coin. If heads, this Pokémon is not Knocked Out, and its remaining HP becomes 10."
+A3,104,Passimian ex,Offload Pass,passive,move_energy_on_knockout,fighting,,"If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, move all {F} Energy from this Pokémon to 1 of your Benched Pokémon."
+A3,109,Alolan Persian,Fur Coat,passive,reduce_incoming_damage,20,,This Pokémon takes −20 damage from attacks.
+A3,122,Solgaleo ex,Rising Road,active,switch_from_bench,,,"Once during your turn, if this Pokémon is on your Bench, you may switch it with your Active Pokémon."
+A3,141,Komala,Comatose,passive,inflict_status_on_energy_attach,asleep,,"As long as this Pokémon is in the Active Spot, whenever you attach an Energy from your Energy Zone to it, it is now Asleep."
+A3,163,Pyukumuku,Innards Out,passive,counter_on_knockout,50,,"If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, do 50 damage to the Attacking Pokémon."
+A3,165,Oricorio,Safeguard,passive,prevent_damage_from_ex,,,Prevent all damage done to this Pokémon by attacks from your opponent's Pokémon ex.
+A3,168,Comfey,Flower Shield,passive,cure_and_prevent_status_with_energy,psychic,,Each of your Pokémon that has any {P} Energy attached recovers from all Special Conditions and can't be affected by any Special Conditions.
+A3,179,Komala,Comatose,passive,inflict_status_on_energy_attach,asleep,,"As long as this Pokémon is in the Active Spot, whenever you attach an Energy from your Energy Zone to it, it is now Asleep."
+A3,186,Lunala ex,Psychic Connect,active,move_all_energy_type,psychic,,"Once during your turn, you may move all {P} Energy from 1 of your Benched {P} Pokémon to your Active Pokémon."
+A3,187,Passimian ex,Offload Pass,passive,move_energy_on_knockout,fighting,,"If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, move all {F} Energy from this Pokémon to 1 of your Benched Pokémon."
+A3,189,Solgaleo ex,Rising Road,active,switch_from_bench,,,"Once during your turn, if this Pokémon is on your Bench, you may switch it with your Active Pokémon."
+A3,204,Lunala ex,Psychic Connect,active,move_all_energy_type,psychic,,"Once during your turn, you may move all {P} Energy from 1 of your Benched {P} Pokémon to your Active Pokémon."
+A3,205,Passimian ex,Offload Pass,passive,move_energy_on_knockout,fighting,,"If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, move all {F} Energy from this Pokémon to 1 of your Benched Pokémon."
+A3,207,Solgaleo ex,Rising Road,active,switch_from_bench,,,"Once during your turn, if this Pokémon is on your Bench, you may switch it with your Active Pokémon."
+A3,229,Wigglytuff,Comforting Song,active,heal_active,20,,"Once during your turn, you may heal 20 damage from your Active Pokémon."
+A3,234,Gengar ex,Shadowy Spellbind,passive,block_supporters,,,"As long as this Pokémon is in the Active Spot, your opponent can't use any Supporter cards from their hand."
+A3,238,Lunala ex,Psychic Connect,active,move_all_energy_type,psychic,,"Once during your turn, you may move all {P} Energy from 1 of your Benched {P} Pokémon to your Active Pokémon."
+A3,239,Solgaleo ex,Rising Road,active,switch_from_bench,,,"Once during your turn, if this Pokémon is on your Bench, you may switch it with your Active Pokémon."
+A3a,015,Luxray,Intimidating Fang,passive,reduce_opponent_damage,20,,As long as this Pokémon is in the Active Spot attacks used by your opponent's Active Pokémon do −20 damage.
+A3a,021,Zeraora,Thunderclap Flash,passive,attach_energy_end_of_first_turn,lightning,,At the end of your first turn take a {L} Energy from your Energy Zone and attach it to this Pokémon.
+A3a,027,Shiinotic,Illuminate,active,search_pokemon_random,,,Once during your turn you may put a random Pokémon from your deck into your hand.
+A3a,031,Claydol,Heal Block,passive,prevent_all_healing,,,Pokémon (both yours and your opponent's) can't be healed.
+A3a,042,Nihilego,More Poison,passive,increase_poison_damage,10,,Your opponent's Active Pokémon takes +10 damage from being Poisoned.
+A3a,052,Ferrothorn,Steel Spikes,passive,counter_on_hit,20,,If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon do 20 damage to the Attacking Pokémon.
+A3a,056,Stoutland,Guard Dog Visage,passive,increase_opponent_cost,1,,As long as this Pokémon is in the Active Spot attacks used by your opponent's Active Pokémon cost 1 {C} more.
+A3a,062,Celesteela,Ultra Thrusters,active,switch_ultra_beast,,,Once during your turn you may switch your Active Ultra Beast with 1 of your Benched Ultra Beasts.
+A3a,075,Celesteela,Ultra Thrusters,active,switch_ultra_beast,,,Once during your turn you may switch your Active Ultra Beast with 1 of your Benched Ultra Beasts.
+A3a,093,Greninja,Water Shuriken,active,deal_damage_any,20,,Once during your turn you may do 20 damage to 1 of your opponent's Pokémon.
+A3a,097,Pidgeot,Drive Off,active,force_opponent_switch,,,Once during your turn you may switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)
+A3a,101,Aerodactyl ex,Primeval Law,passive,block_evolution,opponent,,Your opponent can't play any Pokémon from their hand to evolve their Active Pokémon.
+A3a,103,Nihilego,More Poison,passive,increase_poison_damage,10,,Your opponent's Active Pokémon takes +10 damage from being Poisoned.
+A3b,009,Flareon ex,Combust,active,attach_from_discard_self_damage,fire,20,Once during your turn you may attach a {R} Energy from your discard pile to this Pokémon. If you do do 20 damage to this Pokémon.
+A3b,034,Sylveon ex,Happy Ribbon,passive,draw_on_evolution,2,,Once during your turn when you play this Pokémon from your hand to evolve 1 of your Pokémon you may draw 2 cards.
+A3b,056,Eevee ex,Veevee 'volve,passive,eevee_evolution_rule,,,This Pokémon can evolve into any Pokémon that evolves from Eevee if you play it from your hand onto this Pokémon. (This Pokémon can't evolve during your first turn or the turn you play it.)
+A3b,057,Snorlax ex,Full-Mouth Manner,passive,heal_active_end_of_turn,20,,At the end of your turn if this Pokémon is in the Active Spot heal 20 damage from it.
+A3b,059,Ambipom,Catching Tail,active,search_tool_random,,,Once during your turn you may put a random Pokémon Tool card from your deck into your hand.
+A3b,079,Flareon ex,Combust,active,attach_from_discard_self_damage,fire,20,Once during your turn you may attach a {R} Energy from your discard pile to this Pokémon. If you do do 20 damage to this Pokémon.
+A3b,081,Sylveon ex,Happy Ribbon,passive,draw_on_evolution,2,,Once during your turn when you play this Pokémon from your hand to evolve 1 of your Pokémon you may draw 2 cards.
+A3b,083,Eevee ex,Veevee 'volve,passive,eevee_evolution_rule,,,This Pokémon can evolve into any Pokémon that evolves from Eevee if you play it from your hand onto this Pokémon. (This Pokémon can't evolve during your first turn or the turn you play it.)
+A3b,084,Snorlax ex,Full-Mouth Manner,passive,heal_active_end_of_turn,20,,At the end of your turn if this Pokémon is in the Active Spot heal 20 damage from it.
+A3b,087,Flareon ex,Combust,active,attach_from_discard_self_damage,fire,20,Once during your turn you may attach a {R} Energy from your discard pile to this Pokémon. If you do do 20 damage to this Pokémon.
+A3b,089,Sylveon ex,Happy Ribbon,passive,draw_on_evolution,2,,Once during your turn when you play this Pokémon from your hand to evolve 1 of your Pokémon you may draw 2 cards.
+A3b,091,Snorlax ex,Full-Mouth Manner,passive,heal_active_end_of_turn,20,,At the end of your turn if this Pokémon is in the Active Spot heal 20 damage from it.
+A3b,092,Eevee ex,Veevee 'volve,passive,eevee_evolution_rule,,,This Pokémon can evolve into any Pokémon that evolves from Eevee if you play it from your hand onto this Pokémon. (This Pokémon can't evolve during your first turn or the turn you play it.)
+A3b,099,Gardevoir,Psy Shadow,active,attach_energy_from_zone_to_active,psychic,1,Once during your turn you may take a {P} Energy from your Energy Zone and attach it to the {P} Pokémon in the Active Spot.

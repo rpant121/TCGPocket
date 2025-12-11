@@ -1,0 +1,112 @@
+id,name,category,effect_type,param1,param2,effect_text
+A1-216,Helix Fossil,Item,summon_fossil_pokemon,40,Omanyte,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+A1-217,Dome Fossil,Item,summon_fossil_pokemon,40,Kabuto,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+A1-218,Old Amber,Item,summon_fossil_pokemon,40,Aerodactyl,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+A1-219,Erika,Supporter,heal_type,50,grass,Heal 50 damage from 1 of your {G} Pokémon.
+A1-220,Misty,Supporter,flip_attach_energy,water,until_tails,"Choose 1 of your {W} Pokémon and flip a coin until you get tails. For each heads, take a {W} Energy from your Energy Zone and attach it to that Pokémon."
+A1-221,Blaine,Supporter,boost_damage_type_targets,30,"Ninetales,Rapidash,Magmar","During this turn, attacks used by your Ninetales, Rapidash, or Magmar do +30 damage to your opponent's Active Pokémon."
+A1-222,Koga,Supporter,return_active_to_hand,,"Muk,Weezing",Put your Muk or Weezing in the Active Spot into your hand.
+A1-223,Giovanni,Supporter,boost_all_damage,10,,"During this turn, attacks used by your Pokémon do +10 damage to your opponent's Active Pokémon."
+A1-224,Brock,Supporter,attach_energy_to_targets,fighting,"Golem,Onix",Take 1 {F} Energy from your Energy Zone and attach it to your Golem or Onix.
+A1-225,Sabrina,Supporter,force_opponent_switch,,,Switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)
+A1-226,Lt. Surge,Supporter,move_all_energy_type,lightning,"Raichu,Electrode,Electabuzz","Move all {L} Energy from your Benched Pokémon to your Raichu, Electrode, or Electabuzz in the Active Spot."
+P-A-001,Potion,Item,heal,20,,Heal 20 damage from 1 of your Pokémon.
+P-A-002,X Speed,Item,reduce_retreat_cost,1,,"During this turn, your Active Pokémon's Retreat Cost is reduced by 1."
+P-A-003,Hand Scope,Item,reveal_opponent_hand,,,Your opponent reveals their hand.
+P-A-004,Pokédex,Item,view_top_deck,3,,Look at the top 3 cards of your deck.
+P-A-005,Poké Ball,Item,search_basic_pokemon,basic,,Put a random Basic Pokémon from your deck into your hand.
+P-A-006,Red Card,Item,shuffle_opponent_hand_draw,3,,Your opponent shuffles their hand into their deck and draws 3 cards.
+P-A-007,Professor's Research,Supporter,draw_cards,2,,Draw 2 cards.
+A1a-063,Old Amber,Item,summon_fossil_pokemon,40,Aerodactyl,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+A1a-064,Pokémon Flute,Item,revive_opponent_pokemon,basic,,Put a Basic Pokémon from your opponent's discard pile onto their Bench.
+A1a-065,Mythical Slab,Item,peek_topdeck_type,psychic,hand_or_bottom,"Look at the top card of your deck. If that card is a {P} Pokémon, put it into your hand. If it is not a {P} Pokémon, put it on the bottom of your deck."
+A1a-066,Budding Expeditioner,Supporter,return_active_to_hand,,Mew ex,Put your Mew ex in the Active Spot into your hand.
+A1a-067,Blue,Supporter,reduce_all_incoming_damage_next_turn,10,,"During your opponent's next turn, all of your Pokémon take −10 damage from attacks from your opponent's Pokémon."
+A1a-068,Leaf,Supporter,reduce_retreat_cost,2,,"During this turn, the Retreat Cost of your Active Pokémon is 2 less."
+A1a-080,Budding Expeditioner,Supporter,return_active_to_hand,,Mew ex,Put your Mew ex in the Active Spot into your hand.
+A1a-081,Blue,Supporter,reduce_all_incoming_damage_next_turn,10,,"During your opponent's next turn, all of your Pokémon take −10 damage from attacks from your opponent's Pokémon."
+A1a-082,Leaf,Supporter,reduce_retreat_cost,2,,"During this turn, the Retreat Cost of your Active Pokémon is 2 less."
+A1-266,Erika,Supporter,heal_type,50,grass,Heal 50 damage from 1 of your {G} Pokémon.
+A1-267,Misty,Supporter,flip_attach_energy,water,until_tails,"Choose 1 of your {W} Pokémon, and flip a coin until you get tails. For each heads, take a {W} Energy from your Energy Zone and attach it to that Pokémon."
+A1-268,Blaine,Supporter,boost_damage_type_targets,30,"Ninetales,Rapidash,Magmar","During this turn, attacks used by your Ninetales, Rapidash, or Magmar do +30 damage to your opponent's Active Pokémon."
+A1-269,Koga,Supporter,return_active_to_hand,,"Muk,Weezing",Put your Muk or Weezing in the Active Spot into your hand.
+A1-270,Giovanni,Supporter,boost_all_damage,10,,"During this turn, attacks used by your Pokémon do +10 damage to your opponent's Active Pokémon."
+A1-271,Brock,Supporter,attach_energy_to_targets,fighting,"Golem,Onix",Take 1 {F} Energy from your Energy Zone and attach it to your Golem or Onix.
+A1-272,Sabrina,Supporter,force_opponent_switch,,,Switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)
+A1-273,Lt. Surge,Supporter,move_all_energy_type,lightning,"Raichu,Electrode,Electabuzz","Move all {L} Energy from your Benched Pokémon to your Raichu, Electrode, or Electabuzz in the Active Spot."
+A2-144,Skull Fossil,Item,summon_fossil_pokemon,40,Cranidos,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+A2-145,Armor Fossil,Item,summon_fossil_pokemon,40,Shieldon,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+A2-146,Pokémon Communication,Item,switch_card_in_hand_with_deck,pokemon,,Choose a Pokémon in your hand and switch it with a random Pokémon in your deck.
+A2-147,Giant Cape,Tool,increase_max_hp,20,,The Pokémon this card is attached to gets +20 HP.
+A2-148,Rocky Helmet,Tool,counter_on_hit_tool,20,,"If the Pokémon this card is attached to is in the Active Spot and is damaged by an attack from your opponent's Pokémon, do 20 damage to the Attacking Pokémon."
+A2-149,Lum Berry,Tool,cure_status_end_of_turn,,,"At the end of each turn, if the Pokémon this card is attached to is affected by any Special Conditions, it recovers from all of them, and discard this card."
+A2-150,Cyrus,Supporter,force_switch_damaged_bench,,,Switch in 1 of your opponent's Benched Pokémon that has damage on it to the Active Spot.
+A2-151,Team Galactic Grunt,Supporter,search_named_random,,"Glameow,Stunky,Croagunk","Put 1 random Glameow, Stunky, or Croagunk from your deck into your hand."
+A2-152,Cynthia,Supporter,boost_damage_type_targets,50,"Garchomp,Togekiss","During this turn, attacks used by your Garchomp or Togekiss do +50 damage to your opponent's Active Pokémon."
+A2-153,Volkner,Supporter,attach_from_discard_to_targets,2|lightning,"Electivire,Luxray",Choose 1 of your Electivire or Luxray. Attach 2 {L} Energy from your discard pile to that Pokémon.
+A2-154,Dawn,Supporter,move_energy_bench_to_active,,,Move an Energy from 1 of your Benched Pokémon to your Active Pokémon.
+A2-155,Mars,Supporter,shuffle_hand_draw_points,,,Your opponent shuffles their hand into their deck and draws a card for each of their remaining points needed to win.
+A2-190,Cyrus,Supporter,force_switch_damaged_bench,,,Switch in 1 of your opponent's Benched Pokémon that has damage on it to the Active Spot.
+A2-191,Team Galactic Grunt,Supporter,search_named_random,,"Glameow,Stunky,Croagunk","Put 1 random Glameow, Stunky, or Croagunk from your deck into your hand."
+A2-192,Cynthia,Supporter,boost_damage_type_targets,50,"Garchomp,Togekiss","During this turn, attacks used by your Garchomp or Togekiss do +50 damage to your opponent's Active Pokémon."
+A2-193,Volkner,Supporter,attach_from_discard_to_targets,2|lightning,"Electivire,Luxray",Choose 1 of your Electivire or Luxray. Attach 2 {L} Energy from your discard pile to that Pokémon.
+A2-194,Dawn,Supporter,move_energy_bench_to_active,,,Move an Energy from 1 of your Benched Pokémon to your Active Pokémon.
+A2-195,Mars,Supporter,shuffle_hand_draw_points,,,Your opponent shuffles their hand into their deck and draws a card for each of their remaining points needed to win.
+A2a-072,Irida,Supporter,heal_all_with_type_energy,40,water,Heal 40 damage from each of your Pokémon that has any {W} Energy attached.
+A2a-073,Celestic Town Elder,Supporter,revive_basic_to_hand,,,Put 1 random Basic Pokémon from your discard pile into your hand.
+A2a-074,Barry,Supporter,reduce_attack_cost_targets,2,"Snorlax,Heracross,Staraptor","During this turn, attacks used by your Snorlax, Heracross, and Staraptor cost 2 less {C} Energy."
+A2a-075,Adaman,Supporter,reduce_type_incoming_damage_next_turn,20,metal,"During your opponent's next turn, all of your {M} Pokémon take −20 damage from attacks from your opponent's Pokémon."
+A2a-087,Irida,Supporter,heal_all_with_type_energy,40,water,Heal 40 damage from each of your Pokémon that has any {W} Energy attached.
+A2a-088,Celestic Town Elder,Supporter,revive_basic_to_hand,,,Put 1 random Basic Pokémon from your discard pile into your hand.
+A2a-089,Barry,Supporter,reduce_attack_cost_targets,2,"Snorlax,Heracross,Staraptor","During this turn, attacks used by your Snorlax, Heracross, and Staraptor cost 2 less {C} Energy."
+A2a-090,Adaman,Supporter,reduce_type_incoming_damage_next_turn,20,metal,"During your opponent's next turn, all of your {M} Pokémon take −20 damage from attacks from your opponent's Pokémon."
+A2b-069,Iono,Supporter,shuffle_both_hands_draw_same,,,"Each player shuffles the cards in their hand into their deck, then draws that many cards."
+A2b-070,Pokémon Center Lady,Supporter,heal_and_cure_status,30,,"Heal 30 damage from 1 of your Pokémon, and it recovers from all Special Conditions."
+A2b-071,Red,Supporter,boost_damage_vs_ex,20,,"During this turn, attacks used by your Pokémon do +20 damage to your opponent's Active Pokémon ex."
+A2b-072,Team Rocket Grunt,Supporter,flip_discard_energy_until_tails,,,"Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon."
+A2b-088,Iono,Supporter,shuffle_both_hands_draw_same,,,"Each player shuffles the cards in their hand into their deck, then draws that many cards."
+A2b-089,Pokémon Center Lady,Supporter,heal_and_cure_status,30,,"Heal 30 damage from 1 of your Pokémon, and it recovers from all Special Conditions."
+A2b-090,Red,Supporter,boost_damage_vs_ex,20,,"During this turn, attacks used by your Pokémon do +20 damage to your opponent's Active Pokémon ex."
+A2b-091,Team Rocket Grunt,Supporter,flip_discard_energy_until_tails,,,"Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon."
+A2b-111,Poké Ball,Item,search_basic_pokemon,basic,,Put a random Basic Pokémon from your deck into your hand.
+A3-142,Big Malasada,Item,heal_active_and_cure_random_status,10,,Heal 10 damage and remove a random Special Condition from your Active Pokémon.
+A3-143,Fishing Net,Item,revive_type_to_hand,basic,water,Put a random Basic {W} Pokémon from your discard pile into your hand.
+A3-144,Rare Candy,Item,evolve_basic_to_stage2,,,,"Choose 1 of your Basic Pokémon in play. If you have a Stage 2 card in your hand that evolves from that Pokémon, put that card onto the Basic Pokémon to evolve it, skipping the Stage 1. You can't use this card during your first turn or on a Basic Pokémon that was put into play this turn."
+A3-145,Rotom Dex,Item,peek_topdeck_optional_shuffle,1,,"Look at the top card of your deck. Then, you may shuffle your deck."
+A3-146,Poison Barb,Tool,counter_inflict_status_tool,poisoned,,"If the Pokémon this card is attached to is your Active Pokémon and is damaged by an attack from your opponent's Pokémon, the Attacking Pokémon is now Poisoned."
+A3-147,Leaf Cape,Tool,increase_max_hp_type,30,grass,The {G} Pokémon this card is attached to gets +30 HP.
+A3-148,Acerola,Supporter,transfer_damage_named_to_opponent,40,"Palossand,Mimikyu","Choose 1 of your Palossand or Mimikyu that has damage on it, and move 40 of its damage to your opponent's Active Pokémon."
+A3-149,Ilima,Supporter,return_damaged_type_to_hand,colorless,,Put 1 of your {C} Pokémon that has damage on it into your hand.
+A3-150,Kiawe,Supporter,attach_energy_to_targets_end_turn,2|fire,"Alolan Marowak,Turtonator",Choose 1 of your Alolan Marowak or Turtonator. Take 2 {R} Energy from your Energy Zone and attach it to that Pokémon. Your turn ends.
+A3-151,Guzma,Supporter,discard_all_opponent_tools,,,Discard all Pokémon Tool cards attached to each of your opponent's Pokémon.
+A3-152,Lana,Supporter,force_opponent_switch_if_named,,Araquanid,You can use this card only if you have Araquanid in play. Switch in 1 of your opponent's Benched Pokémon to the Active Spot.
+A3-153,Sophocles,Supporter,boost_damage_type_targets,30,"Alolan Golem,Vikavolt,Togedemaru","During this turn, attacks used by your Alolan Golem, Vikavolt, or Togedemaru do +30 damage to your opponent's Active Pokémon."
+A3-154,Mallow,Supporter,heal_full_discard_energy_named,,"Shiinotic,Tsareena","Heal all damage from 1 of your Shiinotic or Tsareena. If you do, discard all Energy from that Pokémon."
+A3-155,Lillie,Supporter,heal_stage,60,stage2,Heal 60 damage from 1 of your Stage 2 Pokémon.
+A3-190,Acerola,Supporter,transfer_damage_named_to_opponent,40,"Palossand,Mimikyu","Choose 1 of your Palossand or Mimikyu that has damage on it, and move 40 of its damage to your opponent's Active Pokémon."
+A3-191,Ilima,Supporter,return_damaged_type_to_hand,colorless,,Put 1 of your {C} Pokémon that has damage on it into your hand.
+A3-192,Kiawe,Supporter,attach_energy_to_targets_end_turn,2|fire,"Alolan Marowak,Turtonator",Choose 1 of your Alolan Marowak or Turtonator. Take 2 {R} Energy from your Energy Zone and attach it to that Pokémon. Your turn ends.
+A3-193,Guzma,Supporter,discard_all_opponent_tools,,,Discard all Pokémon Tool cards attached to each of your opponent's Pokémon.
+A3-194,Lana,Supporter,force_opponent_switch_if_named,,Araquanid,You can use this card only if you have Araquanid in play. Switch in 1 of your opponent's Benched Pokémon to the Active Spot.
+A3-195,Sophocles,Supporter,boost_damage_type_targets,30,"Alolan Golem,Vikavolt,Togedemaru","During this turn, attacks used by your Alolan Golem, Vikavolt, or Togedemaru do +30 damage to your opponent's Active Pokémon."
+A3-196,Mallow,Supporter,heal_full_discard_energy_named,,"Shiinotic,Tsareena","Heal all damage from 1 of your Shiinotic or Tsareena. If you do, discard all Energy from that Pokémon."
+A3-197,Lillie,Supporter,heal_stage,60,stage2,Heal 60 damage from 1 of your Stage 2 Pokémon.
+A3-208,Guzma,Supporter,discard_all_opponent_tools,,,Discard all Pokémon Tool cards attached to each of your opponent's Pokémon.
+A3-209,Lillie,Supporter,heal_stage,60,stage2,Heal 60 damage from 1 of your Stage 2 Pokémon.
+A3a-063,Beast Wall,Item,reduce_all_incoming_damage_next_turn_if_no_points,20,,You can use this card only if your opponent hasn't gotten any points. During your opponent's next turn all of your Ultra Beasts take −20 damage from attacks from your opponent's Pokémon.
+A3a-064,Repel,Item,force_opponent_switch_basic,,,Switch out your opponent's Active Basic Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)
+A3a-065,Electrical Cord,Tool,move_energy_on_knockout_tool,lightning,2,If the {L} Pokémon this card is attached to is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon move 2 {L} Energy from that Pokémon and attach 1 Energy each to 2 of your Benched Pokémon.
+A3a-066,Beastite,Tool,boost_damage_per_point,10,,Attacks used by the Ultra Beast this card is attached to do +10 damage to your opponent's Active Pokémon for each point you have gotten.
+A3a-067,Gladion,Supporter,search_named_random,,Type: Null;Silvally,Put 1 random Type: Null or Silvally from your deck into your hand.
+A3a-068,Looker,Supporter,reveal_opponent_supporters,,,Your opponent reveals all of the Supporter cards in their deck.
+A3a-069,Lusamine,Supporter,attach_from_discard_ultra_beast_if_points,2,,You can use this card only if your opponent has gotten at least 1 point. Choose 1 of your Ultra Beasts. Attach 2 random Energy from your discard pile to that Pokémon.
+A3a-081,Gladion,Supporter,search_named_random,,Type: Null;Silvally,Put 1 random Type: Null or Silvally from your deck into your hand.
+A3a-082,Looker,Supporter,reveal_opponent_supporters,,,Your opponent reveals all of the Supporter cards in their deck.
+A3a-083,Lusamine,Supporter,attach_from_discard_ultra_beast_if_points,2,,You can use this card only if your opponent has gotten at least 1 point. Choose 1 of your Ultra Beasts. Attach 2 random Energy from your discard pile to that Pokémon.
+A3b-066,Eevee Bag,Item,eevee_boost_or_heal,10,20,Choose 1: During this turn attacks used by your Pokémon that evolve from Eevee do +10 damage to your opponent's Active Pokémon. Heal 20 damage from each of your Pokémon that evolves from Eevee.
+A3b-067,Leftovers,Tool,heal_active_end_of_turn_tool,10,,At the end of your turn if the Pokémon this card is attached to is in the Active Spot heal 10 damage from that Pokémon.
+A3b-068,Hau,Supporter,boost_damage_type_targets,30,"Decidueye ex,Incineroar ex,Primarina ex",During this turn attacks used by your Decidueye ex Incineroar ex or Primarina ex do +30 damage to your opponent's Active Pokémon.
+A3b-069,Penny,Supporter,copy_random_opponent_supporter,,,Look at a random Supporter card that's not Penny from your opponent's deck and shuffle it back into their deck. Use the effect of that card as the effect of this card.
+A3b-085,Hau,Supporter,boost_damage_type_targets,30,"Decidueye ex,Incineroar ex,Primarina ex",During this turn attacks used by your Decidueye ex Incineroar ex or Primarina ex do +30 damage to your opponent's Active Pokémon.
+A3b-086,Penny,Supporter,copy_random_opponent_supporter,,,Look at a random Supporter card that's not Penny from your opponent's deck and shuffle it back into their deck. Use the effect of that card as the effect of this card.
+A3b-107,Eevee Bag,Item,eevee_boost_or_heal,10,20,Choose 1: During this turn attacks used by your Pokémon that evolve from Eevee do +10 damage to your opponent's Active Pokémon. Heal 20 damage from each of your Pokémon that evolves from Eevee.

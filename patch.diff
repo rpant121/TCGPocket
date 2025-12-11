@@ -1,0 +1,67 @@
+*** PATCH START ***
+
+--- a/battle.html
++++ b/battle.html
+@@ -1829,20 +1829,6 @@ async function evolveCard(state, pk, oldImg, newCard) {
+   const slot = oldImg.closest('.card-slot');
+
+   /* -----------------------------
+-    ATTACHMENT TRANSFER (broken)
+-    moveBack(slot, slot) does nothing.
+-  ------------------------------ */
+-  const moveBack = (from, to) => {
+-    const energyBox = from.querySelector('.energy-pips');
+-    const hpOverlay = from.querySelector('.hp-overlay');
+-    const toolThumb = from.querySelector('.tool-thumb');
+-    if (energyBox) to.appendChild(energyBox);
+-    if (hpOverlay) to.appendChild(hpOverlay);
+-    if (toolThumb) to.appendChild(toolThumb);
+-    const tool = getToolDataFromSlot(from);
+-    if (tool) {
+-      setToolDataOnSlot(to, tool);
+-      setToolDataOnSlot(from, null);
+-    }
+-  };
+-  moveBack(slot, slot);
++    ATTACHMENT TRANSFER — correct + minimal
++  ------------------------------ */
++  const energyBox = slot.querySelector('.energy-pips');
++  const hpOverlay = slot.querySelector('.hp-overlay');
++  const toolThumb = slot.querySelector('.tool-thumb');
++  if (energyBox) slot.appendChild(energyBox);
++  if (hpOverlay) slot.appendChild(hpOverlay);
++  if (toolThumb) slot.appendChild(toolThumb);
++  const toolData = getToolDataFromSlot(slot);
++  if (toolData) setToolDataOnSlot(slot, toolData);
+
+@@ -2365,7 +2351,10 @@ function showAttackMenuFor(activeDiv, meta) {
+ 
+-    const effectState = { p1: playerState.player1, p2: playerState.player2 };
++    /* PREVIEW must be side-effect-free → clone */
++    const effectState = {
++      p1: structuredClone(playerState.player1),
++      p2: structuredClone(playerState.player2)
++    };
+
+@@ -2368,7 +2357,7 @@ item.onclick = async () => {
+-    const previewDamage = await applyMoveEffectFromCsv(effectState, pk, atk.name, baseDamage, { isFinal:false });
++    const previewDamage = await applyMoveEffectFromCsv(effectState, pk, atk.name, baseDamage, { isFinal:false });
+
+@@ -2722,6 +2711,18 @@ function promoteFromBench(state, pk, forced) {
+   // (existing logic)
+ }
+
++/* --------------------------------------------------
++   NEW: Clear any leftover promote-glow when cancelled
++-------------------------------------------------- */
++function clearPromotionGlows() {
++  document.querySelectorAll('.promote-glow').forEach(el =>
++    el.classList.remove('promote-glow')
++  );
++}
++
++// Call when zoom closing & retreat blocked
++window.addEventListener('closeZoom', clearPromotionGlows);
++
+
+*** PATCH END ***
