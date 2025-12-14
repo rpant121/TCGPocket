@@ -1,170 +1,170 @@
 set,number,pokemonName,attackName,effect_type,param1,param2,effect_text,damageBase,damageNotation
-A1,003,Venusaur,Mega Drain,heal_self,30,,Heal 30 damage from this Pokémon.,80,80
-A1,004,Venusaur ex,Giant Bloom,heal_self,30,,Heal 30 damage from this Pokémon.,100,100
-A1,005,Caterpie,Find a Friend,search_pokemon_type_random,grass,,Put 1 random {G} Pokémon from your deck into your hand.,0,
-A1,013,Vileplume,Soothing Scent,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80,80
-A1,017,Venomoth,Poison Powder,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,30,30
-A1,022,Exeggutor,Stomp,flip_bonus_damage_if_heads,1,30,Flip a coin. If heads this attack does 30 more damage.,30,30+
-A1,023,Exeggutor ex,Tropical Swing,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40,40+
-A1,024,Tangela,Absorb,heal_self,10,,Heal 10 damage from this Pokémon.,40,40
-A1,026,Pinsir,Double Horn,flip_multiplier,2,50,Flip 2 coins. This attack does 50 damage for each heads.,50,50×
-A1,029,Petilil,Blot,heal_self,10,,Heal 10 damage from this Pokémon.,10,10
-A1,030,Lilligant,Leaf Supply,attach_energy_from_zone,grass,to_bench,Take a {G} Energy from your Energy Zone and attach it to 1 of your Benched {G} Pokémon.,50,50
-A1,031,Skiddo,Surprise Attack,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,40,40
-A1,033,Charmander,Ember,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,30,30
-A1,035,Charizard,Fire Spin,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,150,150
-A1,036,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200,200
-A1,037,Vulpix,Tail Whip,flip_inflict_effect_if_heads,attack_lock,,Flip a coin. If heads the Defending Pokémon can't attack during your opponent's next turn.,0,
-A1,038,Ninetales,Flamethrower,discard_energy_specific,fire,1,Discard 1 {R} Energy from this Pokémon.,90,90
-A1,040,Arcanine,Heat Tackle,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,100,100
-A1,041,Arcanine ex,Inferno Onrush,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,120,120
-A1,045,Flareon,Flamethrower,discard_energy_specific,fire,1,Discard 1 {R} Energy from this Pokémon.,110,110
-A1,046,Moltres,Sky Attack,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,130,130
-A1,047,Moltres ex,Inferno Dance,attach_energy_from_zone,fire,count_heads,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,0,
-A1,052,Centiskorch,Fire Blast,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,130,130
-A1,055,Blastoise,Hydro Pump,extra_damage_if_extra_energy_attached,water,2|60,If this Pokémon has at least 2 extra {W} Energy attached this attack does 60 more damage.,80,80+
-A1,056,Blastoise ex,Hydro Bazooka,extra_damage_if_extra_energy_attached,water,2|60,If this Pokémon has at least 2 extra {W} Energy attached this attack does 60 more damage.,100,100+
-A1,057,Psyduck,Headache,inflict_effect,block_supporter,,Your opponent can't use any Supporter cards during their next turn.,10,10
-A1,063,Tentacruel,Poison Tentacles,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,50,50
-A1,069,Kingler,KO Crab,flip_bonus_if_double_heads,,80,Flip 2 coins. If both are heads this attack does 80 more damage.,80,80+
-A1,071,Seadra,Water Arrow,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,0,
-A1,073,Seaking,Horn Hazard,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,80,80
-A1,078,Gyarados,Hyper Beam,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,100,100
-A1,079,Lapras,Hydro Pump,extra_damage_if_extra_energy_attached,water,3|70,If this Pokémon has at least 3 extra {W} Energy attached this attack does 70 more damage.,20,20+
-A1,080,Vaporeon,Bubble Drain,heal_self,30,,Heal 30 damage from this Pokémon.,60,60
-A1,082,Omastar,Ancient Whirlpool,inflict_effect,attack_lock,,During your opponent's next turn the Defending Pokémon can't attack.,70,70
-A1,083,Articuno,Ice Beam,flip_inflict_status_if_heads,paralysis,,Flip a coin. If heads your opponent's Active Pokémon is now Paralyzed.,60,60
-A1,084,Articuno ex,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80,80
-A1,091,Bruxish,Second Strike,bonus_damage_if_opponent_damaged,60,,If your opponent's Active Pokémon has damage on it this attack does 60 more damage.,10,10+
-A1,093,Frosmoth,Powder Snow,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,40,40
-A1,095,Raichu,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,140,140
-A1,096,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30,30×
-A1,101,Electabuzz,Thunder Punch,flip_bonus_damage_with_self_damage,40,20,Flip a coin. If heads this attack does 40 more damage. If tails this Pokémon also does 20 damage to itself.,40,40+
-A1,102,Jolteon,Pin Missile,flip_multiplier,4,40,Flip 4 coins. This attack does 40 damage for each heads.,40,40×
-A1,103,Zapdos,Raging Thunder,bench_damage_one,self,30,This attack also does 30 damage to 1 of your Benched Pokémon.,100,100
-A1,104,Zapdos ex,Thundering Hurricane,flip_multiplier,4,50,Flip 4 coins. This attack does 50 damage for each heads.,50,50×
-A1,106,Zebstrika,Thunder Spear,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Pokémon.,0,
-A1,109,Eelektross,Thunder Fang,flip_inflict_status_if_heads,paralysis,,Flip a coin. If heads your opponent's Active Pokémon is now Paralyzed.,80,80
-A1,111,Heliolisk,Quick Attack,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40,40+
-A1,112,Pincurchin,Thunder Shock,flip_inflict_status_if_heads,paralysis,,Flip a coin. If heads your opponent's Active Pokémon is now Paralyzed.,40,40
-A1,115,Abra,Teleport,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0,
-A1,117,Alakazam,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60,60+
-A1,122,Gengar,Bother,inflict_effect,block_supporter,,Your opponent can't use any Supporter cards during their next turn.,50,50
-A1,126,Mr. Mime,Barrier Attack,reduce_incoming_damage_next_turn,20,,During your opponent's next turn this Pokémon takes 20 less damage from attacks.,30,30
-A1,127,Jynx,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,30,30+
-A1,128,Mewtwo,Power Blast,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,120,120
-A1,129,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150,150
-A1,136,Golurk,Double Lariat,flip_multiplier,2,100,Flip 2 coins. This attack does 100 damage for each heads.,100,100×
-A1,140,Dugtrio,Dig,flip_inflict_effect_if_heads,prevent_damage_next_turn,,Flip a coin. If heads during your opponent's next turn prevent all damage and effects done to this Pokémon.,40,40
-A1,142,Primeape,Fight Back,bonus_damage_if_self_damaged,60,,If this Pokémon has damage on it this attack does 60 more damage.,40,40+
-A1,149,Golem,Double-Edge,self_damage_fixed_amount,50,,This Pokémon also does 50 damage to itself.,150,150
-A1,151,Cubone,Growl,inflict_effect,reduce_damage_next_turn,20,During your opponent's next turn attacks used by the Defending Pokémon do −20 damage.,0,
-A1,153,Marowak ex,Bonemerang,flip_multiplier,2,80,Flip 2 coins. This attack does 80 damage for each heads.,80,80×
-A1,154,Hitmonlee,Stretch Kick,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Pokémon.,0,
-A1,159,Kabutops,Leech Life,heal_equal_to_damage_done,,,Heal from this Pokémon the same amount of damage you did to your opponent's Active Pokémon.,50,50
-A1,163,Grapploct,Knock Back,force_opponent_switch,,,Switch out your opponent's Active Pokémon to the Bench.,70,70
-A1,165,Arbok,Corner,inflict_effect,retreat_lock,,During your opponent's next turn the Defending Pokémon can't retreat.,60,60
-A1,166,Nidoran♀,Call for Family,search_specific_into_bench,Nidoran♂,,Put 1 random Nidoran♂ from your deck onto your Bench.,0,
-A1,168,Nidoqueen,Lovestrike,bonus_damage_for_each_named_bench,Nidoking,50,This attack does 50 more damage for each of your Benched Nidoking.,80,80+
-A1,171,Nidoking,Poison Horn,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,90,90
-A1,174,Grimer,Poison Gas,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,10,10
-A1,175,Muk,Venoshock,bonus_damage_if_opponent_poisoned,50,,If your opponent's Active Pokémon is Poisoned this attack does 50 more damage.,70,70+
-A1,178,Mawile,Crunch,flip_discard_random_from_opponent,1,,Flip a coin. If heads discard a random Energy from your opponent's Active Pokémon.,20,20
-A1,181,Meltan,Amass,attach_energy_from_zone,metal,self,Take 1 {M} Energy from your Energy Zone and attach it to this Pokémon.,0,
-A1,185,Dragonite,Draco Meteor,random_multi_target_damage,4,50,1 of your opponent's Pokémon is chosen at random 4 times. For each time do 50 damage.,0,
-A1,192,Fearow,Drill Run,flip_discard_random_from_opponent,1,,Flip a coin. If heads discard a random Energy from your opponent's Active Pokémon.,50,50
-A1,195,Wigglytuff ex,Sleepy Song,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80,80
-A1,196,Meowth,Pay Day,draw_cards,1,,Draw a card.,10,10
-A1,197,Persian,Shadow Claw,flip_discard_random_from_opponent_hand,1,,Flip a coin. If heads discard a random card from your opponent's hand.,40,40
-A1,201,Lickitung,Continuous Lick,flip_until_tails_multiplier,60,,Flip a coin until you get tails. This attack does 60 damage for each heads.,60,60×
-A1,203,Kangaskhan,Dizzy Punch,flip_multiplier,2,30,Flip 2 coins. This attack does 30 damage for each heads.,30,30×
-A1,205,Ditto,Copy Anything,copy_opponent_attack,,,Choose 1 of your opponent's Pokémon's attacks and use it.,0,
-A1,210,Aerodactyl,Primal Wingbeat,flip_force_shuffle_opponent_pokemon_into_deck,,,Flip a coin. If heads your opponent shuffles their Active Pokémon into their deck.,0,
-A1,213,Cinccino,Do the Wave,bonus_damage_for_each_bench,30,,This attack does 30 damage for each of your Benched Pokémon.,30,30×
-A1,229,Pinsir,Double Horn,flip_multiplier,2,50,Flip 2 coins. This attack does 50 damage for each heads.,50,50×
-A1,230,Charmander,Ember,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,30,30
-A1,233,Gyarados,Hyper Beam,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,100,100
-A1,234,Lapras,Hydro Pump,extra_damage_if_extra_energy_attached,water,3|70,If this Pokémon has at least 3 extra {W} Energy attached this attack does 70 more damage.,20,20+
-A1,236,Alakazam,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60,60+
-A1,239,Cubone,Growl,inflict_effect,reduce_damage_next_turn,20,During your opponent's next turn attacks used by the Defending Pokémon do −20 damage.,0,
-A1,240,Nidoqueen,Lovestrike,bonus_damage_for_each_named_bench,Nidoking,50,This attack does 50 more damage for each of your Benched Nidoking.,80,80+
-A1,241,Nidoking,Poison Horn,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,90,90
-A1,244,Dragonite,Draco Meteor,random_multi_target_damage,4,50,1 of your opponent's Pokémon is chosen at random 4 times. For each time do 50 damage.,0,
-A1,246,Meowth,Pay Day,draw_cards,1,,Draw a card.,10,10
-A1,247,Ditto,Copy Anything,copy_opponent_attack,,,Choose 1 of your opponent's Pokémon's attacks and use it.,0,
-A1,251,Venusaur ex,Giant Bloom,heal_self,30,,Heal 30 damage from this Pokémon.,100,100
-A1,252,Exeggutor ex,Tropical Swing,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40,40+
-A1,253,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200,200
-A1,254,Arcanine ex,Inferno Onrush,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,120,120
-A1,255,Moltres ex,Inferno Dance,attach_energy_from_zone,fire,count_heads,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,0,
-A1,256,Blastoise ex,Hydro Bazooka,extra_damage_if_extra_energy_attached,water,2|60,If this Pokémon has at least 2 extra {W} Energy attached this attack does 60 more damage.,100,100+
-A1,258,Articuno ex,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80,80
-A1,259,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30,30×
-A1,260,Zapdos ex,Raging Thunder,bench_damage_one,self,30,This attack also does 30 damage to 1 of your Benched Pokémon.,100,100
-A1,262,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150,150
-A1,264,Marowak ex,Bonemerang,flip_multiplier,2,80,Flip 2 coins. This attack does 80 damage for each heads.,80,80×
-A1,265,Wigglytuff ex,Sleepy Song,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80,80
-A1,274,Moltres ex,Inferno Dance,attach_energy_from_zone,fire,count_heads,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,0,
-A1,275,Articuno ex,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80,80
-A1,276,Zapdos ex,Thundering Hurricane,flip_multiplier,4,50,Flip 4 coins. This attack does 50 damage for each heads.,50,50×
-A1,279,Wigglytuff ex,Sleepy Song,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80,80
-A1,280,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200,200
-A1,281,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30,30×
-A1,282,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150,150
-A1,283,Mew,Psy Report,reveal_opponent_hand,,,Your opponent reveals their hand.,20,20
-A1,284,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200,200
-A1,285,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30,30×
-A1,286,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150,150
-A1a,001,Exeggcute,Growth Spurt,attach_energy_from_zone,grass,self,Take a {G} Energy from your Energy Zone and attach it to this Pokémon.,0,
-A1a,002,Exeggutor,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,40,40+
-A1a,003,Celebi ex,Powerful Bloom,flip_multiplier_energy_count,50,,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50,50×
-A1a,008,Shiinotic,Flickering Spores,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,50,50
-A1a,009,Dhelmise,Energy Whip,extra_damage_if_extra_energy_attached,grass,3|70,"""If this Pokémon has at least 3 extra {G} Energy attached, this attack does 70 more damage.""",30,30+
-A1a,010,Ponyta,Stomp,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",30,30+
-A1a,011,Rapidash,Rising Lunge,flip_bonus_damage_if_heads,1,60,"""Flip a coin. If heads, this attack does 60 more damage.""",60,60+
-A1a,012,Magmar,Fire Blast,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,100,100
-A1a,014,Volcarona,Volcanic Ash,discard_energy_then_bench_damage,fire|2,opponent|80,Discard 2 {R} Energy from this Pokémon. This attack does 80 damage to 1 of your opponent's Pokémon.,0,
-A1a,015,Salandit,Venoshock,bonus_damage_if_opponent_poisoned,40,,"""If your opponent's Active Pokémon is Poisoned, this attack does 40 more damage.""",20,20+
-A1a,016,Salazzle,Poison Claws,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,80,80
-A1a,017,Magikarp,Leap Out,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0,
-A1a,018,Gyarados ex,Rampaging Whirlpool,discard_random_energy_all_pokemon,1,,Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's).,140,140
-A1a,021,Lumineon,Aqua Liner,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Benched Pokémon.,0,
-A1a,023,Drednaw,Crunch,flip_discard_random_from_opponent,1,,"""Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon.""",80,80
-A1a,024,Cramorant,Dive,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",40,40
-A1a,025,Pikachu,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,10,This attack does 10 damage for each of your Benched {L} Pokémon.,10,10×
-A1a,026,Raichu,Gigashock,bench_damage_all_opponent,20,,This attack also does 20 damage to each of your opponent's Benched Pokémon.,100,100
-A1a,027,Electabuzz,Thunder Spear,bench_damage_one,opponent,40,This attack does 40 damage to 1 of your opponent's Pokémon.,0,
-A1a,029,Galvantula,Electroweb,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",70,70
-A1a,030,Dedenne,Thunder Shock,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20,20
-A1a,031,Mew,Psy Report,reveal_opponent_hand,,,Your opponent reveals their hand.,20,20
-A1a,032,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0,
-A1a,033,Sigilyph,Spike Draw,draw_cards,1,,Draw a card.,60,60
-A1a,035,Beheeyem,Mind Jack,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,30,30+
-A1a,036,Flabébé,Hypnotic Gaze,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,10,10
-A1a,037,Floette,Leaf Drain,heal_self,10,,Heal 10 damage from this Pokémon.,30,30
-A1a,038,Florges,Bloomshine,heal_all,20,,Heal 20 damage from each of your Pokémon.,80,80
-A1a,041,Mankey,Focus Fist,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",50,50
-A1a,045,Golem,Guard Press,reduce_incoming_damage_next_turn,30,,"""During your opponent's next turn, this Pokémon takes −30 damage from attacks.""",100,100
-A1a,047,Marshadow,Revenge,bonus_damage_if_pokemon_ko_last_turn,60,,"""If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 60 more damage.""",30,30+
-A1a,049,Koffing,Division,search_specific_into_bench,Koffing,,Put 1 random Koffing from your deck onto your Bench.,0,
-A1a,050,Weezing,Smokescreen,inflict_effect,flip_to_attack,,"""During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen.""",80,80
-A1a,054,Whirlipede,Poison Sting,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,40,40
-A1a,055,Scolipede,Venoshock,bonus_damage_if_opponent_poisoned,50,,"""If your opponent's Active Pokémon is Poisoned, this attack does 50 more damage.""",90,90+
-A1a,059,Pidgeot ex,Scattering Cyclone,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,80,80+
-A1a,060,Tauros,Fighting Tackle,bonus_damage_if_opponent_ex,80,,"""If your opponent's Active Pokémon is a Pokémon {ex}, this attack does 80 more damage.""",60,60+
-A1a,061,Eevee,Continuous Steps,flip_until_tails_multiplier,20,,Flip a coin until you get tails. This attack does 20 damage for each heads.,20,20×
-A1a,062,Chatot,Mimic,shuffle_hand_draw_match_opponent,,,Shuffle your hand into your deck. Draw a card for each card in your opponent's hand.,0,
-A1a,069,Exeggutor,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,40,40+
-A1a,071,Salandit,Venoshock,bonus_damage_if_opponent_poisoned,40,,"""If your opponent's Active Pokémon is Poisoned, this attack does 40 more damage.""",20,20+
-A1a,073,Dedenne,Thunder Shock,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20,20
-A1a,074,Marshadow,Revenge,bonus_damage_if_pokemon_ko_last_turn,60,,"""If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 60 more damage.""",30,30+
-A1a,075,Celebi ex,Powerful Bloom,flip_multiplier_energy_count,50,,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50,50×
-A1a,076,Gyarados ex,Rampaging Whirlpool,discard_random_energy_all_pokemon,1,,Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's).,140,140
-A1a,077,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0,
-A1a,079,Pidgeot ex,Scattering Cyclone,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,80,80+
-A1a,083,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0,
-A1a,085,Celebi ex,Powerful Bloom,flip_multiplier_energy_count,50,,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50,50×
-A1a,086,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0,
+A1,3,Venusaur,Mega Drain,heal_self,30,,Heal 30 damage from this Pokémon.,80.0,80
+A1,4,Venusaur ex,Giant Bloom,heal_self,30,,Heal 30 damage from this Pokémon.,100.0,100
+A1,5,Caterpie,Find a Friend,search_pokemon_type_random,grass,,Put 1 random {G} Pokémon from your deck into your hand.,0.0,
+A1,13,Vileplume,Soothing Scent,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80.0,80
+A1,17,Venomoth,Poison Powder,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,30.0,30
+A1,22,Exeggutor,Stomp,flip_bonus_damage_if_heads,1,30,Flip a coin. If heads this attack does 30 more damage.,30.0,30+
+A1,23,Exeggutor ex,Tropical Swing,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40.0,40+
+A1,24,Tangela,Absorb,heal_self,10,,Heal 10 damage from this Pokémon.,40.0,40
+A1,26,Pinsir,Double Horn,flip_multiplier,2,50,Flip 2 coins. This attack does 50 damage for each heads.,50.0,50×
+A1,29,Petilil,Blot,heal_self,10,,Heal 10 damage from this Pokémon.,10.0,10
+A1,30,Lilligant,Leaf Supply,attach_energy_from_zone,grass,to_bench,Take a {G} Energy from your Energy Zone and attach it to 1 of your Benched {G} Pokémon.,50.0,50
+A1,31,Skiddo,Surprise Attack,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,40.0,40
+A1,33,Charmander,Ember,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,30.0,30
+A1,35,Charizard,Fire Spin,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,150.0,150
+A1,36,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200.0,200
+A1,37,Vulpix,Tail Whip,flip_inflict_effect_if_heads,attack_lock,,Flip a coin. If heads the Defending Pokémon can't attack during your opponent's next turn.,0.0,
+A1,38,Ninetales,Flamethrower,discard_energy_specific,fire,1,Discard 1 {R} Energy from this Pokémon.,90.0,90
+A1,40,Arcanine,Heat Tackle,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,100.0,100
+A1,41,Arcanine ex,Inferno Onrush,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,120.0,120
+A1,45,Flareon,Flamethrower,discard_energy_specific,fire,1,Discard 1 {R} Energy from this Pokémon.,110.0,110
+A1,46,Moltres,Sky Attack,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,130.0,130
+A1,47,Moltres ex,Inferno Dance,attach_energy_from_zone,fire,count_heads,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,0.0,
+A1,52,Centiskorch,Fire Blast,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,130.0,130
+A1,55,Blastoise,Hydro Pump,extra_damage_if_extra_energy_attached,water,2|60,If this Pokémon has at least 2 extra {W} Energy attached this attack does 60 more damage.,80.0,80+
+A1,56,Blastoise ex,Hydro Bazooka,extra_damage_if_extra_energy_attached,water,2|60,If this Pokémon has at least 2 extra {W} Energy attached this attack does 60 more damage.,100.0,100+
+A1,57,Psyduck,Headache,inflict_effect,block_supporter,,Your opponent can't use any Supporter cards during their next turn.,10.0,10
+A1,63,Tentacruel,Poison Tentacles,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,50.0,50
+A1,69,Kingler,KO Crab,flip_bonus_if_double_heads,,80,Flip 2 coins. If both are heads this attack does 80 more damage.,80.0,80+
+A1,71,Seadra,Water Arrow,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,0.0,
+A1,73,Seaking,Horn Hazard,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,80.0,80
+A1,78,Gyarados,Hyper Beam,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,100.0,100
+A1,79,Lapras,Hydro Pump,extra_damage_if_extra_energy_attached,water,3|70,If this Pokémon has at least 3 extra {W} Energy attached this attack does 70 more damage.,20.0,20+
+A1,80,Vaporeon,Bubble Drain,heal_self,30,,Heal 30 damage from this Pokémon.,60.0,60
+A1,82,Omastar,Ancient Whirlpool,inflict_effect,attack_lock,,During your opponent's next turn the Defending Pokémon can't attack.,70.0,70
+A1,83,Articuno,Ice Beam,flip_inflict_status_if_heads,paralysis,,Flip a coin. If heads your opponent's Active Pokémon is now Paralyzed.,60.0,60
+A1,84,Articuno ex,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80.0,80
+A1,91,Bruxish,Second Strike,bonus_damage_if_opponent_damaged,60,,If your opponent's Active Pokémon has damage on it this attack does 60 more damage.,10.0,10+
+A1,93,Frosmoth,Powder Snow,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,40.0,40
+A1,95,Raichu,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,140.0,140
+A1,96,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30.0,30×
+A1,101,Electabuzz,Thunder Punch,flip_bonus_damage_with_self_damage,40,20,Flip a coin. If heads this attack does 40 more damage. If tails this Pokémon also does 20 damage to itself.,40.0,40+
+A1,102,Jolteon,Pin Missile,flip_multiplier,4,40,Flip 4 coins. This attack does 40 damage for each heads.,40.0,40×
+A1,103,Zapdos,Raging Thunder,bench_damage_one,self,30,This attack also does 30 damage to 1 of your Benched Pokémon.,100.0,100
+A1,104,Zapdos ex,Thundering Hurricane,flip_multiplier,4,50,Flip 4 coins. This attack does 50 damage for each heads.,50.0,50×
+A1,106,Zebstrika,Thunder Spear,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Pokémon.,0.0,
+A1,109,Eelektross,Thunder Fang,flip_inflict_status_if_heads,paralysis,,Flip a coin. If heads your opponent's Active Pokémon is now Paralyzed.,80.0,80
+A1,111,Heliolisk,Quick Attack,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40.0,40+
+A1,112,Pincurchin,Thunder Shock,flip_inflict_status_if_heads,paralysis,,Flip a coin. If heads your opponent's Active Pokémon is now Paralyzed.,40.0,40
+A1,115,Abra,Teleport,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0.0,
+A1,117,Alakazam,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60.0,60+
+A1,122,Gengar,Bother,inflict_effect,block_supporter,,Your opponent can't use any Supporter cards during their next turn.,50.0,50
+A1,126,Mr. Mime,Barrier Attack,reduce_incoming_damage_next_turn,20,,During your opponent's next turn this Pokémon takes 20 less damage from attacks.,30.0,30
+A1,127,Jynx,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,30.0,30+
+A1,128,Mewtwo,Power Blast,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,120.0,120
+A1,129,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150.0,150
+A1,136,Golurk,Double Lariat,flip_multiplier,2,100,Flip 2 coins. This attack does 100 damage for each heads.,100.0,100×
+A1,140,Dugtrio,Dig,flip_inflict_effect_if_heads,prevent_damage_next_turn,,Flip a coin. If heads during your opponent's next turn prevent all damage and effects done to this Pokémon.,40.0,40
+A1,142,Primeape,Fight Back,bonus_damage_if_self_damaged,60,,If this Pokémon has damage on it this attack does 60 more damage.,40.0,40+
+A1,149,Golem,Double-Edge,self_damage_fixed_amount,50,,This Pokémon also does 50 damage to itself.,150.0,150
+A1,151,Cubone,Growl,inflict_effect,reduce_damage_next_turn,20,During your opponent's next turn attacks used by the Defending Pokémon do −20 damage.,0.0,
+A1,153,Marowak ex,Bonemerang,flip_multiplier,2,80,Flip 2 coins. This attack does 80 damage for each heads.,80.0,80×
+A1,154,Hitmonlee,Stretch Kick,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Pokémon.,0.0,
+A1,159,Kabutops,Leech Life,heal_equal_to_damage_done,,,Heal from this Pokémon the same amount of damage you did to your opponent's Active Pokémon.,50.0,50
+A1,163,Grapploct,Knock Back,force_opponent_switch,,,Switch out your opponent's Active Pokémon to the Bench.,70.0,70
+A1,165,Arbok,Corner,inflict_effect,retreat_lock,,During your opponent's next turn the Defending Pokémon can't retreat.,60.0,60
+A1,166,Nidoran♀,Call for Family,search_specific_into_bench,Nidoran♂,,Put 1 random Nidoran♂ from your deck onto your Bench.,0.0,
+A1,168,Nidoqueen,Lovestrike,bonus_damage_for_each_named_bench,Nidoking,50,This attack does 50 more damage for each of your Benched Nidoking.,80.0,80+
+A1,171,Nidoking,Poison Horn,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,90.0,90
+A1,174,Grimer,Poison Gas,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,10.0,10
+A1,175,Muk,Venoshock,bonus_damage_if_opponent_poisoned,50,,If your opponent's Active Pokémon is Poisoned this attack does 50 more damage.,70.0,70+
+A1,178,Mawile,Crunch,flip_discard_random_from_opponent,1,,Flip a coin. If heads discard a random Energy from your opponent's Active Pokémon.,20.0,20
+A1,181,Meltan,Amass,attach_energy_from_zone,metal,self,Take 1 {M} Energy from your Energy Zone and attach it to this Pokémon.,0.0,
+A1,185,Dragonite,Draco Meteor,random_multi_target_damage,4,50,1 of your opponent's Pokémon is chosen at random 4 times. For each time do 50 damage.,0.0,
+A1,192,Fearow,Drill Run,flip_discard_random_from_opponent,1,,Flip a coin. If heads discard a random Energy from your opponent's Active Pokémon.,50.0,50
+A1,195,Wigglytuff ex,Sleepy Song,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80.0,80
+A1,196,Meowth,Pay Day,draw_cards,1,,Draw a card.,10.0,10
+A1,197,Persian,Shadow Claw,flip_discard_random_from_opponent_hand,1,,Flip a coin. If heads discard a random card from your opponent's hand.,40.0,40
+A1,201,Lickitung,Continuous Lick,flip_until_tails_multiplier,60,,Flip a coin until you get tails. This attack does 60 damage for each heads.,60.0,60×
+A1,203,Kangaskhan,Dizzy Punch,flip_multiplier,2,30,Flip 2 coins. This attack does 30 damage for each heads.,30.0,30×
+A1,205,Ditto,Copy Anything,copy_opponent_attack,,,Choose 1 of your opponent's Pokémon's attacks and use it.,0.0,
+A1,210,Aerodactyl,Primal Wingbeat,flip_force_shuffle_opponent_pokemon_into_deck,,,Flip a coin. If heads your opponent shuffles their Active Pokémon into their deck.,0.0,
+A1,213,Cinccino,Do the Wave,bonus_damage_for_each_bench,30,,This attack does 30 damage for each of your Benched Pokémon.,30.0,30×
+A1,229,Pinsir,Double Horn,flip_multiplier,2,50,Flip 2 coins. This attack does 50 damage for each heads.,50.0,50×
+A1,230,Charmander,Ember,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,30.0,30
+A1,233,Gyarados,Hyper Beam,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,100.0,100
+A1,234,Lapras,Hydro Pump,extra_damage_if_extra_energy_attached,water,3|70,If this Pokémon has at least 3 extra {W} Energy attached this attack does 70 more damage.,20.0,20+
+A1,236,Alakazam,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60.0,60+
+A1,239,Cubone,Growl,inflict_effect,reduce_damage_next_turn,20,During your opponent's next turn attacks used by the Defending Pokémon do −20 damage.,0.0,
+A1,240,Nidoqueen,Lovestrike,bonus_damage_for_each_named_bench,Nidoking,50,This attack does 50 more damage for each of your Benched Nidoking.,80.0,80+
+A1,241,Nidoking,Poison Horn,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,90.0,90
+A1,244,Dragonite,Draco Meteor,random_multi_target_damage,4,50,1 of your opponent's Pokémon is chosen at random 4 times. For each time do 50 damage.,0.0,
+A1,246,Meowth,Pay Day,draw_cards,1,,Draw a card.,10.0,10
+A1,247,Ditto,Copy Anything,copy_opponent_attack,,,Choose 1 of your opponent's Pokémon's attacks and use it.,0.0,
+A1,251,Venusaur ex,Giant Bloom,heal_self,30,,Heal 30 damage from this Pokémon.,100.0,100
+A1,252,Exeggutor ex,Tropical Swing,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40.0,40+
+A1,253,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200.0,200
+A1,254,Arcanine ex,Inferno Onrush,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,120.0,120
+A1,255,Moltres ex,Inferno Dance,attach_energy_from_zone,fire,count_heads,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,0.0,
+A1,256,Blastoise ex,Hydro Bazooka,extra_damage_if_extra_energy_attached,water,2|60,If this Pokémon has at least 2 extra {W} Energy attached this attack does 60 more damage.,100.0,100+
+A1,258,Articuno ex,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80.0,80
+A1,259,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30.0,30×
+A1,260,Zapdos ex,Raging Thunder,bench_damage_one,self,30,This attack also does 30 damage to 1 of your Benched Pokémon.,100.0,100
+A1,262,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150.0,150
+A1,264,Marowak ex,Bonemerang,flip_multiplier,2,80,Flip 2 coins. This attack does 80 damage for each heads.,80.0,80×
+A1,265,Wigglytuff ex,Sleepy Song,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80.0,80
+A1,274,Moltres ex,Inferno Dance,attach_energy_from_zone,fire,count_heads,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,0.0,
+A1,275,Articuno ex,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80.0,80
+A1,276,Zapdos ex,Thundering Hurricane,flip_multiplier,4,50,Flip 4 coins. This attack does 50 damage for each heads.,50.0,50×
+A1,279,Wigglytuff ex,Sleepy Song,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,80.0,80
+A1,280,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200.0,200
+A1,281,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30.0,30×
+A1,282,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150.0,150
+A1,283,Mew,Psy Report,reveal_opponent_hand,,,Your opponent reveals their hand.,20.0,20
+A1,284,Charizard ex,Crimson Storm,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,200.0,200
+A1,285,Pikachu ex,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,30,This attack does 30 damage for each of your Benched {L} Pokémon.,30.0,30×
+A1,286,Mewtwo ex,Psydrive,discard_energy_specific,psychic,2,Discard 2 {P} Energy from this Pokémon.,150.0,150
+A1a,1,Exeggcute,Growth Spurt,attach_energy_from_zone,grass,self,Take a {G} Energy from your Energy Zone and attach it to this Pokémon.,0.0,
+A1a,2,Exeggutor,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,40.0,40+
+A1a,3,Celebi ex,Powerful Bloom,flip_multiplier_energy_count,50,,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50.0,50×
+A1a,8,Shiinotic,Flickering Spores,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,50.0,50
+A1a,9,Dhelmise,Energy Whip,extra_damage_if_extra_energy_attached,grass,3|70,"""If this Pokémon has at least 3 extra {G} Energy attached, this attack does 70 more damage.""",30.0,30+
+A1a,10,Ponyta,Stomp,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",30.0,30+
+A1a,11,Rapidash,Rising Lunge,flip_bonus_damage_if_heads,1,60,"""Flip a coin. If heads, this attack does 60 more damage.""",60.0,60+
+A1a,12,Magmar,Fire Blast,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,100.0,100
+A1a,14,Volcarona,Volcanic Ash,discard_energy_then_bench_damage,fire|2,opponent|80,Discard 2 {R} Energy from this Pokémon. This attack does 80 damage to 1 of your opponent's Pokémon.,0.0,
+A1a,15,Salandit,Venoshock,bonus_damage_if_opponent_poisoned,40,,"""If your opponent's Active Pokémon is Poisoned, this attack does 40 more damage.""",20.0,20+
+A1a,16,Salazzle,Poison Claws,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,80.0,80
+A1a,17,Magikarp,Leap Out,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0.0,
+A1a,18,Gyarados ex,Rampaging Whirlpool,discard_random_energy_all_pokemon,1,,Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's).,140.0,140
+A1a,21,Lumineon,Aqua Liner,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Benched Pokémon.,0.0,
+A1a,23,Drednaw,Crunch,flip_discard_random_from_opponent,1,,"""Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon.""",80.0,80
+A1a,24,Cramorant,Dive,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",40.0,40
+A1a,25,Pikachu,Circle Circuit,bonus_damage_for_each_typed_bench,lightning,10,This attack does 10 damage for each of your Benched {L} Pokémon.,10.0,10×
+A1a,26,Raichu,Gigashock,bench_damage_all_opponent,20,,This attack also does 20 damage to each of your opponent's Benched Pokémon.,100.0,100
+A1a,27,Electabuzz,Thunder Spear,bench_damage_one,opponent,40,This attack does 40 damage to 1 of your opponent's Pokémon.,0.0,
+A1a,29,Galvantula,Electroweb,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",70.0,70
+A1a,30,Dedenne,Thunder Shock,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20.0,20
+A1a,31,Mew,Psy Report,reveal_opponent_hand,,,Your opponent reveals their hand.,20.0,20
+A1a,32,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0.0,
+A1a,33,Sigilyph,Spike Draw,draw_cards,1,,Draw a card.,60.0,60
+A1a,35,Beheeyem,Mind Jack,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,30.0,30+
+A1a,36,Flabébé,Hypnotic Gaze,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,10.0,10
+A1a,37,Floette,Leaf Drain,heal_self,10,,Heal 10 damage from this Pokémon.,30.0,30
+A1a,38,Florges,Bloomshine,heal_all,20,,Heal 20 damage from each of your Pokémon.,80.0,80
+A1a,41,Mankey,Focus Fist,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",50.0,50
+A1a,45,Golem,Guard Press,reduce_incoming_damage_next_turn,30,,"""During your opponent's next turn, this Pokémon takes −30 damage from attacks.""",100.0,100
+A1a,47,Marshadow,Revenge,bonus_damage_if_pokemon_ko_last_turn,60,,"""If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 60 more damage.""",30.0,30+
+A1a,49,Koffing,Division,search_specific_into_bench,Koffing,,Put 1 random Koffing from your deck onto your Bench.,0.0,
+A1a,50,Weezing,Smokescreen,inflict_effect,flip_to_attack,,"""During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen.""",80.0,80
+A1a,54,Whirlipede,Poison Sting,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,40.0,40
+A1a,55,Scolipede,Venoshock,bonus_damage_if_opponent_poisoned,50,,"""If your opponent's Active Pokémon is Poisoned, this attack does 50 more damage.""",90.0,90+
+A1a,59,Pidgeot ex,Scattering Cyclone,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,80.0,80+
+A1a,60,Tauros,Fighting Tackle,bonus_damage_if_opponent_ex,80,,"""If your opponent's Active Pokémon is a Pokémon {ex}, this attack does 80 more damage.""",60.0,60+
+A1a,61,Eevee,Continuous Steps,flip_until_tails_multiplier,20,,Flip a coin until you get tails. This attack does 20 damage for each heads.,20.0,20×
+A1a,62,Chatot,Mimic,shuffle_hand_draw_match_opponent,,,Shuffle your hand into your deck. Draw a card for each card in your opponent's hand.,0.0,
+A1a,69,Exeggutor,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,40.0,40+
+A1a,71,Salandit,Venoshock,bonus_damage_if_opponent_poisoned,40,,"""If your opponent's Active Pokémon is Poisoned, this attack does 40 more damage.""",20.0,20+
+A1a,73,Dedenne,Thunder Shock,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20.0,20
+A1a,74,Marshadow,Revenge,bonus_damage_if_pokemon_ko_last_turn,60,,"""If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 60 more damage.""",30.0,30+
+A1a,75,Celebi ex,Powerful Bloom,flip_multiplier_energy_count,50,,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50.0,50×
+A1a,76,Gyarados ex,Rampaging Whirlpool,discard_random_energy_all_pokemon,1,,Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's).,140.0,140
+A1a,77,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0.0,
+A1a,79,Pidgeot ex,Scattering Cyclone,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,80.0,80+
+A1a,83,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0.0,
+A1a,85,Celebi ex,Powerful Bloom,flip_multiplier_energy_count,50,,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50.0,50×
+A1a,86,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,0.0,
 A2,1,Oddish,Blot,heal_self,10,,Heal 10 damage from this Pokémon.,10.0,10
 A2,5,Tangrowth,Mega Drain,heal_self,30,,Heal 30 damage from this Pokémon.,90.0,90
 A2,7,Yanmega ex,Air Slash,discard_random_energy_self,1,,Discard a random Energy from this Pokémon.,120.0,120
@@ -277,339 +277,694 @@ A2,204,Palkia ex,Dimensional Storm,discard_energy_and_bench_damage,water,3|20,Di
 A2,205,Dialga ex,Metallic Turbo,attach_multiple_energy_to_bench_one,metal,2,Take 2 {M} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,30.0,30
 A2,206,Palkia ex,Dimensional Storm,discard_energy_and_bench_damage,water,3|20,Discard 3 {W} Energy from this Pokémon. This attack also does 20 damage to each of your opponent's Benched Pokémon.,150.0,150
 A2,207,Dialga ex,Metallic Turbo,attach_multiple_energy_to_bench_one,metal,2,Take 2 {M} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,30.0,30
-A2a,001,Heracross,Single-Horn Throw,flip_bonus_if_double_heads,,70,"""Flip 2 coins. If both of them are heads, this attack does 70 more damage.""",50,50+
-A2a,005,Vespiquen,Reckless Charge,self_damage_fixed_amount,30,,This Pokémon also does 30 damage to itself.,120,120
-A2a,007,Cherrim,Worry Seed,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,40,40
-A2a,008,Cherrim,Leech Seed,heal_self,20,,Heal 20 damage from this Pokémon.,60,60
-A2a,012,Houndoom,Corner,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",60,60
-A2a,013,Heatran,Ragin' Mad Strike,bonus_damage_if_self_damaged,40,,"""If this Pokémon has damage on it, this attack does 40 more damage.""",40,40+
-A2a,017,Whiscash,Thrash,flip_bonus_damage_with_self_damage,60,20,"""Flip a coin. If heads, this attack does 60 more damage. If tails, this Pokémon also does 20 damage to itself.""",80,80+
-A2a,019,Froslass,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,40,40
-A2a,023,Origin Forme Palkia,Zone Smash,flip_bonus_damage_if_heads,1,60,"""Flip a coin. If heads, this attack does 60 more damage.""",60,60+
-A2a,024,Phione,Water Pulse,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,40,40
-A2a,025,Pikachu,Spark,bench_damage_one,opponent,10,This attack also does 10 damage to 1 of your opponent's Benched Pokémon.,10,10
-A2a,026,Raichu,Spark,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,40,40
-A2a,028,Manectric,Flash,inflict_effect,attack_lock_flip,,"""During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen.""",40,40
-A2a,030,Clefable,Moonblast,inflict_effect,reduce_damage_next_turn,30,"""During your opponent's next turn, attacks used by the Defending Pokémon do −30 damage.""",60,60
-A2a,031,Gastly,Astonish,flip_reveal_shuffle_opponent_card,,,"""Flip a coin. If heads, your opponent reveals a random card from their hand and shuffles it into their deck.""",,
-A2a,033,Gengar,Hypnoblast,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,70,70
-A2a,035,Rotom,Dash Attack,bench_damage_one,opponent,20,This attack does 20 damage to 1 of your opponent's Benched Pokémon.,,
-A2a,036,Sudowoodo,Fighting Headbutt,bonus_damage_if_opponent_ex,30,,"""If your opponent's Active Pokémon is a Pokémon {ex}, this attack does 30 more damage.""",20,20
-A2a,038,Donphan,Rolling Spin,increase_self_damage_next_turn,Rolling Spin,60,"""During your next turn, this Pokémon's Rolling Spin attack does +60 damage.""",60,60
-A2a,044,Medicham,Kick Shot,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",80,80
-A2a,047,Garchomp ex,Linear Attack,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
-A2a,052,Toxicroak,Toxic,inflict_status_heavy,poison,20,Your opponent's Active Pokémon is now Poisoned. Do 20 damage to this Pokémon instead of the usual amount for this Special Condition.,,
-A2a,056,Mawile,Iron Beam Breaker,bonus_damage_if_opponent_type,metal,30,"""If your opponent's Active Pokémon is a {M} Pokémon, this attack does 30 more damage.""",20,20+
-A2a,057,Probopass ex,Defensive Unit,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",90,90
-A2a,059,Bronzong,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,50,50+
-A2a,060,Origin Forme Dialga,Time Mash,flip_inflict_effect_self_if_tails,attack_lock_self,,"""Flip a coin. If tails, during your next turn, this Pokémon can't attack.""",100,100
-A2a,061,Giratina,Crisis Dive,discard_random_energy_self,2,,Discard 2 random Energy from this Pokémon.,120,120
-A2a,063,Snorlax,Collapse,inflict_status_self,asleep,,This Pokémon is now Asleep.,100,100
-A2a,065,Noctowl,Silent Wing,reveal_opponent_hand,,,Your opponent reveals their hand.,50,50
-A2a,068,Staraptor,Brave Bird,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130,130
-A2a,070,Arceus,Power Blast,discard_random_energy_self,1,,Discard a random Energy from this Pokémon.,100,100
-A2a,071,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70,70+
-A2a,076,Houndoom,Corner,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",60,60
-A2a,079,Sudowoodo,Fighting Headbutt,bonus_damage_if_opponent_ex,30,,"""If your opponent's Active Pokémon is a Pokémon ex, this attack does 30 more damage.""",20,20
-A2a,084,Garchomp ex,Linear Attack,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
-A2a,085,Probopass ex,Defensive Unit,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",90,90
-A2a,086,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70,70+
-A2a,093,Garchomp ex,Linear Attack,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
-A2a,094,Probopass ex,Defensive Unit,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",90,90
-A2a,095,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70,70+
-A2a,096,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70,70+
-A2b,001,Weedle,Multiply,search_specific_into_bench,Weedle,,Put 1 random Weedle from your deck onto your Bench.,,
-A2b,002,Kakuna,String Shot,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20,20
-A2b,003,Beedrill ex,Crushing Spear,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,80,80
-A2b,004,Pinsir,Guillotine Rush,flip_until_tails_bonus_damage,40,,Flip a coin until you get tails. This attack does 40 more damage for each heads.,50,50+
-A2b,005,Sprigatito,Cry for Help,search_pokemon_type_random,grass,,Put 1 random {G} Pokémon from your deck into your hand.,,
-A2b,007,Meowscarada,Fighting Claws,bonus_damage_if_opponent_ex,70,,"""If your opponent's Active Pokémon is a Pokémon ex, this attack does 70 more damage.""",60,60+
-A2b,010,Charizard ex,Stoke,attach_multiple_energy_from_zone_self,fire,3,Take 3 {R} Energy from your Energy Zone and attach it to this Pokémon.,,
-A2b,012,Magmortar,Smoke Bomb,inflict_effect,attack_lock_flip,,"""During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen.""",70,70
-A2b,013,Paldean Tauros,Blaze Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,80,80
-A2b,017,Floatzel,Water Arrow,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Pokémon.,,
-A2b,018,Wiglett,Spring Out,random_single_target_damage,30,,1 of your opponent's Pokémon is chosen at random. Do 30 damage to it.,,
-A2b,019,Wugtrio ex,Pop Out Throughout,random_multi_target_damage,3,50,"""1 of your opponent's Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, do 50 damage to it.""",,
-A2b,020,Dondozo,Ocean Cyclone,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80,80
-A2b,022,Pikachu ex,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,150,150
-A2b,024,Electrode,Tumbling Attack,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",50,50+
-A2b,025,Pachirisu,Plasma,attach_energy_from_zone,lightning,to_bench,Take a {L} Energy from your Energy Zone and attach it to 1 of your Benched  Pokémon.,10,10
-A2b,031,Alakazam,Psychic Suppression,bench_damage_opponent_with_energy,20,,This attack also does 20 damage to each of your opponent's Benched Pokémon that has any Energy attached.,80,80
-A2b,032,Mr. Mime,Juggling,flip_multiplier,4,20,Flip 4 coins. This attack does 20 damage for each heads.,20,20x
-A2b,035,Giratina ex,Chaotic Impact,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130,130
-A2b,036,Gimmighoul,Chest-ouflage,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",,
-A2b,038,Machoke,Pummel,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",30,30+
-A2b,039,Machamp,Power Press,extra_damage_if_extra_energy_attached,fighting,2|50,"""If this Pokémon has at least 2 extra {F} Energy attached, this attack does 50 more damage.""",70,70+
-A2b,043,Lucario ex,Aura Sphere,bench_damage_one,opponent,30,This attack also does 30 damage to 1 of your opponent's Benched Pokémon.,100,100
-A2b,044,Flamigo,Double Kick,flip_multiplier,2,50,Flip 2 coins. This attack does 50 damage for each heads.,50,50x
-A2b,046,Arbok,Venomous Fang,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,70,70
-A2b,047,Paldean Wooper,Poison Jab,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,10,10
-A2b,048,Paldean Clodsire ex,Venoshock,bonus_damage_if_opponent_poisoned,60,,"""If your opponent's Active Pokémon is Poisoned, this attack does 60 more damage.""",60,60+
-A2b,049,Spiritomb,Confuse Ray,flip_inflict_status_if_heads,confused,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Confused.""",20,20
-A2b,053,Tinkatuff,Tenacious Hammer,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",30,30+
-A2b,054,Tinkaton ex,Terrific Thumping,flip_bonus_damage_if_heads,1,80,"""Flip a coin. If heads, this attack does 80 more damage.""",80,80+
-A2b,056,Revavroom,Spinning Drift,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",70,70
-A2b,057,Gholdengo,Scintillating Surfing,flip_multiplier_per_energy,metal,50,Flip a coin for each {M} Energy attached to this Pokémon. This attack does 50 damage for each heads.,50,50x
-A2b,065,Bibarel ex,Carefree Press,heal_self,30,,Heal 30 damage from this Pokémon.,100,100
-A2b,068,Cyclizar,Overacceleration,increase_self_damage_next_turn,Overacceleration,20,"""During your next turn, this Pokémon's Overacceleration attack does +20 damage.""",20,20
-A2b,073,Meowscarada,Fighting Claws,bonus_damage_if_opponent_ex,70,,"""If your opponent's Active Pokémon is a Pokémon ex, this attack does 70 more damage.""",60,60+
-A2b,077,Gholdengo,Scintillating Surfing,flip_multiplier_per_energy,metal,50,Flip a coin for each {M} Energy attached to this Pokémon. This attack does 50 damage for each heads.,50,50x
-A2b,079,Beedrill ex,Crushing Spear,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,80,80
-A2b,080,Charizard ex,Stoke,attach_multiple_energy_from_zone_self,fire,3,Take 3 {R} Energy from your Energy Zone and attach it to this Pokémon.,,
-A2b,081,Wugtrio ex,Pop Out Throughout,random_multi_target_damage,3,50,"""1 of your opponent's Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, do 50 damage to it.""",,
-A2b,082,Pikachu ex,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,150,150
-A2b,083,Giratina ex,Chaotic Impact,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130,130
-A2b,084,Lucario ex,Aura Sphere,bench_damage_one,opponent,30,This attack also does 30 damage to 1 of your opponent's Benched Pokémon.,100,100
-A2b,085,Paldean Clodsire ex,Venoshock,bonus_damage_if_opponent_poisoned,60,,"""If your opponent's Active Pokémon is Poisoned, this attack does 60 more damage.""",60,60
-A2b,086,Tinkaton ex,Terrific Thumping,flip_bonus_damage_if_heads,1,80,"""Flip a coin. If heads, this attack does 80 more damage.""",80,80+
-A2b,087,Bibarel ex,Carefree Press,heal_self,30,,Heal 30 damage from this Pokémon.,100,100
-A2b,092,Pikachu ex,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,150,150
-A2b,093,Paldean Clodsire ex,Venoshock,bonus_damage_if_opponent_poisoned,60,,"""If your opponent's Active Pokémon is Poisoned, this attack does 60 more damage.""",60,60
-A2b,094,Tinkaton ex,Terrific Thumping,flip_bonus_damage_if_heads,1,80,"""Flip a coin. If heads, this attack does 80 more damage.""",80,80+
-A2b,095,Bibarel ex,Carefree Press,heal_self,30,,Heal 30 damage from this Pokémon.,100,100
-A2b,096,Giratina ex,Chaotic Impact,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130,130
-A2b,097,Weedle,Multiply,search_specific_into_bench,Weedle,,Put 1 random Weedle from your deck onto your Bench.,,
-A2b,098,Kakuna,String Shot,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20,20
+A2a,1,Heracross,Single-Horn Throw,flip_bonus_if_double_heads,,70,"""Flip 2 coins. If both of them are heads, this attack does 70 more damage.""",50.0,50+
+A2a,5,Vespiquen,Reckless Charge,self_damage_fixed_amount,30,,This Pokémon also does 30 damage to itself.,120.0,120
+A2a,7,Cherrim,Worry Seed,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,40.0,40
+A2a,8,Cherrim,Leech Seed,heal_self,20,,Heal 20 damage from this Pokémon.,60.0,60
+A2a,12,Houndoom,Corner,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",60.0,60
+A2a,13,Heatran,Ragin' Mad Strike,bonus_damage_if_self_damaged,40,,"""If this Pokémon has damage on it, this attack does 40 more damage.""",40.0,40+
+A2a,17,Whiscash,Thrash,flip_bonus_damage_with_self_damage,60,20,"""Flip a coin. If heads, this attack does 60 more damage. If tails, this Pokémon also does 20 damage to itself.""",80.0,80+
+A2a,19,Froslass,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,40.0,40
+A2a,23,Origin Forme Palkia,Zone Smash,flip_bonus_damage_if_heads,1,60,"""Flip a coin. If heads, this attack does 60 more damage.""",60.0,60+
+A2a,24,Phione,Water Pulse,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,40.0,40
+A2a,25,Pikachu,Spark,bench_damage_one,opponent,10,This attack also does 10 damage to 1 of your opponent's Benched Pokémon.,10.0,10
+A2a,26,Raichu,Spark,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,40.0,40
+A2a,28,Manectric,Flash,inflict_effect,attack_lock_flip,,"""During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen.""",40.0,40
+A2a,30,Clefable,Moonblast,inflict_effect,reduce_damage_next_turn,30,"""During your opponent's next turn, attacks used by the Defending Pokémon do −30 damage.""",60.0,60
+A2a,31,Gastly,Astonish,flip_reveal_shuffle_opponent_card,,,"""Flip a coin. If heads, your opponent reveals a random card from their hand and shuffles it into their deck.""",,
+A2a,33,Gengar,Hypnoblast,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,70.0,70
+A2a,35,Rotom,Dash Attack,bench_damage_one,opponent,20,This attack does 20 damage to 1 of your opponent's Benched Pokémon.,,
+A2a,36,Sudowoodo,Fighting Headbutt,bonus_damage_if_opponent_ex,30,,"""If your opponent's Active Pokémon is a Pokémon {ex}, this attack does 30 more damage.""",20.0,20
+A2a,38,Donphan,Rolling Spin,increase_self_damage_next_turn,Rolling Spin,60,"""During your next turn, this Pokémon's Rolling Spin attack does +60 damage.""",60.0,60
+A2a,44,Medicham,Kick Shot,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",80.0,80
+A2a,47,Garchomp ex,Linear Attack,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+A2a,52,Toxicroak,Toxic,inflict_status_heavy,poison,20,Your opponent's Active Pokémon is now Poisoned. Do 20 damage to this Pokémon instead of the usual amount for this Special Condition.,,
+A2a,56,Mawile,Iron Beam Breaker,bonus_damage_if_opponent_type,metal,30,"""If your opponent's Active Pokémon is a {M} Pokémon, this attack does 30 more damage.""",20.0,20+
+A2a,57,Probopass ex,Defensive Unit,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",90.0,90
+A2a,59,Bronzong,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,50.0,50+
+A2a,60,Origin Forme Dialga,Time Mash,flip_inflict_effect_self_if_tails,attack_lock_self,,"""Flip a coin. If tails, during your next turn, this Pokémon can't attack.""",100.0,100
+A2a,61,Giratina,Crisis Dive,discard_random_energy_self,2,,Discard 2 random Energy from this Pokémon.,120.0,120
+A2a,63,Snorlax,Collapse,inflict_status_self,asleep,,This Pokémon is now Asleep.,100.0,100
+A2a,65,Noctowl,Silent Wing,reveal_opponent_hand,,,Your opponent reveals their hand.,50.0,50
+A2a,68,Staraptor,Brave Bird,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130.0,130
+A2a,70,Arceus,Power Blast,discard_random_energy_self,1,,Discard a random Energy from this Pokémon.,100.0,100
+A2a,71,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70.0,70+
+A2a,76,Houndoom,Corner,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",60.0,60
+A2a,79,Sudowoodo,Fighting Headbutt,bonus_damage_if_opponent_ex,30,,"""If your opponent's Active Pokémon is a Pokémon ex, this attack does 30 more damage.""",20.0,20
+A2a,84,Garchomp ex,Linear Attack,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+A2a,85,Probopass ex,Defensive Unit,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",90.0,90
+A2a,86,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70.0,70+
+A2a,93,Garchomp ex,Linear Attack,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+A2a,94,Probopass ex,Defensive Unit,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",90.0,90
+A2a,95,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70.0,70+
+A2a,96,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,This attack does 20 more damage for each of your Benched Pokémon.,70.0,70+
+A2b,1,Weedle,Multiply,search_specific_into_bench,Weedle,,Put 1 random Weedle from your deck onto your Bench.,,
+A2b,2,Kakuna,String Shot,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20.0,20
+A2b,3,Beedrill ex,Crushing Spear,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,80.0,80
+A2b,4,Pinsir,Guillotine Rush,flip_until_tails_bonus_damage,40,,Flip a coin until you get tails. This attack does 40 more damage for each heads.,50.0,50+
+A2b,5,Sprigatito,Cry for Help,search_pokemon_type_random,grass,,Put 1 random {G} Pokémon from your deck into your hand.,,
+A2b,7,Meowscarada,Fighting Claws,bonus_damage_if_opponent_ex,70,,"""If your opponent's Active Pokémon is a Pokémon ex, this attack does 70 more damage.""",60.0,60+
+A2b,10,Charizard ex,Stoke,attach_multiple_energy_from_zone_self,fire,3,Take 3 {R} Energy from your Energy Zone and attach it to this Pokémon.,,
+A2b,12,Magmortar,Smoke Bomb,inflict_effect,attack_lock_flip,,"""During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen.""",70.0,70
+A2b,13,Paldean Tauros,Blaze Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,80.0,80
+A2b,17,Floatzel,Water Arrow,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Pokémon.,,
+A2b,18,Wiglett,Spring Out,random_single_target_damage,30,,1 of your opponent's Pokémon is chosen at random. Do 30 damage to it.,,
+A2b,19,Wugtrio ex,Pop Out Throughout,random_multi_target_damage,3,50,"""1 of your opponent's Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, do 50 damage to it.""",,
+A2b,20,Dondozo,Ocean Cyclone,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80.0,80
+A2b,22,Pikachu ex,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,150.0,150
+A2b,24,Electrode,Tumbling Attack,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",50.0,50+
+A2b,25,Pachirisu,Plasma,attach_energy_from_zone,lightning,to_bench,Take a {L} Energy from your Energy Zone and attach it to 1 of your Benched  Pokémon.,10.0,10
+A2b,31,Alakazam,Psychic Suppression,bench_damage_opponent_with_energy,20,,This attack also does 20 damage to each of your opponent's Benched Pokémon that has any Energy attached.,80.0,80
+A2b,32,Mr. Mime,Juggling,flip_multiplier,4,20,Flip 4 coins. This attack does 20 damage for each heads.,20.0,20x
+A2b,35,Giratina ex,Chaotic Impact,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130.0,130
+A2b,36,Gimmighoul,Chest-ouflage,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",,
+A2b,38,Machoke,Pummel,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",30.0,30+
+A2b,39,Machamp,Power Press,extra_damage_if_extra_energy_attached,fighting,2|50,"""If this Pokémon has at least 2 extra {F} Energy attached, this attack does 50 more damage.""",70.0,70+
+A2b,43,Lucario ex,Aura Sphere,bench_damage_one,opponent,30,This attack also does 30 damage to 1 of your opponent's Benched Pokémon.,100.0,100
+A2b,44,Flamigo,Double Kick,flip_multiplier,2,50,Flip 2 coins. This attack does 50 damage for each heads.,50.0,50x
+A2b,46,Arbok,Venomous Fang,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,70.0,70
+A2b,47,Paldean Wooper,Poison Jab,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,10.0,10
+A2b,48,Paldean Clodsire ex,Venoshock,bonus_damage_if_opponent_poisoned,60,,"""If your opponent's Active Pokémon is Poisoned, this attack does 60 more damage.""",60.0,60+
+A2b,49,Spiritomb,Confuse Ray,flip_inflict_status_if_heads,confused,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Confused.""",20.0,20
+A2b,53,Tinkatuff,Tenacious Hammer,flip_bonus_damage_if_heads,1,30,"""Flip a coin. If heads, this attack does 30 more damage.""",30.0,30+
+A2b,54,Tinkaton ex,Terrific Thumping,flip_bonus_damage_if_heads,1,80,"""Flip a coin. If heads, this attack does 80 more damage.""",80.0,80+
+A2b,56,Revavroom,Spinning Drift,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",70.0,70
+A2b,57,Gholdengo,Scintillating Surfing,flip_multiplier_per_energy,metal,50,Flip a coin for each {M} Energy attached to this Pokémon. This attack does 50 damage for each heads.,50.0,50x
+A2b,65,Bibarel ex,Carefree Press,heal_self,30,,Heal 30 damage from this Pokémon.,100.0,100
+A2b,68,Cyclizar,Overacceleration,increase_self_damage_next_turn,Overacceleration,20,"""During your next turn, this Pokémon's Overacceleration attack does +20 damage.""",20.0,20
+A2b,73,Meowscarada,Fighting Claws,bonus_damage_if_opponent_ex,70,,"""If your opponent's Active Pokémon is a Pokémon ex, this attack does 70 more damage.""",60.0,60+
+A2b,77,Gholdengo,Scintillating Surfing,flip_multiplier_per_energy,metal,50,Flip a coin for each {M} Energy attached to this Pokémon. This attack does 50 damage for each heads.,50.0,50x
+A2b,79,Beedrill ex,Crushing Spear,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,80.0,80
+A2b,80,Charizard ex,Stoke,attach_multiple_energy_from_zone_self,fire,3,Take 3 {R} Energy from your Energy Zone and attach it to this Pokémon.,,
+A2b,81,Wugtrio ex,Pop Out Throughout,random_multi_target_damage,3,50,"""1 of your opponent's Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, do 50 damage to it.""",,
+A2b,82,Pikachu ex,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,150.0,150
+A2b,83,Giratina ex,Chaotic Impact,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130.0,130
+A2b,84,Lucario ex,Aura Sphere,bench_damage_one,opponent,30,This attack also does 30 damage to 1 of your opponent's Benched Pokémon.,100.0,100
+A2b,85,Paldean Clodsire ex,Venoshock,bonus_damage_if_opponent_poisoned,60,,"""If your opponent's Active Pokémon is Poisoned, this attack does 60 more damage.""",60.0,60
+A2b,86,Tinkaton ex,Terrific Thumping,flip_bonus_damage_if_heads,1,80,"""Flip a coin. If heads, this attack does 80 more damage.""",80.0,80+
+A2b,87,Bibarel ex,Carefree Press,heal_self,30,,Heal 30 damage from this Pokémon.,100.0,100
+A2b,92,Pikachu ex,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,150.0,150
+A2b,93,Paldean Clodsire ex,Venoshock,bonus_damage_if_opponent_poisoned,60,,"""If your opponent's Active Pokémon is Poisoned, this attack does 60 more damage.""",60.0,60
+A2b,94,Tinkaton ex,Terrific Thumping,flip_bonus_damage_if_heads,1,80,"""Flip a coin. If heads, this attack does 80 more damage.""",80.0,80+
+A2b,95,Bibarel ex,Carefree Press,heal_self,30,,Heal 30 damage from this Pokémon.,100.0,100
+A2b,96,Giratina ex,Chaotic Impact,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,130.0,130
+A2b,97,Weedle,Multiply,search_specific_into_bench,Weedle,,Put 1 random Weedle from your deck onto your Bench.,,
+A2b,98,Kakuna,String Shot,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",20.0,20
 A2b,101,Wiglett,Spring Out,random_single_target_damage,30,,1 of your opponent's Pokémon is chosen at random. Do 30 damage to it.,,
-A2b,102,Dondozo,Ocean Cyclone,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80,80
-A2b,103,Pachirisu,Plasma,attach_energy_from_zone,lightning,to_bench,Take a {L} Energy from your Energy Zone and attach it to 1 of your Benched  Pokémon.,10,10
-A2b,106,Revavroom,Spinning Drift,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",70,70
-A2b,107,Beedrill ex,Crushing Spear,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,80,80
+A2b,102,Dondozo,Ocean Cyclone,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80.0,80
+A2b,103,Pachirisu,Plasma,attach_energy_from_zone,lightning,to_bench,Take a {L} Energy from your Energy Zone and attach it to 1 of your Benched  Pokémon.,10.0,10
+A2b,106,Revavroom,Spinning Drift,flip_inflict_effect_if_heads,prevent_damage_next_turn,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",70.0,70
+A2b,107,Beedrill ex,Crushing Spear,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,80.0,80
 A2b,108,Charizard ex,Stoke,attach_multiple_energy_from_zone_self,fire,3,Take 3 {R} Energy from your Energy Zone and attach it to this Pokémon.,,
 A2b,109,Wugtrio ex,Pop Out Throughout,random_multi_target_damage,3,50,"""1 of your opponent's Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, do 50 damage to it.""",,
-A2b,110,Lucario ex,Aura Sphere,bench_damage_one,opponent,30,This attack also does 30 damage to 1 of your opponent's Benched Pokémon.,100,100
-A3,002,Alolan Exeggutor,Tropical Hammer,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,150,150
-A3,003,Surskit,Quick Attack,flip_bonus_damage_if_heads,1,20,Flip a coin. If heads this attack does 20 more damage.,10,10+
-A3,010,Rowlet,Skill Dive,bench_damage_one,opponent,10,This attack does 10 damage to 1 of your opponent's Pokémon.,0,
-A3,012,Decidueye ex,Pierce the Pain,bench_damage_to_damaged_only,100,,This attack does 100 damage to 1 of your opponent's Pokémon that have damage on them.,0,
-A3,015,Lurantis,Petal Blizzard,bench_damage_all_opponent,20,,This attack does 20 damage to each of your opponent's Pokémon.,0,
-A3,017,Shiinotic,Flickering Light,flip_inflict_effect_if_heads,attack_lock,,"""Flip a coin. If heads, the Defending Pokémon can't attack during your opponent's next turn.""",50,50
-A3,019,Steenee,Double Spin,flip_multiplier,2,30,Flip 2 coins. This attack does 30 damage for each heads.,30,30×
-A3,020,Tsareena,Three Kick Combo,flip_multiplier,3,50,Flip 3 coins. This attack does 50 damage for each heads.,50,50×
-A3,022,Golisopod,First Impression,bonus_damage_if_switched_in,60,,"""If this Pokémon moved from your Bench to the Active Spot this turn, this attack does 60 more damage.""",60,60+
-A3,023,Dhelmise ex,Anchor Shot,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",80,80
-A3,024,Tapu Bulu,Stuck-In Tackle,flip_self_damage_if_tails,20,,"""Flip a coin. If tails, this Pokémon also does 20 damage to itself.""",100,100
-A3,027,Alolan Marowak,Burning Bonemerang,flip_conditional_burn,2,70,"""Flip 2 coins. This attack does 70 damage for each heads. If at least 1 of them is heads, your opponent's Active Pokémon is now Burned.""",70,70×
-A3,030,Litten,Heat Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,30,30
-A3,032,Torracat,Heat Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,40,40
-A3,033,Incineroar ex,Fire Fang,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,30,30
-A3,033,Incineroar ex,Scar-Charged Smash,bonus_damage_if_self_damaged,60,,"""If this Pokémon has damage on it, this attack does 60 more damage.""",80,80+
-A3,034,Oricorio,Kindle,discard_random_energy_from_both,,,Discard a random Energy from both Active Pokémon.,40,40
-A3,036,Salazzle,Heated Poison,inflict_double_status,poisoned,burned,Your opponent's Active Pokémon is now Poisoned and Burned.,30,30
-A3,037,Turtonator,Fire Spin,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,90,90
-A3,039,Alolan Sandslash,Spike Armor,inflict_effect_counter_next_turn,40,,"""During your opponent's next turn, if this Pokémon is damaged by an attack, do 40 damage to the Attacking Pokémon.""",20,20
-A3,040,Alolan Vulpix,Call Forth Cold,attach_energy_from_zone_to_self,water,,Take a {W} Energy from your Energy Zone and attach it to this Pokémon.,0,
-A3,041,Alolan Ninetales,Blizzard,bench_damage_all_opponent,20,,This attack also does 20 damage to each of your opponent's Benched Pokémon.,60,60
-A3,043,Cloyster,Guard Press,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",50,50
-A3,045,Popplio,Sing,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,0,
-A3,049,Crabominable ex,Insatiable Striking,bonus_damage_during_next_turn,40,,"""During your next turn, this Pokémon's Insatiable Striking attack does +40 damage.""",40,40
-A3,050,Wishiwashi,Call for Family,search_named_to_bench,,"""Wishiwashi,Wishiwashi ex""",Put 1 random Wishiwashi or Wishiwashi ex from your deck onto your Bench.,0,
-A3,051,Wishiwashi ex,School Storm,bonus_damage_for_each_named_bench,40,"""Wishiwashi,Wishiwashi ex""",This attack does 40 more damage for each of your Benched Wishiwashi and Wishiwashi ex.,30,30+
-A3,053,Araquanid,Dangerous Claws,bonus_damage_if_opponent_basic,60,,"""If your opponent's Active Pokémon is a Basic Pokémon, this attack does 60 more damage.""",60,60+
-A3,056,Tapu Fini,Spiral Drain,heal_self,20,,Heal 20 damage from this Pokémon.,60,60
-A3,058,Alolan Raichu ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60,60+
-A3,061,Alolan Golem,Super Zap Cannon,discard_energy_specific,lightning,2,Discard 2 {L} Energy from this Pokémon.,150,150
-A3,065,Vikavolt,Disconnect,inflict_effect,block_items,,"""During your opponent's next turn, they can't play any Item cards from their hand.""",70,70
-A3,067,Togedemaru,Electrosmash,flip_bonus_damage_if_heads,1,30,Flip a coin. If heads this attack does 30 more damage.,20,20+
-A3,068,Tapu Koko,Volt Switch,switch_self_with_bench_type,lightning,,Switch this Pokémon with 1 of your Benched {L} Pokémon.,70,70
-A3,069,Mr. Mime,Barrier Shove,flip_prevent_damage_and_effects_next_turn,,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",30,30
-A3,070,Sableye,Corner,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",40,40
-A3,071,Spoink,Psycharge,attach_energy_from_zone_to_self,psychic,,Take a {P} Energy from your Energy Zone and attach it to this Pokémon.,0,
-A3,075,Banette,Night Bind,inflict_effect,block_energy_attach,,"""During your opponent's next turn, they can't take any Energy from their Energy Zone to attach to their Active Pokémon.""",30,30
-A3,076,Oricorio,Dazzle Dance,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,40,40
-A3,077,Oricorio,Spiteful Dance,bonus_damage_if_pokemon_ko_last_turn,60,,"""If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 60 more damage.""",20,20+
-A3,083,Mimikyu,Shadow Hit,bench_damage_one,self,20,This attack also does 20 damage to 1 of your Pokémon.,60,60
-A3,084,Tapu Lele,Energy Arrow,bench_damage_per_energy_on_target,20,,This attack does 20 damage to 1 of your opponent's Pokémon for each Energy attached to that Pokémon.,0,
-A3,085,Cosmog,Teleport,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0,
-A3,086,Cosmoem,Stiffen,reduce_incoming_damage_next_turn,50,,"""During your opponent's next turn, this Pokémon takes −50 damage from attacks.""",0,
-A3,088,Necrozma,Prismatic Laser,self_inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't attack.""",120,120
-A3,091,Hariyama,Push Out,force_opponent_switch,,,Switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.),50,50
-A3,098,Rockruff,Signs of Evolution,search_evolution_of_self,,,Put a random card that evolves from Rockruff from your deck into your hand.,0,
-A3,100,Lycanroc,Crunch,flip_discard_energy_if_heads,,,"""Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon.""",80,80
-A3,101,Lycanroc,Blood Fang,bonus_damage_if_opponent_has_more_hp,50,,"""If your opponent's Active Pokémon has more remaining HP than this Pokémon, this attack does 50 more damage.""",50,50+
-A3,103,Mudsdale,High Horsepower,self_damage_fixed_amount,40,,This Pokémon also does 40 damage to itself.,140,140
-A3,105,Minior,Star Drop,bench_damage_one,opponent,40,This attack does 40 damage to 1 of your opponent's Pokémon.,0,
-A3,107,Alolan Raticate,Scrounge-and-Scarf,discard_random_item_from_opponent_hand,,,Discard a random Item card from your opponent's hand.,50,50
-A3,111,Alolan Muk ex,Chemical Panic,inflict_random_status,,,"""1 Special Condition from among Asleep, Burned, Confused, Paralyzed, and Poisoned is chosen at random, and your opponent's Active Pokémon is now affected by that Special Condition. Any Special Conditions already affecting that Pokémon will not be chosen.""",80,80
-A3,112,Absol,Unseen Claw,bonus_damage_if_opponent_has_status,60,,"""If your opponent's Active Pokémon is affected by a Special Condition, this attack does 60 more damage.""",20,20+
-A3,114,Garbodor,Super Poison Breath,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,70,70
-A3,116,Toxapex,Spike Cannon,flip_multiplier,4,20,Flip 4 coins. This attack does 20 damage for each heads.,20,20×
-A3,118,Alolan Dugtrio,Iron Head,flip_multiplier_until_tails,70,,Flip a coin until you get tails. This attack does 70 damage for each heads.,70,70×
-A3,120,Escavalier,Pike,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,30,30
-A3,121,Klefki,Unlock,draw_cards,1,,Draw a card.,10,10
-A3,122,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120,120
-A3,123,Magearna,Silver Cannon,bonus_damage_if_opponent_has_ability,40,,"""If your opponent's Active Pokémon has an Ability, this attack does 40 more damage.""",40,40+
-A3,124,Drampa,Berserk,bonus_damage_if_own_bench_damaged,50,,"""If any of your Benched Pokémon have damage on them, this attack does 50 more damage.""",20,20+
-A3,127,Kommo-o,Clanging Scales,increase_incoming_damage_next_turn,30,,"""During your opponent's next turn, this Pokémon takes +30 damage from attacks.""",130,130
-A3,128,Tauros,Rising Lunge,flip_bonus_damage_if_heads,1,50,Flip a coin. If heads this attack does 50 more damage.,50,50+
-A3,130,Delcatty,Energy Assist,attach_energy_from_zone,colorless,to_bench,Take a {C} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,30,30
-A3,132,Hawlucha,Justified Press,bonus_damage_if_opponent_type,30,darkness,"""If your opponent's Active Pokémon is a {D} Pokémon, this attack does 30 more damage.""",20,20+
-A3,139,Bewear,Tantrum,self_inflict_status,confused,,This Pokémon is now Confused.,130,130
-A3,140,Oranguru,Primate's Trap,increase_opponent_costs_next_turn,1,,"""During your opponent's next turn, attacks used by the Defending Pokémon cost 1 {C} more, and its Retreat Cost is 1 {C} more.""",40,40
-A3,156,Alolan Exeggutor,Tropical Hammer,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,150,150
-A3,158,Tsareena,Three Kick Combo,flip_multiplier,3,50,Flip 3 coins. This attack does 50 damage for each heads.,50,50×
-A3,159,Tapu Bulu,Stuck-In Tackle,flip_self_damage_if_tails,20,,"""Flip a coin. If tails, this Pokémon also does 20 damage to itself.""",100,100
-A3,160,Alolan Marowak,Burning Bonemerang,flip_conditional_burn,2,70,"""Flip 2 coins. This attack does 70 damage for each heads. If at least 1 of them is heads, your opponent's Active Pokémon is now Burned.""",70,70×
-A3,161,Turtonator,Fire Spin,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,90,90
-A3,162,Alolan Vulpix,Call Forth Cold,attach_energy_from_zone_to_self,water,,Take a {W} Energy from your Energy Zone and attach it to this Pokémon.,0,
-A3,164,Tapu Fini,Spiral Drain,heal_self,20,,Heal 20 damage from this Pokémon.,60,60
-A3,166,Tapu Koko,Volt Switch,switch_self_with_bench_type,lightning,,Switch this Pokémon with 1 of your Benched {L} Pokémon.,70,70
-A3,170,Tapu Lele,Energy Arrow,bench_damage_per_energy_on_target,20,,This attack does 20 damage to 1 of your opponent's Pokémon for each Energy attached to that Pokémon.,0,
-A3,171,Cosmog,Teleport,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0,
-A3,172,Rockruff,Signs of Evolution,search_evolution_of_self,,,Put a random card that evolves from Rockruff from your deck into your hand.,0,
-A3,173,Mudsdale,High Horsepower,self_damage_fixed_amount,40,,This Pokémon also does 40 damage to itself.,140,140
-A3,174,Minior,Star Drop,bench_damage_one,opponent,40,This attack does 40 damage to 1 of your opponent's Pokémon.,0,
-A3,175,Magearna,Silver Cannon,bonus_damage_if_opponent_has_ability,40,,"""If your opponent's Active Pokémon has an Ability, this attack does 40 more damage.""",40,40+
-A3,176,Drampa,Berserk,bonus_damage_if_own_bench_damaged,50,,"""If any of your Benched Pokémon have damage on them, this attack does 50 more damage.""",20,20+
-A3,178,Bewear,Tantrum,self_inflict_status,confused,,This Pokémon is now Confused.,130,130
-A3,180,Decidueye ex,Pierce the Pain,bench_damage_to_damaged_only,100,,This attack does 100 damage to 1 of your opponent's Pokémon that have damage on them.,0,
-A3,181,Dhelmise ex,Anchor Shot,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",80,80
-A3,182,Incineroar ex,Fire Fang,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,30,30
-A3,182,Incineroar ex,Scar-Charged Smash,bonus_damage_if_self_damaged,60,,"""If this Pokémon has damage on it, this attack does 60 more damage.""",80,80+
-A3,183,Crabominable ex,Insatiable Striking,bonus_damage_during_next_turn,40,,"""During your next turn, this Pokémon's Insatiable Striking attack does +40 damage.""",40,40
-A3,184,Wishiwashi ex,School Storm,bonus_damage_for_each_named_bench,40,"""Wishiwashi,Wishiwashi ex""",This attack does 40 more damage for each of your Benched Wishiwashi and Wishiwashi ex.,30,30+
-A3,185,Alolan Raichu ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60,60+
-A3,188,Alolan Muk ex,Chemical Panic,inflict_random_status,,,"""1 Special Condition from among Asleep, Burned, Confused, Paralyzed, and Poisoned is chosen at random, and your opponent's Active Pokémon is now affected by that Special Condition. Any Special Conditions already affecting that Pokémon will not be chosen.""",80,80
-A3,189,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120,120
-A3,198,Decidueye ex,Pierce the Pain,bench_damage_to_damaged_only,100,,This attack does 100 damage to 1 of your opponent's Pokémon that have damage on them.,0,
-A3,199,Dhelmise ex,Anchor Shot,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",80,80
-A3,200,Incineroar ex,Fire Fang,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,30,30
-A3,200,Incineroar ex,Scar-Charged Smash,bonus_damage_if_self_damaged,60,,"""If this Pokémon has damage on it, this attack does 60 more damage.""",80,80+
-A3,201,Crabominable ex,Insatiable Striking,bonus_damage_during_next_turn,40,,"""During your next turn, this Pokémon's Insatiable Striking attack does +40 damage.""",40,40
-A3,202,Wishiwashi ex,School Storm,bonus_damage_for_each_named_bench,40,"""Wishiwashi,Wishiwashi ex""",This attack does 40 more damage for each of your Benched Wishiwashi and Wishiwashi ex.,30,30+
-A3,203,Alolan Raichu ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60,60+
-A3,206,Alolan Muk ex,Chemical Panic,inflict_random_status,,,"""1 Special Condition from among Asleep, Burned, Confused, Paralyzed, and Poisoned is chosen at random, and your opponent's Active Pokémon is now affected by that Special Condition. Any Special Conditions already affecting that Pokémon will not be chosen.""",80,80
-A3,207,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120,120
-A3,212,Venusaur,Mega Drain,heal_self,30,,Heal 30 damage from this Pokémon.,80,80
-A3,214,Exeggutor,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,80,80+
-A3,217,Blastoise,Hydro Pump,extra_damage_if_extra_energy_attached,water,2|60,"""If this Pokémon has at least 2 extra {W} Energy attached, this attack does 60 more damage.""",80,80+
-A3,220,Gastly,Astonish,flip_reveal_and_shuffle,,,"""Flip a coin. If heads, your opponent reveals a random card from their hand and shuffles it into their deck.""",0,
-A3,222,Gengar,Bother,inflict_effect,block_supporter,,Your opponent can't use any Supporter cards from their hand during their next turn.,50,50
-A3,225,Machamp,Power Press,extra_damage_if_extra_energy_attached,fighting,2|50,"""If this Pokémon has at least 2 extra {F} Energy attached, this attack does 50 more damage.""",70,70+
-A3,226,Cubone,Growl,inflict_effect,reduce_damage_next_turn,20,"""During your opponent's next turn, attacks used by the Defending Pokémon do −20 damage.""",0,
-A3,230,Venusaur ex,Giant Bloom,heal_self,30,,Heal 30 damage from this Pokémon.,100,100
-A3,231,Exeggutor ex,Tropical Swing,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40,40+
-A3,232,Blastoise ex,Hydro Bazooka,extra_damage_if_extra_energy_attached,water,2|60,"""If this Pokémon has at least 2 extra {W} Energy attached, this attack does 60 more damage.""",100,100+
-A3,236,Marowak ex,Bonemerang,flip_multiplier,2,80,Flip 2 coins. This attack does 80 damage for each heads.,80,80×
-A3,237,Wigglytuff ex,Sleepy Song,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,80,80
-A3,239,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120,120
-A3a,003,Rowlet,Fury Attack,flip_multiplier,3,10,Flip 3 coins. This attack does 10 damage for each heads.,10,10
-A3a,004,Dartrix,Skill Dive,bench_damage_one,opponent,20,This attack does 20 damage to 1 of your opponent's Pokémon.,,
-A3a,005,Decidueye,Sniping Arrow,bench_damage_one,opponent,70,This attack does 70 damage to 1 of your opponent's Pokémon.,,
-A3a,006,Buzzwole ex,Big Beat,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't use Big Beat.""",120,120
-A3a,007,Pheromosa,Jump Blues,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,20,20
-A3a,009,Blacephalon,Beat Punk,self_damage_fixed_amount,70,,This Pokémon also does 70 damage to itself.,130,130
-A3a,012,Sharpedo,Crunch,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon.""",50,50
-A3a,019,Tapu Koko ex,Plasma Hurricane,attach_energy_from_zone_to_self,lightning,1,Take a {L} Energy from your Energy Zone and attach it to this Pokémon.,20,20
-A3a,020,Xurkitree,Electronica,inflict_status,confusion,,Your opponent's Active Pokémon is now Confused.,60,60
-A3a,028,Meditite,Trip Over,flip_do_nothing_if_tails,20,,"""Flip a coin. If heads, this attack does 20 more damage.""",10,10
-A3a,033,Lycanroc ex,Lycanfang,discard_energy_specific,fighting,1,Discard a {F} Energy from this Pokémon.,130,130
-A3a,034,Passimian,Let's Throw,bonus_damage_if_benched,40,,"""If Passimian is on your Bench, this attack does 40 more damage.""",40,40
-A3a,036,Palossand,Sand Tomb,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",90,90
-A3a,037,Alolan Meowth,Meddle,discard_all_opponent_tools,,,Discard a random Pokémon Tool card from your opponent's hand.,,
-A3a,038,Alolan Persian,Fake Out,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",50,50
-A3a,041,Krookodile,Poaching Fangs,flip_inflict_effect_if_heads,shuffle_hand_to_deck,3,"""Flip 3 coins. For each heads, a card is chosen at random from your opponent's hand. Your opponent reveals that card and shuffles it into their deck.""",90,90
-A3a,042,Nihilego,New Wave,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,30,30
-A3a,043,Guzzlord ex,Grindcore,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",30,30
-A3a,044,Poipole,2-Step,flip_multiplier,2,20,Flip 2 coins. This attack does 20 damage for each heads.,20,20
-A3a,045,Naganadel,Electro House,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,40,40
-A3a,046,Alolan Diglett,Happened to Headbutt,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",40,40
-A3a,047,Alolan Dugtrio ex,Triplet Headbutt,flip_multiplier,3,60,Flip 3 coins. This attack does 60 damage for each heads.,60,60
-A3a,050,Aggron,Giga Impact,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't attack.""",150,150
-A3a,053,Stakataka,Brass Rock,inflict_effect,attack_lock,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",40,40
-A3a,058,Bewear,Superpowered Hug,flip_two_stage,0,0,"""Flip 2 coins. If both of them are heads, your opponent's Active Pokémon is Knocked Out.""",,
-A3a,060,Type: Null,Quick Blow,flip_do_nothing_if_tails,20,,"""Flip a coin. If heads, this attack does 20 more damage.""",20,20
-A3a,061,Silvally,Brave Buddies,bonus_damage_conditional,supporter_played_this_turn,50,"""If you played a Supporter card from your hand during this turn, this attack does 50 more damage.""",50,50
-A3a,062,Celesteela,Moombahton,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",100,100
-A3a,070,Rowlet,Fury Attack,flip_multiplier,3,10,Flip 3 coins. This attack does 10 damage for each heads.,10,10
-A3a,071,Pheromosa,Jump Blues,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,20,20
-A3a,072,Blacephalon,Beat Punk,self_damage_fixed_amount,70,,This Pokémon also does 70 damage to itself.,130,130
-A3a,073,Alolan Meowth,Meddle,discard_all_opponent_tools,,,Discard a random Pokémon Tool card from your opponent's hand.,,
-A3a,074,Silvally,Brave Buddies,bonus_damage_conditional,supporter_played_this_turn,50,"""If you played a Supporter card from your hand during this turn, this attack does 50 more damage.""",50,50
-A3a,075,Celesteela,Moombahton,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",100,100
-A3a,076,Buzzwole ex,Big Beat,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't use Big Beat.""",120,120
-A3a,077,Tapu Koko ex,Plasma Hurricane,attach_energy_from_zone_to_self,lightning,1,Take a {L} Energy from your Energy Zone and attach it to this Pokémon.,20,20
-A3a,078,Lycanroc ex,Lycanfang,discard_energy_specific,fighting,1,Discard a {F} Energy from this Pokémon.,130,130
-A3a,079,Guzzlord ex,Grindcore,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",30,30
-A3a,080,Alolan Dugtrio ex,Triplet Headbutt,flip_multiplier,3,60,Flip 3 coins. This attack does 60 damage for each heads.,60,60
-A3a,084,Tapu Koko ex,Plasma Hurricane,attach_energy_from_zone_to_self,lightning,1,Take a {L} Energy from your Energy Zone and attach it to this Pokémon.,20,20
-A3a,085,Lycanroc ex,Lycanfang,discard_energy_specific,fighting,1,Discard a {F} Energy from this Pokémon.,130,130
-A3a,086,Guzzlord ex,Grindcore,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",30,30
-A3a,087,Alolan Dugtrio ex,Triplet Headbutt,flip_multiplier,3,60,Flip 3 coins. This attack does 60 damage for each heads.,60,60
-A3a,088,Buzzwole ex,Big Beat,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't use Big Beat.""",120,120
-A3a,090,Arcanine,Heat Tackle,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,100,100
-A3a,094,Jynx,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,30,30
-A3a,098,Aerodactyl,Primal Wingbeat,flip_do_nothing_if_tails,20,,"""Flip a coin. If heads, your opponent shuffles their Active Pokémon into their deck.""",,
-A3a,099,Celebi ex,Powerful Bloom,flip_multiplier,,50,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50,50
-A3a,100,Arcanine ex,Inferno Onrush,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,120,120
-A3a,102,Pidgeot ex,Scattering Cyclone,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,80,80
-A3a,103,Nihilego,New Wave,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,30,30
-A3b,002,Leafeon,Leaf Blast,,,,This attack does 20 more damage for each {G} Energy attached to this Pokémon.,10,10
-A3b,005,Tsareena,Kick Down,,,,Your opponent reveals a random card from their hand and shuffles it into their deck.,50,50
-A3b,007,Appletun,Sweets Relay,,,,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 30 more damage.""",40,40
-A3b,008,Flareon,Assisting Heater,,,,Take a {R} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,40,40
-A3b,009,Flareon ex,Fire Spin,,,,Discard 2 {R} Energy from this Pokémon.,130,130
-A3b,010,Torkoal,Flamethrower,,,,Discard a {R} Energy from this Pokémon.,70,70
-A3b,013,Incineroar,Darkest Lariat,,,,Flip 2 coins. This attack does 100 damage for each heads.,100,100
-A3b,014,Salandit,Ember,,,,Discard a {R} Energy from this Pokémon.,30,30
-A3b,016,Vaporeon,Hyper Whirlpool,,,,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",70,70
-A3b,017,Glaceon,Ice Blade,,,,This attack does 50 damage to 1 of your opponent's Pokémon.,,
-A3b,018,Vanillite,Sweets Relay,,,,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",10,10
-A3b,019,Vanillish,Sweets Relay,,,,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",30,30
-A3b,020,Vanilluxe,Double Spin,,,,Flip 2 coins. This attack does 80 damage for each heads.,80,80
-A3b,021,Alomomola,Water Pulse,,,,Your opponent's Active Pokémon is now Asleep.,50,50
-A3b,024,Primarina ex,Hydro Pump,,,,"""If this Pokémon has at least 1 extra {W} Energy attached, this attack does 40 more damage.""",40,40
-A3b,024,Primarina ex,Sparkling Aria,,,,Heal 20 damage from this Pokémon.,100,100
-A3b,025,Jolteon,Beginning Bolt,,,,"""If this Pokémon evolved during this turn, this attack does 20 more damage.""",40,40
-A3b,026,Joltik,Jolt,,,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",10,10
-A3b,027,Galvantula,Electric Shock,,,,Discard all Energy attached to this Pokémon. Your opponent's Active Pokémon is now Paralyzed.,70,70
-A3b,028,Espeon,Energy Crush,,,,This attack does 20 damage for each Energy attached to all of your opponent's Pokémon.,20,20
-A3b,031,Swirlix,Sweets Relay,,,,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",10,10
-A3b,032,Slurpuff,Sweets Relay,,,,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 60 more damage.""",30,30
-A3b,033,Sylveon,Evoharmony,,,,This attack does 30 more damage for each Evolution Pokémon on your Bench.,40,40
-A3b,035,Mimikyu,Try to Imitate,,,,"""Flip a coin. If heads, choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.""",,
-A3b,036,Milcery,Sweets Relay,,,,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",10,10
-A3b,037,Alcremie,Sweets Overload,,,,This attack does 40 damage for each time your Pokémon used Sweets Relay during this game.,40,40
-A3b,039,Whiscash,Earthquake,,,,This attack also does 10 damage to each of your Benched Pokémon.,130,130
-A3b,040,Mienfoo,Kick Shot,,,,"""Flip a coin. If tails, this attack does nothing.""",40,40
-A3b,042,Carbink,Hard Roll,,,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",30,30
-A3b,043,Umbreon,Dark Binding,,,,"""If the Defending Pokémon is a Basic Pokémon, it can't attack during your opponent's next turn.""",40,40
-A3b,045,Purrloin,Playful Knockdown,,,,Discard all Pokémon Tools from your opponent's Active Pokémon.,,
-A3b,047,Mawile,Powerful Vise,,,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",30,30
-A3b,048,Togedemaru,Bristling Spikes,,,,"""During your opponent's next turn, if this Pokémon is damaged by an attack, do 30 damage to the Attacking Pokémon.""",30,30
-A3b,053,Dragonite ex,Giga Impact,,,,"""During your next turn, this Pokémon can't attack.""",180,180
-A3b,054,Drampa,Dragon Breath,,,,"""Flip a coin. If tails, this attack does nothing. If heads, your opponent's Active Pokémon is now Paralyzed.""",70,70
-A3b,055,Eevee,Collect,,,,Draw a card.,,
-A3b,057,Snorlax ex,Flop-Down Punch,,,,This Pokémon is now Asleep.,130,130
-A3b,058,Aipom,Double Hit,,,,Flip 2 coins. This attack does 20 damage for each heads.,20,20
-A3b,060,Chatot,Tone-Deaf,,,,Your opponent's Active Pokémon is now Confused.,10,10
-A3b,061,Audino,Do the Wave,,,,This attack does 20 damage for each of your Benched Pokémon.,20,20
-A3b,065,Greedent,Enhanced Fang,,,,"""If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage.""",50,50
-A3b,070,Leafeon,Leaf Blast,,,,This attack does 20 more damage for each {G} Energy attached to this Pokémon.,10,10
-A3b,071,Flareon,Assisting Heater,,,,Take a {R} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,40,40
-A3b,072,Vaporeon,Hyper Whirlpool,,,,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",70,70
-A3b,073,Glaceon,Ice Blade,,,,This attack does 50 damage to 1 of your opponent's Pokémon.,,
-A3b,074,Jolteon,Beginning Bolt,,,,"""If this Pokémon evolved during this turn, this attack does 20 more damage.""",40,40
-A3b,075,Espeon,Energy Crush,,,,This attack does 20 damage for each Energy attached to all of your opponent's Pokémon.,20,20
-A3b,076,Sylveon,Evoharmony,,,,This attack does 30 more damage for each Evolution Pokémon on your Bench.,40,40
-A3b,077,Umbreon,Dark Binding,,,,"""If the Defending Pokémon is a Basic Pokémon, it can't attack during your opponent's next turn.""",40,40
-A3b,078,Eevee,Collect,,,,Draw a card.,,
-A3b,079,Flareon ex,Fire Spin,,,,Discard 2 {R} Energy from this Pokémon.,130,130
-A3b,080,Primarina ex,Hydro Pump,,,,"""If this Pokémon has at least 1 extra {W} Energy attached, this attack does 40 more damage.""",40,40
-A3b,080,Primarina ex,Sparkling Aria,,,,Heal 20 damage from this Pokémon.,100,100
-A3b,082,Dragonite ex,Giga Impact,,,,"""During your next turn, this Pokémon can't attack.""",180,180
-A3b,084,Snorlax ex,Flop-Down Punch,,,,This Pokémon is now Asleep.,130,130
-A3b,087,Flareon ex,Fire Spin,,,,Discard 2 {R} Energy from this Pokémon.,130,130
-A3b,088,Primarina ex,Hydro Pump,,,,"""If this Pokémon has at least 1 extra {W} Energy attached, this attack does 40 more damage.""",40,40
-A3b,088,Primarina ex,Sparkling Aria,,,,Heal 20 damage from this Pokémon.,100,100
-A3b,090,Dragonite ex,Giga Impact,,,,"""During your next turn, this Pokémon can't attack.""",180,180
-A3b,091,Snorlax ex,Flop-Down Punch,,,,This Pokémon is now Asleep.,130,130
-A3b,093,Pinsir,Guillotine Rush,,,,Flip a coin until you get tails. This attack does 40 more damage for each heads.,50,50
-A3b,094,Lapras,Hydro Pump,,,,"""If this Pokémon has at least 3 extra {W} Energy attached, this attack does 70 more damage.""",20,20
-A3b,095,Voltorb,Big Explosion,,,,This Pokémon also does 10 damage to itself.,30,30
-A3b,097,Ralts,Teleport,,,,Switch this Pokémon with 1 of your Benched Pokémon.,,
-A3b,101,Arbok,Corner,,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",60,60
-A3b,103,Moltres ex,Inferno Dance,,,,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,,
-A3b,104,Articuno ex,Blizzard,,,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80,80
-A3b,105,Zapdos ex,Thundering Hurricane,,,,Flip 4 coins. This attack does 50 damage for each heads.,50,50
-A3b,106,Gallade ex,Energized Blade,,,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,70,70
+A2b,110,Lucario ex,Aura Sphere,bench_damage_one,opponent,30,This attack also does 30 damage to 1 of your opponent's Benched Pokémon.,100.0,100
+A3,2,Alolan Exeggutor,Tropical Hammer,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,150.0,150
+A3,3,Surskit,Quick Attack,flip_bonus_damage_if_heads,1,20,Flip a coin. If heads this attack does 20 more damage.,10.0,10+
+A3,10,Rowlet,Skill Dive,bench_damage_one,opponent,10,This attack does 10 damage to 1 of your opponent's Pokémon.,0.0,
+A3,12,Decidueye ex,Pierce the Pain,bench_damage_to_damaged_only,100,,This attack does 100 damage to 1 of your opponent's Pokémon that have damage on them.,0.0,
+A3,15,Lurantis,Petal Blizzard,bench_damage_all_opponent,20,,This attack does 20 damage to each of your opponent's Pokémon.,0.0,
+A3,17,Shiinotic,Flickering Light,flip_inflict_effect_if_heads,attack_lock,,"""Flip a coin. If heads, the Defending Pokémon can't attack during your opponent's next turn.""",50.0,50
+A3,19,Steenee,Double Spin,flip_multiplier,2,30,Flip 2 coins. This attack does 30 damage for each heads.,30.0,30×
+A3,20,Tsareena,Three Kick Combo,flip_multiplier,3,50,Flip 3 coins. This attack does 50 damage for each heads.,50.0,50×
+A3,22,Golisopod,First Impression,bonus_damage_if_switched_in,60,,"""If this Pokémon moved from your Bench to the Active Spot this turn, this attack does 60 more damage.""",60.0,60+
+A3,23,Dhelmise ex,Anchor Shot,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",80.0,80
+A3,24,Tapu Bulu,Stuck-In Tackle,flip_self_damage_if_tails,20,,"""Flip a coin. If tails, this Pokémon also does 20 damage to itself.""",100.0,100
+A3,27,Alolan Marowak,Burning Bonemerang,flip_conditional_burn,2,70,"""Flip 2 coins. This attack does 70 damage for each heads. If at least 1 of them is heads, your opponent's Active Pokémon is now Burned.""",70.0,70×
+A3,30,Litten,Heat Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,30.0,30
+A3,32,Torracat,Heat Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,40.0,40
+A3,33,Incineroar ex,Fire Fang,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,30.0,30
+A3,33,Incineroar ex,Scar-Charged Smash,bonus_damage_if_self_damaged,60,,"""If this Pokémon has damage on it, this attack does 60 more damage.""",80.0,80+
+A3,34,Oricorio,Kindle,discard_random_energy_from_both,,,Discard a random Energy from both Active Pokémon.,40.0,40
+A3,36,Salazzle,Heated Poison,inflict_double_status,poisoned,burned,Your opponent's Active Pokémon is now Poisoned and Burned.,30.0,30
+A3,37,Turtonator,Fire Spin,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,90.0,90
+A3,39,Alolan Sandslash,Spike Armor,inflict_effect_counter_next_turn,40,,"""During your opponent's next turn, if this Pokémon is damaged by an attack, do 40 damage to the Attacking Pokémon.""",20.0,20
+A3,40,Alolan Vulpix,Call Forth Cold,attach_energy_from_zone_to_self,water,,Take a {W} Energy from your Energy Zone and attach it to this Pokémon.,0.0,
+A3,41,Alolan Ninetales,Blizzard,bench_damage_all_opponent,20,,This attack also does 20 damage to each of your opponent's Benched Pokémon.,60.0,60
+A3,43,Cloyster,Guard Press,reduce_incoming_damage_next_turn,20,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",50.0,50
+A3,45,Popplio,Sing,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,0.0,
+A3,49,Crabominable ex,Insatiable Striking,bonus_damage_during_next_turn,40,,"""During your next turn, this Pokémon's Insatiable Striking attack does +40 damage.""",40.0,40
+A3,50,Wishiwashi,Call for Family,search_named_to_bench,,"""Wishiwashi,Wishiwashi ex""",Put 1 random Wishiwashi or Wishiwashi ex from your deck onto your Bench.,0.0,
+A3,51,Wishiwashi ex,School Storm,bonus_damage_for_each_named_bench,40,"""Wishiwashi,Wishiwashi ex""",This attack does 40 more damage for each of your Benched Wishiwashi and Wishiwashi ex.,30.0,30+
+A3,53,Araquanid,Dangerous Claws,bonus_damage_if_opponent_basic,60,,"""If your opponent's Active Pokémon is a Basic Pokémon, this attack does 60 more damage.""",60.0,60+
+A3,56,Tapu Fini,Spiral Drain,heal_self,20,,Heal 20 damage from this Pokémon.,60.0,60
+A3,58,Alolan Raichu ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60.0,60+
+A3,61,Alolan Golem,Super Zap Cannon,discard_energy_specific,lightning,2,Discard 2 {L} Energy from this Pokémon.,150.0,150
+A3,65,Vikavolt,Disconnect,inflict_effect,block_items,,"""During your opponent's next turn, they can't play any Item cards from their hand.""",70.0,70
+A3,67,Togedemaru,Electrosmash,flip_bonus_damage_if_heads,1,30,Flip a coin. If heads this attack does 30 more damage.,20.0,20+
+A3,68,Tapu Koko,Volt Switch,switch_self_with_bench_type,lightning,,Switch this Pokémon with 1 of your Benched {L} Pokémon.,70.0,70
+A3,69,Mr. Mime,Barrier Shove,flip_prevent_damage_and_effects_next_turn,,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",30.0,30
+A3,70,Sableye,Corner,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",40.0,40
+A3,71,Spoink,Psycharge,attach_energy_from_zone_to_self,psychic,,Take a {P} Energy from your Energy Zone and attach it to this Pokémon.,0.0,
+A3,75,Banette,Night Bind,inflict_effect,block_energy_attach,,"""During your opponent's next turn, they can't take any Energy from their Energy Zone to attach to their Active Pokémon.""",30.0,30
+A3,76,Oricorio,Dazzle Dance,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,40.0,40
+A3,77,Oricorio,Spiteful Dance,bonus_damage_if_pokemon_ko_last_turn,60,,"""If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 60 more damage.""",20.0,20+
+A3,83,Mimikyu,Shadow Hit,bench_damage_one,self,20,This attack also does 20 damage to 1 of your Pokémon.,60.0,60
+A3,84,Tapu Lele,Energy Arrow,bench_damage_per_energy_on_target,20,,This attack does 20 damage to 1 of your opponent's Pokémon for each Energy attached to that Pokémon.,0.0,
+A3,85,Cosmog,Teleport,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0.0,
+A3,86,Cosmoem,Stiffen,reduce_incoming_damage_next_turn,50,,"""During your opponent's next turn, this Pokémon takes −50 damage from attacks.""",0.0,
+A3,88,Necrozma,Prismatic Laser,self_inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't attack.""",120.0,120
+A3,91,Hariyama,Push Out,force_opponent_switch,,,Switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.),50.0,50
+A3,98,Rockruff,Signs of Evolution,search_evolution_of_self,,,Put a random card that evolves from Rockruff from your deck into your hand.,0.0,
+A3,100,Lycanroc,Crunch,flip_discard_energy_if_heads,,,"""Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon.""",80.0,80
+A3,101,Lycanroc,Blood Fang,bonus_damage_if_opponent_has_more_hp,50,,"""If your opponent's Active Pokémon has more remaining HP than this Pokémon, this attack does 50 more damage.""",50.0,50+
+A3,103,Mudsdale,High Horsepower,self_damage_fixed_amount,40,,This Pokémon also does 40 damage to itself.,140.0,140
+A3,105,Minior,Star Drop,bench_damage_one,opponent,40,This attack does 40 damage to 1 of your opponent's Pokémon.,0.0,
+A3,107,Alolan Raticate,Scrounge-and-Scarf,discard_random_item_from_opponent_hand,,,Discard a random Item card from your opponent's hand.,50.0,50
+A3,111,Alolan Muk ex,Chemical Panic,inflict_random_status,,,"""1 Special Condition from among Asleep, Burned, Confused, Paralyzed, and Poisoned is chosen at random, and your opponent's Active Pokémon is now affected by that Special Condition. Any Special Conditions already affecting that Pokémon will not be chosen.""",80.0,80
+A3,112,Absol,Unseen Claw,bonus_damage_if_opponent_has_status,60,,"""If your opponent's Active Pokémon is affected by a Special Condition, this attack does 60 more damage.""",20.0,20+
+A3,114,Garbodor,Super Poison Breath,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,70.0,70
+A3,116,Toxapex,Spike Cannon,flip_multiplier,4,20,Flip 4 coins. This attack does 20 damage for each heads.,20.0,20×
+A3,118,Alolan Dugtrio,Iron Head,flip_multiplier_until_tails,70,,Flip a coin until you get tails. This attack does 70 damage for each heads.,70.0,70×
+A3,120,Escavalier,Pike,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,30.0,30
+A3,121,Klefki,Unlock,draw_cards,1,,Draw a card.,10.0,10
+A3,122,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120.0,120
+A3,123,Magearna,Silver Cannon,bonus_damage_if_opponent_has_ability,40,,"""If your opponent's Active Pokémon has an Ability, this attack does 40 more damage.""",40.0,40+
+A3,124,Drampa,Berserk,bonus_damage_if_own_bench_damaged,50,,"""If any of your Benched Pokémon have damage on them, this attack does 50 more damage.""",20.0,20+
+A3,127,Kommo-o,Clanging Scales,increase_incoming_damage_next_turn,30,,"""During your opponent's next turn, this Pokémon takes +30 damage from attacks.""",130.0,130
+A3,128,Tauros,Rising Lunge,flip_bonus_damage_if_heads,1,50,Flip a coin. If heads this attack does 50 more damage.,50.0,50+
+A3,130,Delcatty,Energy Assist,attach_energy_from_zone,colorless,to_bench,Take a {C} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,30.0,30
+A3,132,Hawlucha,Justified Press,bonus_damage_if_opponent_type,30,darkness,"""If your opponent's Active Pokémon is a {D} Pokémon, this attack does 30 more damage.""",20.0,20+
+A3,139,Bewear,Tantrum,self_inflict_status,confused,,This Pokémon is now Confused.,130.0,130
+A3,140,Oranguru,Primate's Trap,increase_opponent_costs_next_turn,1,,"""During your opponent's next turn, attacks used by the Defending Pokémon cost 1 {C} more, and its Retreat Cost is 1 {C} more.""",40.0,40
+A3,156,Alolan Exeggutor,Tropical Hammer,flip_do_nothing_if_tails,,,Flip a coin. If tails this attack does nothing.,150.0,150
+A3,158,Tsareena,Three Kick Combo,flip_multiplier,3,50,Flip 3 coins. This attack does 50 damage for each heads.,50.0,50×
+A3,159,Tapu Bulu,Stuck-In Tackle,flip_self_damage_if_tails,20,,"""Flip a coin. If tails, this Pokémon also does 20 damage to itself.""",100.0,100
+A3,160,Alolan Marowak,Burning Bonemerang,flip_conditional_burn,2,70,"""Flip 2 coins. This attack does 70 damage for each heads. If at least 1 of them is heads, your opponent's Active Pokémon is now Burned.""",70.0,70×
+A3,161,Turtonator,Fire Spin,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,90.0,90
+A3,162,Alolan Vulpix,Call Forth Cold,attach_energy_from_zone_to_self,water,,Take a {W} Energy from your Energy Zone and attach it to this Pokémon.,0.0,
+A3,164,Tapu Fini,Spiral Drain,heal_self,20,,Heal 20 damage from this Pokémon.,60.0,60
+A3,166,Tapu Koko,Volt Switch,switch_self_with_bench_type,lightning,,Switch this Pokémon with 1 of your Benched {L} Pokémon.,70.0,70
+A3,170,Tapu Lele,Energy Arrow,bench_damage_per_energy_on_target,20,,This attack does 20 damage to 1 of your opponent's Pokémon for each Energy attached to that Pokémon.,0.0,
+A3,171,Cosmog,Teleport,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,0.0,
+A3,172,Rockruff,Signs of Evolution,search_evolution_of_self,,,Put a random card that evolves from Rockruff from your deck into your hand.,0.0,
+A3,173,Mudsdale,High Horsepower,self_damage_fixed_amount,40,,This Pokémon also does 40 damage to itself.,140.0,140
+A3,174,Minior,Star Drop,bench_damage_one,opponent,40,This attack does 40 damage to 1 of your opponent's Pokémon.,0.0,
+A3,175,Magearna,Silver Cannon,bonus_damage_if_opponent_has_ability,40,,"""If your opponent's Active Pokémon has an Ability, this attack does 40 more damage.""",40.0,40+
+A3,176,Drampa,Berserk,bonus_damage_if_own_bench_damaged,50,,"""If any of your Benched Pokémon have damage on them, this attack does 50 more damage.""",20.0,20+
+A3,178,Bewear,Tantrum,self_inflict_status,confused,,This Pokémon is now Confused.,130.0,130
+A3,180,Decidueye ex,Pierce the Pain,bench_damage_to_damaged_only,100,,This attack does 100 damage to 1 of your opponent's Pokémon that have damage on them.,0.0,
+A3,181,Dhelmise ex,Anchor Shot,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",80.0,80
+A3,182,Incineroar ex,Fire Fang,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,30.0,30
+A3,182,Incineroar ex,Scar-Charged Smash,bonus_damage_if_self_damaged,60,,"""If this Pokémon has damage on it, this attack does 60 more damage.""",80.0,80+
+A3,183,Crabominable ex,Insatiable Striking,bonus_damage_during_next_turn,40,,"""During your next turn, this Pokémon's Insatiable Striking attack does +40 damage.""",40.0,40
+A3,184,Wishiwashi ex,School Storm,bonus_damage_for_each_named_bench,40,"""Wishiwashi,Wishiwashi ex""",This attack does 40 more damage for each of your Benched Wishiwashi and Wishiwashi ex.,30.0,30+
+A3,185,Alolan Raichu ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60.0,60+
+A3,188,Alolan Muk ex,Chemical Panic,inflict_random_status,,,"""1 Special Condition from among Asleep, Burned, Confused, Paralyzed, and Poisoned is chosen at random, and your opponent's Active Pokémon is now affected by that Special Condition. Any Special Conditions already affecting that Pokémon will not be chosen.""",80.0,80
+A3,189,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120.0,120
+A3,198,Decidueye ex,Pierce the Pain,bench_damage_to_damaged_only,100,,This attack does 100 damage to 1 of your opponent's Pokémon that have damage on them.,0.0,
+A3,199,Dhelmise ex,Anchor Shot,inflict_effect_retreat_lock,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",80.0,80
+A3,200,Incineroar ex,Fire Fang,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,30.0,30
+A3,200,Incineroar ex,Scar-Charged Smash,bonus_damage_if_self_damaged,60,,"""If this Pokémon has damage on it, this attack does 60 more damage.""",80.0,80+
+A3,201,Crabominable ex,Insatiable Striking,bonus_damage_during_next_turn,40,,"""During your next turn, this Pokémon's Insatiable Striking attack does +40 damage.""",40.0,40
+A3,202,Wishiwashi ex,School Storm,bonus_damage_for_each_named_bench,40,"""Wishiwashi,Wishiwashi ex""",This attack does 40 more damage for each of your Benched Wishiwashi and Wishiwashi ex.,30.0,30+
+A3,203,Alolan Raichu ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,60.0,60+
+A3,206,Alolan Muk ex,Chemical Panic,inflict_random_status,,,"""1 Special Condition from among Asleep, Burned, Confused, Paralyzed, and Poisoned is chosen at random, and your opponent's Active Pokémon is now affected by that Special Condition. Any Special Conditions already affecting that Pokémon will not be chosen.""",80.0,80
+A3,207,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120.0,120
+A3,212,Venusaur,Mega Drain,heal_self,30,,Heal 30 damage from this Pokémon.,80.0,80
+A3,214,Exeggutor,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,80.0,80+
+A3,217,Blastoise,Hydro Pump,extra_damage_if_extra_energy_attached,water,2|60,"""If this Pokémon has at least 2 extra {W} Energy attached, this attack does 60 more damage.""",80.0,80+
+A3,220,Gastly,Astonish,flip_reveal_and_shuffle,,,"""Flip a coin. If heads, your opponent reveals a random card from their hand and shuffles it into their deck.""",0.0,
+A3,222,Gengar,Bother,inflict_effect,block_supporter,,Your opponent can't use any Supporter cards from their hand during their next turn.,50.0,50
+A3,225,Machamp,Power Press,extra_damage_if_extra_energy_attached,fighting,2|50,"""If this Pokémon has at least 2 extra {F} Energy attached, this attack does 50 more damage.""",70.0,70+
+A3,226,Cubone,Growl,inflict_effect,reduce_damage_next_turn,20,"""During your opponent's next turn, attacks used by the Defending Pokémon do −20 damage.""",0.0,
+A3,230,Venusaur ex,Giant Bloom,heal_self,30,,Heal 30 damage from this Pokémon.,100.0,100
+A3,231,Exeggutor ex,Tropical Swing,flip_bonus_damage_if_heads,1,40,Flip a coin. If heads this attack does 40 more damage.,40.0,40+
+A3,232,Blastoise ex,Hydro Bazooka,extra_damage_if_extra_energy_attached,water,2|60,"""If this Pokémon has at least 2 extra {W} Energy attached, this attack does 60 more damage.""",100.0,100+
+A3,236,Marowak ex,Bonemerang,flip_multiplier,2,80,Flip 2 coins. This attack does 80 damage for each heads.,80.0,80×
+A3,237,Wigglytuff ex,Sleepy Song,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,80.0,80
+A3,239,Solgaleo ex,Sol Breaker,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,120.0,120
+A3a,3,Rowlet,Fury Attack,flip_multiplier,3,10,Flip 3 coins. This attack does 10 damage for each heads.,10.0,10
+A3a,4,Dartrix,Skill Dive,bench_damage_one,opponent,20,This attack does 20 damage to 1 of your opponent's Pokémon.,,
+A3a,5,Decidueye,Sniping Arrow,bench_damage_one,opponent,70,This attack does 70 damage to 1 of your opponent's Pokémon.,,
+A3a,6,Buzzwole ex,Big Beat,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't use Big Beat.""",120.0,120
+A3a,7,Pheromosa,Jump Blues,bench_damage_one,bench,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,20.0,20
+A3a,9,Blacephalon,Beat Punk,self_damage_fixed_amount,70,,This Pokémon also does 70 damage to itself.,130.0,130
+A3a,12,Sharpedo,Crunch,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon.""",50.0,50
+A3a,19,Tapu Koko ex,Plasma Hurricane,attach_energy_from_zone_to_self,lightning,1,Take a {L} Energy from your Energy Zone and attach it to this Pokémon.,20.0,20
+A3a,20,Xurkitree,Electronica,inflict_status,confusion,,Your opponent's Active Pokémon is now Confused.,60.0,60
+A3a,28,Meditite,Trip Over,flip_do_nothing_if_tails,20,,"""Flip a coin. If heads, this attack does 20 more damage.""",10.0,10
+A3a,33,Lycanroc ex,Lycanfang,discard_energy_specific,fighting,1,Discard a {F} Energy from this Pokémon.,130.0,130
+A3a,34,Passimian,Let's Throw,bonus_damage_if_benched,40,,"""If Passimian is on your Bench, this attack does 40 more damage.""",40.0,40
+A3a,36,Palossand,Sand Tomb,inflict_effect,retreat_lock,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",90.0,90
+A3a,37,Alolan Meowth,Meddle,discard_all_opponent_tools,,,Discard a random Pokémon Tool card from your opponent's hand.,,
+A3a,38,Alolan Persian,Fake Out,flip_inflict_status_if_heads,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",50.0,50
+A3a,41,Krookodile,Poaching Fangs,flip_inflict_effect_if_heads,shuffle_hand_to_deck,3,"""Flip 3 coins. For each heads, a card is chosen at random from your opponent's hand. Your opponent reveals that card and shuffles it into their deck.""",90.0,90
+A3a,42,Nihilego,New Wave,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,30.0,30
+A3a,43,Guzzlord ex,Grindcore,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",30.0,30
+A3a,44,Poipole,2-Step,flip_multiplier,2,20,Flip 2 coins. This attack does 20 damage for each heads.,20.0,20
+A3a,45,Naganadel,Electro House,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,40.0,40
+A3a,46,Alolan Diglett,Happened to Headbutt,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",40.0,40
+A3a,47,Alolan Dugtrio ex,Triplet Headbutt,flip_multiplier,3,60,Flip 3 coins. This attack does 60 damage for each heads.,60.0,60
+A3a,50,Aggron,Giga Impact,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't attack.""",150.0,150
+A3a,53,Stakataka,Brass Rock,inflict_effect,attack_lock,,"""During your opponent's next turn, this Pokémon takes −20 damage from attacks.""",40.0,40
+A3a,58,Bewear,Superpowered Hug,flip_two_stage,0,0,"""Flip 2 coins. If both of them are heads, your opponent's Active Pokémon is Knocked Out.""",,
+A3a,60,Type: Null,Quick Blow,flip_do_nothing_if_tails,20,,"""Flip a coin. If heads, this attack does 20 more damage.""",20.0,20
+A3a,61,Silvally,Brave Buddies,bonus_damage_conditional,50,supporter_played_this_turn,"""If you played a Supporter card from your hand during this turn, this attack does 50 more damage.""",50.0,50
+A3a,62,Celesteela,Moombahton,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",100.0,100
+A3a,70,Rowlet,Fury Attack,flip_multiplier,3,10,Flip 3 coins. This attack does 10 damage for each heads.,10.0,10
+A3a,71,Pheromosa,Jump Blues,bench_damage_one,bench,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,20.0,20
+A3a,72,Blacephalon,Beat Punk,self_damage_fixed_amount,70,,This Pokémon also does 70 damage to itself.,130.0,130
+A3a,73,Alolan Meowth,Meddle,discard_all_opponent_tools,,,Discard a random Pokémon Tool card from your opponent's hand.,,
+A3a,74,Silvally,Brave Buddies,bonus_damage_conditional,50,supporter_played_this_turn,"""If you played a Supporter card from your hand during this turn, this attack does 50 more damage.""",50.0,50
+A3a,75,Celesteela,Moombahton,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",100.0,100
+A3a,76,Buzzwole ex,Big Beat,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't use Big Beat.""",120.0,120
+A3a,77,Tapu Koko ex,Plasma Hurricane,attach_energy_from_zone_to_self,lightning,1,Take a {L} Energy from your Energy Zone and attach it to this Pokémon.,20.0,20
+A3a,78,Lycanroc ex,Lycanfang,discard_energy_specific,fighting,1,Discard a {F} Energy from this Pokémon.,130.0,130
+A3a,79,Guzzlord ex,Grindcore,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",30.0,30
+A3a,80,Alolan Dugtrio ex,Triplet Headbutt,flip_multiplier,3,60,Flip 3 coins. This attack does 60 damage for each heads.,60.0,60
+A3a,84,Tapu Koko ex,Plasma Hurricane,attach_energy_from_zone_to_self,lightning,1,Take a {L} Energy from your Energy Zone and attach it to this Pokémon.,20.0,20
+A3a,85,Lycanroc ex,Lycanfang,discard_energy_specific,fighting,1,Discard a {F} Energy from this Pokémon.,130.0,130
+A3a,86,Guzzlord ex,Grindcore,flip_inflict_effect_if_heads,discard_energy,1,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",30.0,30
+A3a,87,Alolan Dugtrio ex,Triplet Headbutt,flip_multiplier,3,60,Flip 3 coins. This attack does 60 damage for each heads.,60.0,60
+A3a,88,Buzzwole ex,Big Beat,inflict_effect,cant_attack_next_turn,,"""During your next turn, this Pokémon can't use Big Beat.""",120.0,120
+A3a,90,Arcanine,Heat Tackle,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,100.0,100
+A3a,94,Jynx,Psychic,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,30.0,30
+A3a,98,Aerodactyl,Primal Wingbeat,flip_do_nothing_if_tails,20,,"""Flip a coin. If heads, your opponent shuffles their Active Pokémon into their deck.""",,
+A3a,99,Celebi ex,Powerful Bloom,flip_multiplier,,50,Flip a coin for each Energy attached to this Pokémon. This attack does 50 damage for each heads.,50.0,50
+A3a,100,Arcanine ex,Inferno Onrush,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,120.0,120
+A3a,102,Pidgeot ex,Scattering Cyclone,bonus_damage_for_each_opponent_bench,20,,This attack does 20 more damage for each of your opponent's Benched Pokémon.,80.0,80
+A3a,103,Nihilego,New Wave,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,30.0,30
+A3b,2,Leafeon,Leaf Blast,bonus_damage_per_energy_attached,20,,This attack does 20 more damage for each {G} Energy attached to this Pokémon.,10.0,10
+A3b,5,Tsareena,Kick Down,flip_shuffle_random_from_hand,,,Your opponent reveals a random card from their hand and shuffles it into their deck.,50.0,50
+A3b,7,Appletun,Sweets Relay,bonus_damage_if_last_move_name_used,Sweets Relay,30,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 30 more damage.""",40.0,40
+A3b,8,Flareon,Assisting Heater,attach_energy_from_zone,fire,to_bench,Take a {R} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,40.0,40
+A3b,9,Flareon ex,Fire Spin,discard_energy_specific,,2,Discard 2 {R} Energy from this Pokémon.,130.0,130
+A3b,10,Torkoal,Flamethrower,discard_energy_specific,,1,Discard a {R} Energy from this Pokémon.,70.0,70
+A3b,13,Incineroar,Darkest Lariat,flip_multiplier,2,100,Flip 2 coins. This attack does 100 damage for each heads.,100.0,100
+A3b,14,Salandit,Ember,discard_energy_specific,,1,Discard a {R} Energy from this Pokémon.,30.0,30
+A3b,16,Vaporeon,Hyper Whirlpool,discard_random_energy_from_opponent,1,,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",70.0,70
+A3b,17,Glaceon,Ice Blade,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+A3b,18,Vanillite,Sweets Relay,bonus_damage_if_last_move_name_used,Sweets Relay,20,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",10.0,10
+A3b,19,Vanillish,Sweets Relay,bonus_damage_if_last_move_name_used,Sweets Relay,20,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",30.0,30
+A3b,20,Vanilluxe,Double Spin,flip_multiplier,2,80,Flip 2 coins. This attack does 80 damage for each heads.,80.0,80
+A3b,21,Alomomola,Water Pulse,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,50.0,50
+A3b,24,Primarina ex,Hydro Pump,extra_damage_if_extra_energy_attached,1|40,,"""If this Pokémon has at least 1 extra {W} Energy attached, this attack does 40 more damage.""",40.0,40
+A3b,24,Primarina ex,Sparkling Aria,heal_self,20,,Heal 20 damage from this Pokémon.,100.0,100
+A3b,25,Jolteon,Beginning Bolt,bonus_damage_if_evolved_this_turn,20,,"""If this Pokémon evolved during this turn, this attack does 20 more damage.""",40.0,40
+A3b,26,Joltik,Jolt,inflict_status,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",10.0,10
+A3b,27,Galvantula,Electric Shock,inflict_status,paralysis,,Discard all Energy attached to this Pokémon. Your opponent's Active Pokémon is now Paralyzed.,70.0,70
+A3b,28,Espeon,Energy Crush,bonus_damage_per_energy_on_opponent_all,20,,This attack does 20 damage for each Energy attached to all of your opponent's Pokémon.,0,0
+A3b,31,Swirlix,Sweets Relay,bonus_damage_if_last_move_name_used,Sweets Relay,20,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",10.0,10
+A3b,32,Slurpuff,Sweets Relay,bonus_damage_if_last_move_name_used,Sweets Relay,60,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 60 more damage.""",30.0,30
+A3b,33,Sylveon,Evoharmony,bonus_damage_per_evolution_bench,30,,This attack does 30 more damage for each Evolution Pokémon on your Bench.,40.0,40
+A3b,35,Mimikyu,Try to Imitate,flip_copy_opponent_attack,,,"""Flip a coin. If heads, choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.""",,
+A3b,36,Milcery,Sweets Relay,bonus_damage_if_last_move_name_used,Sweets Relay,20,"""If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.""",10.0,10
+A3b,37,Alcremie,Sweets Overload,damage_per_other_move_used,Sweets Relay,40,This attack does 40 damage for each time your Pokémon used Sweets Relay during this game.,40.0,40
+A3b,39,Whiscash,Earthquake,bench_damage_all_self,10,,This attack also does 10 damage to each of your Benched Pokémon.,130.0,130
+A3b,40,Mienfoo,Kick Shot,flip_do_nothing_if_tails,,,"""Flip a coin. If tails, this attack does nothing.""",40.0,40
+A3b,42,Carbink,Hard Roll,flip_prevent_damage_next_turn,,,"""Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.""",30.0,30
+A3b,43,Umbreon,Dark Binding,cant_attack_next_turn,,,"""If the Defending Pokémon is a Basic Pokémon, it can't attack during your opponent's next turn.""",40.0,40
+A3b,45,Purrloin,Playful Knockdown,discard_tools_from_opponent,,,Discard all Pokémon Tools from your opponent's Active Pokémon.,,
+A3b,47,Mawile,Powerful Vise,inflict_status,paralysis,,"""Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.""",30.0,30
+A3b,48,Togedemaru,Bristling Spikes,counter_on_hit_next_turn,30,,"""During your opponent's next turn, if this Pokémon is damaged by an attack, do 30 damage to the Attacking Pokémon.""",30.0,30
+A3b,53,Dragonite ex,Giga Impact,cant_attack_next_turn,,,"""During your next turn, this Pokémon can't attack.""",180.0,180
+A3b,54,Drampa,Dragon Breath,inflict_status,paralysis,,"""Flip a coin. If tails, this attack does nothing. If heads, your opponent's Active Pokémon is now Paralyzed.""",70.0,70
+A3b,55,Eevee,Collect,draw_cards,1,,Draw a card.,,
+A3b,57,Snorlax ex,Flop-Down Punch,inflict_status_self,asleep,,This Pokémon is now Asleep.,130.0,130
+A3b,58,Aipom,Double Hit,flip_multiplier,2,20,Flip 2 coins. This attack does 20 damage for each heads.,20.0,20
+A3b,60,Chatot,Tone-Deaf,inflict_status,confusion,,Your opponent's Active Pokémon is now Confused.,10.0,10
+A3b,61,Audino,Do the Wave,bonus_damage_for_each_bench,20,,This attack does 20 damage for each of your Benched Pokémon.,20.0,20
+A3b,65,Greedent,Enhanced Fang,bonus_damage_if_tool,50,,"""If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage.""",50.0,50
+A3b,70,Leafeon,Leaf Blast,bonus_damage_per_energy_attached,20,,This attack does 20 more damage for each {G} Energy attached to this Pokémon.,10.0,10
+A3b,71,Flareon,Assisting Heater,attach_energy_from_zone,fire,to_bench,Take a {R} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,40.0,40
+A3b,72,Vaporeon,Hyper Whirlpool,discard_random_energy_from_opponent,1,,"""Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.""",70.0,70
+A3b,73,Glaceon,Ice Blade,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+A3b,74,Jolteon,Beginning Bolt,bonus_damage_if_evolved_this_turn,20,,"""If this Pokémon evolved during this turn, this attack does 20 more damage.""",40.0,40
+A3b,75,Espeon,Energy Crush,bonus_damage_per_energy_on_opponent_all,20,,This attack does 20 damage for each Energy attached to all of your opponent's Pokémon.,20.0,20
+A3b,76,Sylveon,Evoharmony,bonus_damage_per_evolution_bench,30,,This attack does 30 more damage for each Evolution Pokémon on your Bench.,40.0,40
+A3b,77,Umbreon,Dark Binding,cant_attack_next_turn,,,"""If the Defending Pokémon is a Basic Pokémon, it can't attack during your opponent's next turn.""",40.0,40
+A3b,78,Eevee,Collect,draw_cards,1,,Draw a card.,,
+A3b,79,Flareon ex,Fire Spin,discard_energy_specific,,2,Discard 2 {R} Energy from this Pokémon.,130.0,130
+A3b,80,Primarina ex,Hydro Pump,extra_damage_if_extra_energy_attached,1|40,,"""If this Pokémon has at least 1 extra {W} Energy attached, this attack does 40 more damage.""",40.0,40
+A3b,80,Primarina ex,Sparkling Aria,heal_self,20,,Heal 20 damage from this Pokémon.,100.0,100
+A3b,82,Dragonite ex,Giga Impact,cant_attack_next_turn,,,"""During your next turn, this Pokémon can't attack.""",180.0,180
+A3b,84,Snorlax ex,Flop-Down Punch,inflict_status_self,asleep,,This Pokémon is now Asleep.,130.0,130
+A3b,87,Flareon ex,Fire Spin,discard_energy_specific,,2,Discard 2 {R} Energy from this Pokémon.,130.0,130
+A3b,88,Primarina ex,Hydro Pump,extra_damage_if_extra_energy_attached,1|40,,"""If this Pokémon has at least 1 extra {W} Energy attached, this attack does 40 more damage.""",40.0,40
+A3b,88,Primarina ex,Sparkling Aria,heal_self,20,,Heal 20 damage from this Pokémon.,100.0,100
+A3b,90,Dragonite ex,Giga Impact,cant_attack_next_turn,,,"""During your next turn, this Pokémon can't attack.""",180.0,180
+A3b,91,Snorlax ex,Flop-Down Punch,inflict_status_self,asleep,,This Pokémon is now Asleep.,130.0,130
+A3b,93,Pinsir,Guillotine Rush,flip_bonus_damage_if_heads,1,40,Flip a coin until you get tails. This attack does 40 more damage for each heads.,50.0,50
+A3b,94,Lapras,Hydro Pump,extra_damage_if_extra_energy_attached,3|70,,"""If this Pokémon has at least 3 extra {W} Energy attached, this attack does 70 more damage.""",20.0,20
+A3b,95,Voltorb,Big Explosion,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,30.0,30
+A3b,97,Ralts,Teleport,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,,
+A3b,101,Arbok,Corner,prevent_retreat_next_turn,,,"""During your opponent's next turn, the Defending Pokémon can't retreat.""",60.0,60
+A3b,103,Moltres ex,Inferno Dance,attach_energy_from_zone,fire,count_heads,Flip 3 coins. Take an amount of {R} Energy from your Energy Zone equal to the number of heads and attach it to your Benched {R} Pokémon in any way you like.,,
+A3b,104,Articuno ex,Blizzard,bench_damage_all_opponent,10,,This attack also does 10 damage to each of your opponent's Benched Pokémon.,80.0,80
+A3b,105,Zapdos ex,Thundering Hurricane,flip_multiplier,4,50,Flip 4 coins. This attack does 50 damage for each heads.,50.0,50
+A3b,106,Gallade ex,Energized Blade,bonus_damage_per_energy_attached,20,,This attack does 20 more damage for each Energy attached to your opponent's Active Pokémon.,70.0,70
+A4,1,Oddish,Poison Powder,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,10.0,10.0
+A4,3,Bellossom,Petal Dance,flip_multiplier_self_confuse,3,60.0,Flip 3 coins. This attack does 60 damage for each heads. This Pokémon is now Confused.,60.0,60.0
+A4,4,Tangela,Sleep Powder,inflict_status,sleep,,Your opponent's Active Pokémon is now Asleep.,20.0,20.0
+A4,5,Tangrowth,Grass Knot,bonus_damage_per_energy_attached,40,,This attack does 40 more damage for each Energy in your opponent's Active Pokémon's Retreat Cost.,10.0,10.0
+A4,10,Meganium,Bloomshine,heal_all,20,,Heal 20 damage from each of your Pokémon.,80.0,80.0
+A4,16,Sunkern,Blot,heal_self,10,,Heal 10 damage from this Pokémon.,20.0,20.0
+A4,18,Yanma,U-turn,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,20.0,20.0
+A4,21,Shuckle ex,Triple Slap,flip_multiplier,3,20.0,Flip 3 coins. This attack does 20 damage for each heads.,20.0,20.0
+A4,22,Heracross,Single Lunge,bonus_damage_if_no_damage_self,40,,"If this Pokémon has no damage on it, this attack does 40 more damage.",40.0,40.0
+A4,23,Cherubi,Sweets Relay,damage_per_other_move_used,sweets relay,20.0,"If 1 of your Pokémon used Sweets Relay during your last turn, this attack does 20 more damage.",10.0,10.0
+A4,26,Ninetales,Scorching Breath,cant_attack_next_turn,,,"During your next turn, this Pokémon can't attack.",120.0,120.0
+A4,31,Magcargo,Spurt Fire,random_multi_target_damage,3,50.0,"1 other Pokémon (either yours or your opponent's) is chosen at random 3 times. For each time a Pokémon was chosen, do 50 damage to it.",,
+A4,32,Magby,Toasty Toss,attach_energy_from_zone,fire,to_bench,Take a {R} Energy from your Energy Zone and attach it to 1 of your Benched Basic Pokémon.,,
+A4,33,Entei,Strong Flare,discard_random_energy_from_opponent,2,,"Flip a coin. If tails, discard 2 random Energy from this Pokémon.",110.0,110.0
+A4,34,Ho-Oh ex,Phoenix Turbo,attach_multiple_energy_from_zone,fire;water;lightning,to_bench,"Take a {R}, {W}, and {L} Energy from your Energy Zone and attach them to your Benched Basic Pokémon in any way you like.",80.0,80.0
+A4,37,Heatmor,Roasting Heat,bonus_damage_if_opponent_burned,60,,"If your opponent's Active Pokémon is Burned, this attack does 60 more damage.",30.0,30.0
+A4,43,Kingdra ex,Stormy Prison,prevent_retreat_next_turn,,,"During your opponent's next turn, the Defending Pokémon can't retreat.",90.0,90.0
+A4,44,Magikarp,Splashing Dodge,flip_prevent_damage_next_turn,,,"Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.",10.0,10.0
+A4,45,Gyarados,Wild Swing,discard_bench_for_bonus_damage,40,,You may discard any number of your Benched {W} Pokémon. This attack does 40 more damage for each Benched Pokémon you discarded in this way.,20.0,20.0
+A4,48,Feraligatr,Destructive Whirlpool,discard_random_energy_from_opponent,1,,Discard a random Energy from your opponent's Active Pokémon.,90.0,90.0
+A4,53,Qwilfish,Poison Sting,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,20.0,20.0
+A4,54,Corsola,Find a Friend,search_pokemon_type_random,,,Put a random Pokémon from your deck into your hand.,,
+A4,56,Octillery,Octazooka,flip_block_attack,,,"If the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen. This effect lasts until the Defending Pokémon leaves the Active Spot, and it doesn't stack.",50.0,50.0
+A4,57,Delibird,Stumbling Draw,draw_cards,1,,Draw a card.,10.0,10.0
+A4,58,Mantine,Dive,flip_prevent_damage_next_turn,,,"Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.",80.0,80.0
+A4,59,Suicune,Cure Stream,reduce_damage_next_turn,20,,"During your opponent's next turn, attacks used by the Defending Pokémon do −20 damage.",70.0,70.0
+A4,63,Swanna,Feathery Cyclone,move_all_energy_to_bench,,,Move all Energy from this Pokémon to 1 of your Benched Pokémon.,60.0,60.0
+A4,65,Lanturn ex,Flashing Signal,inflict_status,paralysis,,"Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed. If tails, your opponent's Active Pokémon is now Confused.",80.0,80.0
+A4,66,Pichu,Crackly Toss,attach_energy_from_zone,lightning,to_bench,Take a {L} Energy from your Energy Zone and attach it to 1 of your Benched Basic Pokémon.,,
+A4,69,Ampharos,Thunder Punch,flip_bonus_damage_if_heads,1,40.0,"Flip a coin. If heads, this attack does 40 more damage. If tails, this Pokémon also does 20 damage to itself.",80.0,80.0
+A4,70,Elekid,Zappy Shot,bench_damage_one,opponent,20.0,This attack does 20 damage to 1 of your opponent's Benched Pokémon.,,
+A4,71,Raikou,Thunder,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,70.0,70.0
+A4,72,Emolga,Raging Thunder,bench_damage_one,self,10.0,This attack also does 10 damage to 1 of your Benched Pokémon.,40.0,40.0
+A4,73,Slowpoke,Rest,inflict_status,sleep,,This Pokémon is now Asleep. Heal 30 damage from it.,,
+A4,74,Slowking,Psychic,bonus_damage_per_energy_attached,30,,This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.,10.0,10.0
+A4,75,Smoochum,Shivery Wave,bonus_damage_for_each_energy_on_opponent,20,,This attack does 20 damage for each Energy attached to your opponent's Active Pokémon.,20.0,20.0
+A4,76,Jynx,Attract Smack,inflict_status,paralysis,,"Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.",30.0,30.0
+A4,77,Cleffa,Twinkly Call,search_pokemon_type_random,,,Put a random Pokémon from your deck into your hand.,,
+A4,78,Togepi,Charm,reduce_damage_next_turn,20,,"During your opponent's next turn, attacks used by the Defending Pokémon do −20 damage.",,
+A4,82,Xatu,Life Drain,flip_set_hp,10,,"Flip a coin. If heads, your opponent's Active Pokémon's remaining HP is now 10.",,
+A4,86,Wobbuffet,Reply Strongly,bonus_damage_if_damaged_last_turn,50,,"If this Pokémon was damaged by an attack during your opponent's last turn while it was in the Active Spot, this attack does 50 more damage.",30.0,30.0
+A4,87,Girafarig,Psybeam,inflict_status,confusion,,Your opponent's Active Pokémon is now Confused.,50.0,50.0
+A4,89,Granbull,Wild Tackle,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,100.0,100.0
+A4,91,Musharna,Dream Dance,inflict_status,sleep,,Both Active Pokémon are now Asleep.,60.0,60.0
+A4,98,Mamoswine,Earthquake,bench_damage_all_self,20,,This attack also does 20 damage to each of your Benched Pokémon.,160.0,160.0
+A4,99,Phanpy,Reckless Charge,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,30.0,30.0
+A4,100,Donphan ex,Gigantic Press,extra_damage_if_extra_energy_attached,2|60,,"If this Pokémon has at least 2 extra {F} Energy attached, this attack does 60 more damage.",50.0,50.0
+A4,102,Hitmontop,Piercing Spin,bench_damage_one,opponent,20.0,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,20.0,20.0
+A4,104,Pupitar,Guard Press,reduce_damage_next_turn,30,,"During your opponent's next turn, this Pokémon takes −30 damage from attacks.",20.0,20.0
+A4,105,Binacle,Dual Chop,flip_multiplier,2,30.0,Flip 2 coins. This attack does 30 damage for each heads.,30.0,30.0
+A4,107,Zubat,Venomous Fang,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,10.0,10.0
+A4,108,Golbat,Venomous Fang,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,20.0,20.0
+A4,109,Crobat ex,Venomous Slash,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,70.0,70.0
+A4,111,Ariados,Bind Down,prevent_retreat_next_turn,,,"During your opponent's next turn, the Defending Pokémon can't retreat.",40.0,40.0
+A4,113,Murkrow,Astonish,flip_shuffle_random_from_hand,,,"Flip a coin. If heads, your opponent reveals a random card from their hand and shuffles it into their deck.",,
+A4,118,Houndoom,Diving Swipe,discard_random_from_opponent_hand,1,,Discard a random card from your opponent's hand.,70.0,70.0
+A4,120,Absol,Leap Over,bench_damage_one,opponent,30.0,This attack does 30 damage to 1 of your opponent's Benched Pokémon.,,
+A4,123,Scizor,Gale Thrust,bonus_damage_if_switched_in,50,,"If this Pokémon moved from your Bench to the Active Spot this turn, this attack does 50 more damage.",50.0,50.0
+A4,124,Skarmory ex,Steel Wing,reduce_damage_next_turn,20,,"During your opponent's next turn, this Pokémon takes −20 damage from attacks.",70.0,70.0
+A4,128,Klinklang,Gear Spinner,boost_next_attack,70,,"During your next turn, this Pokémon's Gear Spinner attack does +70 damage.",70.0,70.0
+A4,130,Fearow,Peck Bugs,bonus_damage_if_type,grass,40,"If your opponent's Active Pokémon is a {G} Pokémon, this attack does 40 more damage.",30.0,30.0
+A4,131,Chansey,Scrunch,flip_prevent_damage_next_turn,,,"Flip a coin. If heads, during your opponent's next turn, prevent all damage done to this Pokémon by attacks.",,
+A4,132,Blissey,Energy Blow,bonus_damage_per_energy_attached,20,,This attack does 20 more damage for each Energy attached to this Pokémon.,20.0,20.0
+A4,133,Kangaskhan,Cross-Cut,bonus_damage_if_evolution,40,,"If your opponent's Active Pokémon is an Evolution Pokémon, this attack does 40 more damage.",20.0,20.0
+A4,134,Eevee,Find a Friend,search_pokemon_type_random,,,Put a random Pokémon from your deck into your hand.,,
+A4,137,Porygon-Z,Slowing Beam,increase_energy_cost,1,,"During your opponent's next turn, attacks used by the Defending Pokémon cost 1 {C} more.",70.0,70.0
+A4,139,Furret,Tail Smash,flip_do_nothing_if_tails,,,"Flip a coin. If tails, this attack does nothing.",80.0,80.0
+A4,141,Noctowl,Fly,flip_do_nothing_if_tails,,,"Flip a coin. If tails, this attack does nothing. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon.",90.0,90.0
+A4,142,Aipom,Imitate,draw_until_equal_hand,,,Draw cards until you have the same number of cards in your hand as your opponent.,,
+A4,144,Dunsparce,Sudden Flash,inflict_status,paralysis,,"Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.",20.0,20.0
+A4,145,Teddiursa,Honey Snack,heal_self,20,,Heal 20 damage from this Pokémon.,,
+A4,146,Ursaring,Swing Around,flip_multiplier_bonus,2,20.0,Flip 2 coins. This attack does 20 more damage for each heads.,60.0,60.0
+A4,147,Stantler,Enhanced Horns,bonus_damage_if_tool,50,,"If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage.",20.0,20.0
+A4,148,Smeargle,Splatter Coating,change_energy_type,random,,"Change the type of a random Energy attached to your opponent's Active Pokémon to 1 of the following at random: {G}, {R}, {W}, {L}, {P}, {F}, {D}, or {M}.",50.0,50.0
+A4,149,Lugia ex,Elemental Blast,discard_energy_specific,,1.0,"Discard a {R}, {W}, and {L} Energy from this Pokémon.",180.0,180.0
+A4,150,Bouffalant,Continuous Headbutt,flip_until_tails_multiplier,,70.0,Flip a coin until you get tails. This attack does 70 damage for each heads.,70.0,70.0
+A4,163,Bellossom,Petal Dance,flip_multiplier_self_confuse,3,60.0,Flip 3 coins. This attack does 60 damage for each heads. This Pokémon is now Confused.,60.0,60.0
+A4,164,Heracross,Single Lunge,bonus_damage_if_no_damage_self,40,,"If this Pokémon has no damage on it, this attack does 40 more damage.",40.0,40.0
+A4,166,Magby,Toasty Toss,attach_energy_from_zone,fire,to_bench,Take a {R} Energy from your Energy Zone and attach it to 1 of your Benched Basic Pokémon.,,
+A4,168,Qwilfish,Poison Sting,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,20.0,20.0
+A4,169,Octillery,Octazooka,flip_block_attack,,,"If the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen. This effect lasts until the Defending Pokémon leaves the Active Spot, and it doesn't stack.",50.0,50.0
+A4,170,Delibird,Stumbling Draw,draw_cards,1,,Draw a card.,10.0,10.0
+A4,171,Pichu,Crackly Toss,attach_energy_from_zone,lightning,to_bench,Take a {L} Energy from your Energy Zone and attach it to 1 of your Benched Basic Pokémon.,,
+A4,172,Ampharos,Thunder Punch,flip_bonus_damage_if_heads,1,40.0,"Flip a coin. If heads, this attack does 40 more damage. If tails, this Pokémon also does 20 damage to itself.",80.0,80.0
+A4,173,Togepi,Charm,reduce_damage_next_turn,20,,"During your opponent's next turn, attacks used by the Defending Pokémon do −20 damage.",,
+A4,174,Xatu,Life Drain,flip_set_hp,10,,"Flip a coin. If heads, your opponent's Active Pokémon's remaining HP is now 10.",,
+A4,175,Wobbuffet,Reply Strongly,bonus_damage_if_damaged_last_turn,50,,"If this Pokémon was damaged by an attack during your opponent's last turn while it was in the Active Spot, this attack does 50 more damage.",30.0,30.0
+A4,178,Murkrow,Astonish,flip_shuffle_random_from_hand,,,"Flip a coin. If heads, your opponent reveals a random card from their hand and shuffles it into their deck.",,
+A4,180,Scizor,Gale Thrust,bonus_damage_if_switched_in,50,,"If this Pokémon moved from your Bench to the Active Spot this turn, this attack does 50 more damage.",50.0,50.0
+A4,183,Stantler,Enhanced Horns,bonus_damage_if_tool,50,,"If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage.",20.0,20.0
+A4,184,Smeargle,Splatter Coating,change_energy_type,random,,"Change the type of a random Energy attached to your opponent's Active Pokémon to 1 of the following at random: {G}, {R}, {W}, {L}, {P}, {F}, {D}, or {M}.",50.0,50.0
+A4,185,Blissey,Energy Blow,bonus_damage_per_energy_attached,20,,This attack does 20 more damage for each Energy attached to this Pokémon.,20.0,20.0
+A4,186,Shuckle ex,Triple Slap,flip_multiplier,3,20.0,Flip 3 coins. This attack does 20 damage for each heads.,20.0,20.0
+A4,187,Ho-Oh ex,Phoenix Turbo,attach_multiple_energy_from_zone,fire;water;lightning,to_bench,"Take a {R}, {W}, and {L} Energy from your Energy Zone and attach them to your Benched Basic Pokémon in any way you like.",80.0,80.0
+A4,188,Kingdra ex,Stormy Prison,prevent_retreat_next_turn,,,"During your opponent's next turn, the Defending Pokémon can't retreat.",90.0,90.0
+A4,189,Lanturn ex,Flashing Signal,inflict_status,paralysis,,"Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed. If tails, your opponent's Active Pokémon is now Confused.",80.0,80.0
+A4,191,Donphan ex,Gigantic Press,extra_damage_if_extra_energy_attached,2|60,,"If this Pokémon has at least 2 extra {F} Energy attached, this attack does 60 more damage.",50.0,50.0
+A4,192,Crobat ex,Venomous Slash,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,70.0,70.0
+A4,194,Skarmory ex,Steel Wing,reduce_damage_next_turn,20,,"During your opponent's next turn, this Pokémon takes −20 damage from attacks.",70.0,70.0
+A4,195,Lugia ex,Elemental Blast,discard_energy_specific,,1.0,"Discard a {R}, {W}, and {L} Energy from this Pokémon.",180.0,180.0
+A4,202,Shuckle ex,Triple Slap,flip_multiplier,3,20.0,Flip 3 coins. This attack does 20 damage for each heads.,20.0,20.0
+A4,203,Kingdra ex,Stormy Prison,prevent_retreat_next_turn,,,"During your opponent's next turn, the Defending Pokémon can't retreat.",90.0,90.0
+A4,204,Lanturn ex,Flashing Signal,inflict_status,paralysis,,"Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed. If tails, your opponent's Active Pokémon is now Confused.",80.0,80.0
+A4,206,Donphan ex,Gigantic Press,extra_damage_if_extra_energy_attached,2|60,,"If this Pokémon has at least 2 extra {F} Energy attached, this attack does 60 more damage.",50.0,50.0
+A4,207,Crobat ex,Venomous Slash,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,70.0,70.0
+A4,209,Skarmory ex,Steel Wing,reduce_damage_next_turn,20,,"During your opponent's next turn, this Pokémon takes −20 damage from attacks.",70.0,70.0
+A4,210,Ho-Oh ex,Phoenix Turbo,attach_multiple_energy_from_zone,fire;water;lightning,to_bench,"Take a {R}, {W}, and {L} Energy from your Energy Zone and attach them to your Benched Basic Pokémon in any way you like.",80.0,80.0
+A4,211,Lugia ex,Elemental Blast,discard_energy_specific,,1.0,"Discard a {R}, {W}, and {L} Energy from this Pokémon.",180.0,180.0
+A4,212,Yanma,U-turn,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,20.0,20.0
+A4,213,Flareon,Assisting Heater,attach_energy_from_zone,fire,to_bench,Take a {R} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,40.0,40.0
+A4,214,Magikarp,Leap Out,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,,
+A4,215,Gyarados,Wild Swing,discard_bench_for_bonus_damage,40,,You may discard any number of your Benched {W} Pokémon. This attack does 40 more damage for each Benched Pokémon you discarded in this way.,20.0,20.0
+A4,216,Vaporeon,Bubble Drain,heal_self,30,,Heal 30 damage from this Pokémon.,60.0,60.0
+A4,219,Jolteon,Beginning Bolt,bonus_damage_if_evolved_this_turn,20,,"If this Pokémon evolved during this turn, this attack does 20 more damage.",40.0,40.0
+A4,221,Mankey,Focus Fist,flip_do_nothing_if_tails,,,"Flip a coin. If tails, this attack does nothing.",50.0,50.0
+A4,222,Primeape,Fight Back,bonus_damage_if_opponent_damaged,60,,"If this Pokémon has damage on it, this attack does 60 more damage.",40.0,40.0
+A4,223,Nidoran♀,Call for Family,search_specific_into_bench,nidoran♂,,Put 1 random Nidoran♂ from your deck onto your Bench.,,
+A4,225,Nidoqueen,Lovestrike,bonus_damage_for_each_named_bench,nidoking,50.0,This attack does 50 more damage for each of your Benched Nidoking.,80.0,80.0
+A4,228,Nidoking,Poison Horn,inflict_status,poison,,Your opponent's Active Pokémon is now Poisoned.,90.0,90.0
+A4,231,Eevee,Find a Friend,search_pokemon_type_random,,,Put a random Pokémon from your deck into your hand.,,
+A4,232,Yanmega ex,Air Slash,discard_random_energy_from_opponent,1,,Discard a random Energy from this Pokémon.,120.0,120.0
+A4,234,Gyarados ex,Rampaging Whirlpool,discard_random_energy_from_opponent,1,,Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's).,140.0,140.0
+A4,236,Pachirisu ex,Sparking Gadget,bonus_damage_if_tool,40,,"If this Pokémon has a Pokémon Tool attached, this attack does 40 more damage.",40.0,40.0
+A4,237,Mismagius ex,Magical Delusion,inflict_status,confusion,,Your opponent's Active Pokémon is now Confused.,70.0,70.0
+A4,238,Weavile ex,Scratching Nails,bonus_damage_if_opponent_damaged,40,,"If your opponent's Active Pokémon has damage on it, this attack does 40 more damage.",30.0,30.0
+A4,239,Lickilicky ex,Licking Fury,flip_bonus_damage_if_heads,1,40.0,Flip a coin until you get tails. This attack does 40 more damage for each heads.,100.0,100.0
+A4,240,Ho-Oh ex,Phoenix Turbo,attach_multiple_energy_from_zone,fire;water;lightning,to_bench,"Take a {R}, {W}, and {L} Energy from your Energy Zone and attach them to your Benched Basic Pokémon in any way you like.",80.0,80.0
+A4,241,Lugia ex,Elemental Blast,discard_energy_specific,,1.0,"Discard a {R}, {W}, and {L} Energy from this Pokémon.",180.0,180.0
+A4a,2,Skiploom,Bounce,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,30.0,30.0
+A4a,3,Jumpluff ex,Breeze-By Attack,switch_self_with_bench,,,You may switch this Pokémon with 1 of your Benched Pokémon.,70.0,70.0
+A4a,5,Sunflora,Trip Over,flip_bonus_damage_if_heads,1,30,"Flip a coin. If heads, this attack does 30 more damage.",50.0,50.0
+A4a,6,Celebi,Temporal Leaves,devolve_opponent,,,"If your opponent's Active Pokémon is an evolved Pokémon, devolve it by putting the highest Stage Evolution card on it into your opponent's hand.",40.0,40.0
+A4a,7,Durant,Mountain Munch,discard_top_opponent_deck,1,,Discard the top card of your opponent's deck.,40.0,40.0
+A4a,10,Entei ex,Blazing Beatdown,extra_damage_if_extra_energy_attached,2|60,r,"If this Pokémon has at least 2 extra {R} Energy attached, this attack does 60 more damage.",60.0,60.0
+A4a,12,Talonflame,Searing Flame,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,50.0,50.0
+A4a,13,Poliwag,Call for Family,search_specific_into_bench,poliwag,,Put 1 random Poliwag from your deck onto your Bench.,,
+A4a,15,Tentacool,Poison Sting,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,20.0,20.0
+A4a,16,Tentacruel,Stun Poison,flip_inflict_status_both,poisoned_paralyzed,,"Flip a coin. If heads, your opponent's Active Pokémon is now Poisoned and Paralyzed.",50.0,50.0
+A4a,18,Slowking,Litter,discard_tools_for_damage,2,,Discard up to 2 Pokémon Tool cards from your hand. This attack does 50 damage for each card you discarded in this way.,50.0,50.0
+A4a,19,Jynx,Dazzle Dance,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,40.0,40.0
+A4a,20,Suicune ex,Crystal Waltz,bonus_damage_for_each_bench,20,,This attack does 20 damage for each Benched Pokémon (both yours and your opponent's).,20.0,20.0
+A4a,21,Feebas,Leap Out,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,,
+A4a,23,Mantyke,Splashy Toss,attach_energy_from_zone,w,,Take a {W} Energy from your Energy Zone and attach it to 1 of your Benched Basic Pokémon.,,
+A4a,24,Cryogonal,Ice Blade,bench_damage_one,40,,This attack does 40 damage to 1 of your opponent's Pokémon.,,
+A4a,25,Raikou ex,Voltaic Bullet,bench_damage_one,10,,This attack also does 10 damage to 1 of your opponent's Benched Pokémon.,60.0,60.0
+A4a,28,Eelektross,Wild Charge,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,120.0,120.0
+A4a,31,Boltund,Defiant Spark,reduce_energy_cost_if_damaged,1|l,,"If this Pokémon has damage on it, this attack can be used for 1 {L} Energy.",70.0,70.0
+A4a,33,Mismagius,Cursed Prose,damage_end_of_opponent_turn,90,,"At the end of your opponent's next turn, do 90 damage to the Defending Pokémon.",,
+A4a,36,Latias,Crossing Flights,bonus_damage_if_named_bench,latios,20,"If Latios is on your Bench, this attack does 20 more damage.",20.0,20.0
+A4a,37,Latios,Luster Purge,discard_energy_specific,all,all,Discard all Energy from this Pokémon.,120.0,120.0
+A4a,38,Frillish,Absorb,heal_self,10,,Heal 10 damage from this Pokémon.,10.0,10.0
+A4a,41,Dugtrio,Cliff Crumbler,discard_top_own_deck_bonus_if_type,fighting,60,"Discard the top card of your deck. If that card is a {F} Pokémon, this attack does 60 more damage.",40.0,40.0
+A4a,42,Poliwrath ex,Hydro Knuckle,bonus_damage_per_energy_attached,w,40,"If this Pokémon has any {W} Energy attached, this attack does 40 more damage.",100.0,100.0
+A4a,43,Phanpy,Flail,damage_equal_to_self_damage,,,This attack does damage to your opponent's Active Pokémon equal to the damage this Pokémon has on it.,,
+A4a,45,Relicanth,Take Down,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,50.0,50.0
+A4a,47,Crustle,Stone Edge,flip_bonus_damage_if_heads,1,50,"Flip a coin. If heads, this attack does 50 more damage.",100.0,100.0
+A4a,48,Seviper,Fateful Fang,bonus_damage_if_named_opponent,zangoose,40,"If your opponent's Active Pokémon is Zangoose, this attack does 40 more damage.",40.0,40.0
+A4a,52,Malamar,Mental Surge,bench_damage_all_opponent,20,,This attack does 20 damage to each of your opponent's Pokémon.,,
+A4a,55,Altaria,Dragon Arcana,bonus_damage_if_multiple_energy_types,60,,"If this Pokémon has 2 or more different types of Energy attached, this attack does 60 more damage.",40.0,40.0
+A4a,57,Lickitung,Stretch Tongue,bench_damage_one,30,,This attack does 30 damage to 1 of your opponent's Pokémon.,,
+A4a,58,Lickilicky,Stretch Tongue,bench_damage_one,60,,This attack does 60 damage to 1 of your opponent's Pokémon.,,
+A4a,59,Igglybuff,Sleepy Lullaby,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,10.0,10.0
+A4a,60,Teddiursa,Surprise Attack,flip_do_nothing_if_tails,,,"Flip a coin. If tails, this attack does nothing.",40.0,40.0
+A4a,62,Miltank,Rolling Frenzy,stacking_damage_boost,30,,"Until this Pokémon leaves the Active Spot, this Pokémon's Rolling Frenzy attack does +30 damage. This effect stacks.",10.0,10.0
+A4a,63,Azurill,Squishy Healing,heal_bench_one,50,,Heal 50 damage from 1 of your Benched Pokémon.,,
+A4a,66,Fletchling,Quick Attack,flip_bonus_damage_if_heads,1,30,"Flip a coin. If heads, this attack does 30 more damage.",10.0,10.0
+A4a,75,Latios,Luster Purge,discard_energy_specific,all,all,Discard all Energy from this Pokémon.,120.0,120.0
+A4a,76,Phanpy,Flail,damage_equal_to_self_damage,,,This attack does damage to your opponent's Active Pokémon equal to the damage this Pokémon has on it.,,
+A4a,77,Azurill,Squishy Healing,heal_bench_one,50,,Heal 50 damage from 1 of your Benched Pokémon.,,
+A4a,78,Jumpluff ex,Breeze-By Attack,switch_self_with_bench,,,You may switch this Pokémon with 1 of your Benched Pokémon.,70.0,70.0
+A4a,79,Entei ex,Blazing Beatdown,extra_damage_if_extra_energy_attached,2|60,r,"If this Pokémon has at least 2 extra {R} Energy attached, this attack does 60 more damage.",60.0,60.0
+A4a,80,Suicune ex,Crystal Waltz,bonus_damage_for_each_bench,20,,This attack does 20 damage for each Benched Pokémon (both yours and your opponent's).,20.0,20.0
+A4a,81,Raikou ex,Voltaic Bullet,bench_damage_one,10,,This attack also does 10 damage to 1 of your opponent's Benched Pokémon.,60.0,60.0
+A4a,82,Poliwrath ex,Hydro Knuckle,bonus_damage_per_energy_attached,w,40,"If this Pokémon has any {W} Energy attached, this attack does 40 more damage.",100.0,100.0
+A4a,86,Jumpluff ex,Breeze-By Attack,switch_self_with_bench,,,You may switch this Pokémon with 1 of your Benched Pokémon.,70.0,70.0
+A4a,87,Entei ex,Blazing Beatdown,extra_damage_if_extra_energy_attached,2|60,r,"If this Pokémon has at least 2 extra {R} Energy attached, this attack does 60 more damage.",60.0,60.0
+A4a,88,Raikou ex,Voltaic Bullet,bench_damage_one,10,,This attack also does 10 damage to 1 of your opponent's Benched Pokémon.,60.0,60.0
+A4a,89,Poliwrath ex,Hydro Knuckle,bonus_damage_per_energy_attached,w,40,"If this Pokémon has any {W} Energy attached, this attack does 40 more damage.",100.0,100.0
+A4a,90,Suicune ex,Crystal Waltz,bonus_damage_for_each_bench,20,,This attack does 20 damage for each Benched Pokémon (both yours and your opponent's).,20.0,20.0
+A4a,93,Psyduck,Headache,prevent_supporter_next_turn,,,Your opponent can't use any Supporter cards from their hand during their next turn.,10.0,10.0
+A4a,96,Kingler,KO Crab,flip_both_heads_bonus,80,,"Flip 2 coins. If both of them are heads, this attack does 80 more damage.",80.0,80.0
+A4a,100,Paldean Wooper,Poison Jab,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,10.0,10.0
+A4a,101,Infernape ex,Flare Blitz,discard_energy_specific,r,all,Discard all {R} Energy from this Pokémon.,140.0,140.0
+A4a,102,Mew ex,Genome Hacking,copy_opponent_attack,,,Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack.,,
+A4a,103,Garchomp ex,Linear Attack,bench_damage_one,50,,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+A4a,104,Paldean Clodsire ex,Venoshock,bonus_damage_if_opponent_poisoned,60,,"If your opponent's Active Pokémon is Poisoned, this attack does 60 more damage.",60.0,60.0
+A4a,105,Mantyke,Splashy Toss,attach_energy_from_zone,w,,Take a {W} Energy from your Energy Zone and attach it to 1 of your Benched Basic Pokémon.,,
+B1,001,Pinsir,X-Scissor,flip_bonus_damage_if_heads,1,50,"Flip a coin. If heads, this attack does 50 more damage.",50,50
+B1,002,Mega Pinsir ex,Critical Scissors,flip_bonus_damage_if_heads,1,70,"Flip a coin. If heads, this attack does 70 more damage.",80,80
+B1,004,Silcoon,Harden,prevent_damage_if_under_threshold,40,,"During your opponent's next turn, prevent all damage done to this Pokémon by attacks if that damage is 40 or less.",,
+B1,005,Beautifly,Skill Dive,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+B1,006,Cascoon,Harden,prevent_damage_if_under_threshold,40,,"During your opponent's next turn, prevent all damage done to this Pokémon by attacks if that damage is 40 or less.",,
+B1,007,Dustox,Select Powder,inflict_status_choice,poisoned;confused,,"Choose either Poisoned or Confused. Your opponent's Active Pokémon is now affected by that Special Condition.",60,60
+B1,010,Shiftry,Nipping Cyclone,discard_random_from_opponent_hand,1,,Discard a random card from your opponent's hand.,70,70
+B1,014,Simisage,Fury Swipes,flip_multiplier,3,40,Flip 3 coins. This attack does 40 damage for each heads.,40,40
+B1,016,Whimsicott ex,Grass Knot,bonus_damage_per_retreat_cost,30,,"This attack does 30 more damage for each Energy in your opponent's Active Pokémon's Retreat Cost.",40,40
+B1,019,Maractus,Dazzle Dance,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,40,40
+B1,020,Virizion,Sacred Sword,self_lock_specific_attack,,,"During your next turn, this Pokémon can't use Sacred Sword.",110,110
+B1,022,Gogoat,Double-Edge,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,100,100
+B1,024,Trevenant,Horn Leech,heal_self,20,,Heal 20 damage from this Pokémon.,60,60
+B1,029,Arcanine,Fire Fang,flip_inflict_status_if_heads,burned,,"Flip a coin. If heads, your opponent's Active Pokémon is now Burned.",50,50
+B1,031,Rapidash ex,Sprinting Flare,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,110,110
+B1,032,Ho-Oh,Blessed Burn,heal_type_pokemon,30,basic,Heal 30 damage from each of your Benched Basic Pokémon.,100,100
+B1,035,Blaziken,Blaze Kick,discard_energy_specific,fire,1,Discard a {R} Energy from this Pokémon.,100,100
+B1,036,Mega Blaziken ex,Mega Burning,discard_energy_specific_inflict_status,fire,1,"Discard Fire{R} Energy from this Pokémon. Your opponent's Active Pokémon is now Burned.",120,120
+B1,038,Simisear,Fury Swipes,flip_multiplier,3,40,Flip 3 coins. This attack does 40 damage for each heads.,40,40
+B1,039,Darumaka,Reckless Charge,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,50,50
+B1,040,Darmanitan,Darmani-Hands,flip_multiplier_bonus,2,30,Flip 2 coins. This attack does 30 more damage for each heads.,80,80
+B1,044,Heatmor,Tongue Whip,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Benched Pokémon.,,
+B1,046,Pyroar,Fire Blast,discard_energy_specific,fire,2,Discard 2 {R} Energy from this Pokémon.,130,130
+B1,047,Turtonator,Shell Trap,counter_on_hit_next_turn,20,,"During your opponent's next turn, if this Pokémon is damaged by an attack, do 20 damage to the Attacking Pokémon.",40,40
+B1,050,Magikarp,Waterfall Evolution,auto_evolve_random,,,"Put a random card from your deck that evolves from this Pokémon onto this Pokémon to evolve it.",,
+B1,051,Gyarados,Hammering Tail,discard_top_opponent_deck,1,,Discard the top card of your opponent's deck.,100,100
+B1,052,Mega Gyarados ex,Mega Blaster,discard_top_opponent_deck,3,,Discard the top 3 cards of your opponent's deck.,140,140
+B1,055,Ludicolo,Rhythmic Steps,bonus_damage_if_hand_count,60,"1;3;5","If you have exactly 1, 3, or 5 cards in your hand, this attack does 60 more damage.",60,60
+B1,057,Wailord,Whale Pump,bonus_damage_per_energy_attached,10,water,"This attack does 10 more damage for each {W} Energy attached to this Pokémon.",60,60
+B1,060,Luvdisc,Paired Tackle,bonus_damage_if_hand_count,30,"2;4;6","If you have exactly 2, 4, or 6 cards in your hand, this attack does 30 more damage.",30,30
+B1,062,Simipour,Fury Swipes,flip_multiplier,3,40,Flip 3 coins. This attack does 40 damage for each heads.,40,40
+B1,065,Seismitoad,Split Spiral Punch,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,90,90
+B1,067,Carracosta,Blocking Shell,prevent_damage_from_basic_next_turn,,,"Prevent all damage done to this Pokémon by attacks from Basic Pokémon during your opponent's next turn.",100,100
+B1,070,Keldeo,Sacred Sword,self_lock_specific_attack,,,"During your next turn, this Pokémon can't use Sacred Sword.",110,110
+B1,072,Frogadier,Bounce,switch_self_with_bench,,,Switch this Pokémon with 1 of your Benched Pokémon.,40,40
+B1,075,Avalugg,Frost Barrier,reduce_incoming_damage_next_turn,20,,"During your opponent's next turn, this Pokémon takes −20 damage from attacks.",70,70
+B1,077,Drednaw,Jaw Lock,inflict_effect,retreat_lock,,"During your opponent's next turn, the Defending Pokémon can't retreat.",70,70
+B1,079,Barraskewda,Double-Edge,self_damage_fixed_amount,20,,This Pokémon also does 20 damage to itself.,80,80
+B1,084,Ampharos,Zapping Bullet,random_single_target_damage,20,,"1 of your opponent's Benched Pokémon is chosen at random. This attack also does 20 damage to it.",90,90
+B1,085,Mega Ampharos ex,Lightning Lancer,random_multi_target_damage,3,20,"1 of your opponent's Benched Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, also do 20 damage to it.",100,100
+B1,088,Luxray,Flash Impact,bench_damage_one,self,20,This attack also does 20 damage to 1 of your Benched Pokémon.,110,110
+B1,089,Pachirisu,Attack the Wound,bonus_damage_if_opponent_damaged,30,,"If your opponent's Active Pokémon has damage on it, this attack does 30 more damage.",30,30
+B1,094,Dedenne,Electric Nibbling,discard_energy_type_from_opponent,lightning,1,Discard a {L} Energy from your opponent's Active Pokémon.,20,20
+B1,095,Yamper,Roar,force_opponent_switch,,,Switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.),,
+B1,099,Misdreavus,Double Spin,flip_multiplier,2,20,Flip 2 coins. This attack does 20 damage for each heads.,20,20
+B1,101,Sableye,Dirty Throw,discard_from_hand_required,1,,"Discard a card from your hand. If you can't, this attack does nothing.",70,70
+B1,102,Mega Altaria ex,Mega Harmony,bonus_damage_for_each_bench,30,,"This attack does 30 more damage for each of your Benched Pokémon.",40,40
+B1,103,Duskull,Ambush,flip_bonus_damage_if_heads,1,30,"Flip a coin. If heads, this attack does 30 more damage.",10,10
+B1,106,Jirachi,Star Drop,bench_damage_one,opponent,30,This attack does 30 damage to 1 of your opponent's Pokémon.,,
+B1,107,Drifloon,Wind Blast,bench_damage_one,opponent,20,This attack does 20 damage to 1 of your opponent's Benched Pokémon.,,
+B1,108,Drifblim,Balloon Barrage,bonus_damage_per_energy_attached,20,,"This attack does 20 more damage for each Energy attached to this Pokémon.",20,20
+B1,109,Chingling,Jingly Noise,inflict_effect,block_items,,"During your opponent's next turn, they can't play any Item cards from their hand.",10,10
+B1,111,Cofagrigus,Soul Shot,discard_from_hand_required,2,,"Discard 2 cards from your hand. If you can't discard 2 cards, this attack does nothing.",120,120
+B1,114,Gothitelle,Stellar Cradle,inflict_status_on_energy_attach,asleep,,"During your opponent's next turn, if they attach Energy from their Energy Zone to the Defending Pokémon, that Pokémon will be Asleep.",70,70
+B1,116,Aromatisse,Confounding Cologne,inflict_status,confused,,Your opponent's Active Pokémon is now Confused.,40,40
+B1,117,Swirlix,Cotton Guard,reduce_incoming_damage_next_turn,20,,"During your opponent's next turn, this Pokémon takes −20 damage from attacks.",10,10
+B1,118,Slurpuff,Draining Kiss,heal_self,30,,Heal 30 damage from this Pokémon.,50,50
+B1,119,Carbink,Guard Press,reduce_incoming_damage_next_turn,30,,"During your opponent's next turn, this Pokémon takes −30 damage from attacks.",30,30
+B1,121,Indeedee ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,"This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.",30,30
+B1,124,Hitmonchan ex,Quick Straight,ignore_weakness,,,This attack's damage isn't affected by Weakness.,50,50
+B1,125,Sudowoodo,Fight Back,bonus_damage_if_self_damaged,50,,"If this Pokémon has damage on it, this attack does 50 more damage.",30,30
+B1,127,Hariyama,Slapping Knockdown,discard_tools_before_damage,,,"Before doing damage, discard all Pokémon Tools from your opponent's Active Pokémon.",110,110
+B1,129,Hippowdon,Crashing Fangs,flip_lock_self_if_tails,,,"Flip a coin. If tails, during your next turn, this Pokémon can't attack.",100,100
+B1,132,Krookodile,Chomp Chomp Bite,flip_discard_energy_until_tails,,,"Flip a coin until you get tails. For each heads, discard a random Energy from your opponent's Active Pokémon.",90,90
+B1,134,Archeops,Wild Spin,damage_all_opponent_stack,20,,"This attack does 20 damage to each of your opponent's Pokémon. During your next turn, this Pokémon's Wild Spin attack does +20 damage to each of your opponent's Pokémon.",,
+B1,136,Golurk,Heavy Rocket,bonus_damage_per_retreat_cost_reveal,60,3,Reveal the top 3 cards of your deck. This attack does 60 damage for each Pokémon with a Retreat Cost of 3 or more you find there. Shuffle the revealed cards back into your deck.,60,60
+B1,137,Terrakion,Sacred Sword,self_lock_specific_attack,,,"During your next turn, this Pokémon can't use Sacred Sword.",110,110
+B1,140,Crabominable,Last-Chance Punch,bonus_damage_if_low_hp,60,30,"If this Pokémon's remaining HP is 30 or less, this attack does 60 more damage.",30,30
+B1,143,Sandygast,Sand Attack,flip_block_attack_next_turn,,,"During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen.",20,20
+B1,144,Palossand,Life Sucker,heal_self,20,,Heal 20 damage from this Pokémon.,70,70
+B1,147,Coalossal,Coal Drop,bonus_damage_if_opponent_type,50,grass,"If your opponent's Active Pokémon is a {G} Pokémon, this attack does 50 more damage.",100,100
+B1,149,Honchkrow,Evil Admonition,bonus_damage_per_ability_opponent,40,,"This attack does 40 more damage for each of your opponent's Pokémon in play that has an Ability.",40,40
+B1,150,Absol,Ominous Claw,flip_reveal_discard_supporter,,,"Flip a coin. If heads, your opponent reveals their hand. Choose a Supporter card you find there and discard it.",50,50
+B1,151,Mega Absol ex,Darkness Claw,reveal_discard_supporter,,,Your opponent reveals their hand. Choose a Supporter card you find there and discard it.,80,80
+B1,153,Drapion,Stun Poison,flip_inflict_status_both,poisoned_paralyzed,,"Flip a coin. If heads, your opponent's Active Pokémon is now Poisoned and Paralyzed.",50,50
+B1,154,Darkrai,Shadow Cage,inflict_effect,retreat_lock,,"During your opponent's next turn, the Defending Pokémon can't retreat.",70,70
+B1,157,Hydreigon,Hyper Ray,discard_energy_all,,,Discard all Energy from this Pokémon.,130,130
+B1,158,Pangoro,Overdrive Smash,self_boost_next_turn,30,,"During your next turn, this Pokémon's Overdrive Smash attack does +30 damage.",30,30
+B1,161,Mareanie,Poison Sting,inflict_status,poisoned,,Your opponent's Active Pokémon is now Poisoned.,,
+B1,162,Toxapex,Venoshock,bonus_damage_if_opponent_poisoned,70,,"If your opponent's Active Pokémon is Poisoned, this attack does 70 more damage.",50,50
+B1,164,Morgrem,False Surrender,ignore_effects,,,This attack's damage isn't affected by any effects on your opponent's Active Pokémon.,50,50
+B1,167,Ferrothorn,Guard Press,reduce_incoming_damage_next_turn,20,,"During your opponent's next turn, this Pokémon takes −20 damage from attacks.",50,50
+B1,168,Durant,Bite Together,bonus_damage_if_named_bench,40,Durant,"If Durant is on your Bench, this attack does 40 more damage.",40,40
+B1,169,Cobalion,Sacred Sword,self_lock_specific_attack,,,"During your next turn, this Pokémon can't use Sacred Sword.",110,110
+B1,174,Melmetal ex,Metal Arms,bonus_damage_if_tool,50,,"If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage.",100,100
+B1,175,Corviknight,Iron Wings,discard_energy_specific_reduce_damage,metal,2,"Discard 2 {M} Energy from this Pokémon. During your opponent's next turn, this Pokémon takes −50 damage from attacks.",100,100
+B1,176,Druddigon,Giga Claw,flip_do_nothing_if_double_tails,,,"Flip 2 coins. If both of them are tails, this attack does nothing.",120,120
+B1,179,Goodra,Spiral Drain,heal_self,40,,Heal 40 damage from this Pokémon.,100,100
+B1,182,Pidgeot,Twister,flip_discard_energy_multiple,2,,"Flip 2 coins. For each heads, discard a random Energy from your opponent's Active Pokémon. If both of them are tails, this attack does nothing.",80,80
+B1,183,Tauros ex,Wild Tackle,flip_self_damage_if_tails,30,,"Flip a coin. If tails, this Pokémon also does 30 damage to itself.",90,90
+B1,185,Aipom,Tail Smash,flip_do_nothing_if_tails,,,"Flip a coin. If tails, this attack does nothing.",40,40
+B1,186,Ambipom,Excited Tail,flip_multiplier_tool_bonus,2,30,"Flip 2 coins. This attack does 30 damage for each heads. If this Pokémon has Lucky Mittens attached, flip 4 coins instead.",30,30
+B1,187,Miltank,Body Slam,flip_inflict_status_if_heads,paralysis,,"Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.",40,40
+B1,192,Exploud,Booming Roar,inflict_effect,block_items,,"During your opponent's next turn, they can't play any Item cards from their hand.",90,90
+B1,193,Skitty,Play Rough,flip_bonus_damage_if_heads,1,30,"Flip a coin. If heads, this attack does 30 more damage.",10,10
+B1,195,Spinda,Dizzying Headbutt,inflict_status_both,confused,,"Both Active Pokémon are now Confused.",30,30
+B1,196,Swablu,Sing,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,,
+B1,197,Altaria,Do the Wave,bonus_damage_for_each_bench,20,,"This attack does 20 more damage for each of your Benched Pokémon.",20,20
+B1,198,Chatot,Sleepy Song,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,30,30
+B1,200,Watchog,Biting Fang,flip_bonus_damage_if_heads,1,40,"Flip a coin. If heads, this attack does 40 more damage.",40,40
+B1,201,Lillipup,Collect,draw_cards,1,,Draw a card.,,
+B1,203,Stoutland,Dangerous Bite,bonus_damage_if_opponent_basic,70,,"If your opponent's Active Pokémon is a Basic Pokémon, this attack does 70 more damage.",70,70
+B1,211,Wooloo,Continuous Tumble,flip_until_tails_multiplier,40,,"Flip a coin until you get tails. This attack does 40 damage for each heads.",40,40
+B1,212,Dubwool,Boundless Power,cant_attack_next_turn,,,"During your next turn, this Pokémon can't attack.",100,100
+B1,227,Beautifly,Skill Dive,bench_damage_one,opponent,50,This attack does 50 damage to 1 of your opponent's Pokémon.,,
+B1,232,Magikarp,Waterfall Evolution,auto_evolve_random,,,"Put a random card from your deck that evolves from this Pokémon onto this Pokémon to evolve it.",,
+B1,233,Ludicolo,Rhythmic Steps,bonus_damage_if_hand_count,60,"1;3;5","If you have exactly 1, 3, or 5 cards in your hand, this attack does 60 more damage.",60,60
+B1,235,Keldeo,Sacred Sword,self_lock_specific_attack,,,"During your next turn, this Pokémon can't use Sacred Sword.",110,110
+B1,237,Luxray,Flash Impact,bench_damage_one,self,20,This attack also does 20 damage to 1 of your Benched Pokémon.,110,110
+B1,238,Cofagrigus,Soul Shot,discard_from_hand_required,2,,"Discard 2 cards from your hand. If you can't discard 2 cards, this attack does nothing.",120,120
+B1,241,Hippowdon,Crashing Fangs,flip_lock_self_if_tails,,,"Flip a coin. If tails, during your next turn, this Pokémon can't attack.",100,100
+B1,242,Archeops,Wild Spin,damage_all_opponent_stack,20,,"This attack does 20 damage to each of your opponent's Pokémon. During your next turn, this Pokémon's Wild Spin attack does +20 damage to each of your opponent's Pokémon.",,
+B1,244,Honchkrow,Evil Admonition,bonus_damage_per_ability_opponent,40,,"This attack does 40 more damage for each of your opponent's Pokémon in play that has an Ability.",40,40
+B1,245,Hydreigon,Hyper Ray,discard_energy_all,,,Discard all Energy from this Pokémon.,130,130
+B1,246,Corviknight,Iron Wings,discard_energy_specific_reduce_damage,metal,2,"Discard 2 {M} Energy from this Pokémon. During your opponent's next turn, this Pokémon takes −50 damage from attacks.",100,100
+B1,249,Stoutland,Dangerous Bite,bonus_damage_if_opponent_basic,70,,"If your opponent's Active Pokémon is a Basic Pokémon, this attack does 70 more damage.",70,70
+B1,251,Mega Pinsir ex,Critical Scissors,flip_bonus_damage_if_heads,1,70,"Flip a coin. If heads, this attack does 70 more damage.",80,80
+B1,252,Whimsicott ex,Grass Knot,bonus_damage_per_retreat_cost,30,,"This attack does 30 more damage for each Energy in your opponent's Active Pokémon's Retreat Cost.",40,40
+B1,253,Rapidash ex,Sprinting Flare,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,110,110
+B1,254,Mega Blaziken ex,Mega Burning,discard_energy_specific_inflict_status,fire,1,"Discard Fire{R} Energy from this Pokémon. Your opponent's Active Pokémon is now Burned.",120,120
+B1,255,Mega Gyarados ex,Mega Blaster,discard_top_opponent_deck,3,,Discard the top 3 cards of your opponent's deck.,140,140
+B1,258,Mega Ampharos ex,Lightning Lancer,random_multi_target_damage,3,20,"1 of your opponent's Benched Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, also do 20 damage to it.",100,100
+B1,259,Mega Altaria ex,Mega Harmony,bonus_damage_for_each_bench,30,,"This attack does 30 more damage for each of your Benched Pokémon.",40,40
+B1,260,Indeedee ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,"This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.",30,30
+B1,261,Hitmonchan ex,Quick Straight,ignore_weakness,,,This attack's damage isn't affected by Weakness.,50,50
+B1,262,Mega Absol ex,Darkness Claw,reveal_discard_supporter,,,Your opponent reveals their hand. Choose a Supporter card you find there and discard it.,80,80
+B1,264,Melmetal ex,Metal Arms,bonus_damage_if_tool,50,,"If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage.",100,100
+B1,265,Tauros ex,Wild Tackle,flip_self_damage_if_tails,30,,"Flip a coin. If tails, this Pokémon also does 30 damage to itself.",90,90
+B1,272,Mega Pinsir ex,Critical Scissors,flip_bonus_damage_if_heads,1,70,"Flip a coin. If heads, this attack does 70 more damage.",80,80
+B1,273,Whimsicott ex,Grass Knot,bonus_damage_per_retreat_cost,30,,"This attack does 30 more damage for each Energy in your opponent's Active Pokémon's Retreat Cost.",40,40
+B1,274,Rapidash ex,Sprinting Flare,bench_damage_one,opponent,20,This attack also does 20 damage to 1 of your opponent's Benched Pokémon.,110,110
+B1,277,Mega Ampharos ex,Lightning Lancer,random_multi_target_damage,3,20,"1 of your opponent's Benched Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, also do 20 damage to it.",100,100
+B1,278,Indeedee ex,Psychic,bonus_damage_for_each_energy_on_opponent,30,,"This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon.",30,30
+B1,279,Hitmonchan ex,Quick Straight,ignore_weakness,,,This attack's damage isn't affected by Weakness.,50,50
+B1,280,Mega Absol ex,Darkness Claw,reveal_discard_supporter,,,Your opponent reveals their hand. Choose a Supporter card you find there and discard it.,80,80
+B1,282,Melmetal ex,Metal Arms,bonus_damage_if_tool,50,,"If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage.",100,100
+B1,283,Tauros ex,Wild Tackle,flip_self_damage_if_tails,30,,"Flip a coin. If tails, this Pokémon also does 30 damage to itself.",90,90
+B1,284,Mega Blaziken ex,Mega Burning,discard_energy_specific_inflict_status,fire,1,"Discard Fire{R} Energy from this Pokémon. Your opponent's Active Pokémon is now Burned.",120,120
+B1,285,Mega Gyarados ex,Mega Blaster,discard_top_opponent_deck,3,,Discard the top 3 cards of your opponent's deck.,140,140
+B1,286,Mega Altaria ex,Mega Harmony,bonus_damage_for_each_bench,30,,"This attack does 30 more damage for each of your Benched Pokémon.",40,40
+B1,290,Rowlet,Skill Dive,bench_damage_one,opponent,10,This attack does 10 damage to 1 of your opponent's Pokémon.,,
+B1,291,Dartrix,Skill Dive,bench_damage_one,opponent,20,This attack does 20 damage to 1 of your opponent's Pokémon.,,
+B1,292,Moltres,Sky Attack,flip_do_nothing_if_tails,,,"Flip a coin. If tails, this attack does nothing.",130,130
+B1,293,Litten,Heat Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,30,30
+B1,294,Torracat,Heat Tackle,self_damage_fixed_amount,10,,This Pokémon also does 10 damage to itself.,40,40
+B1,295,Poliwag,Call for Family,search_specific_into_bench,Poliwag,,Put 1 random Poliwag from your deck onto your Bench.,,
+B1,298,Articuno,Ice Beam,flip_inflict_status_if_heads,paralysis,,"Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed.",60,60
+B1,299,Manaphy,Oceanic Gift,attach_energy_to_multiple_bench,water,2,"Choose 2 of your Benched Pokémon. For each of those Pokémon, take a {W} Energy from your Energy Zone and attach it to that Pokémon.",,
+B1,300,Popplio,Sing,inflict_status,asleep,,Your opponent's Active Pokémon is now Asleep.,,
+B1,302,Zapdos,Raging Thunder,bench_damage_one,self,30,This attack also does 30 damage to 1 of your Benched Pokémon.,100,100
+B1,309,Golem,Guard Press,reduce_incoming_damage_next_turn,30,,"During your opponent's next turn, this Pokémon takes −30 damage from attacks.",120,120
+B1,310,Rockruff,Signs of Evolution,search_evolution_of_self,,,"Put a random card that evolves from Rockruff from your deck into your hand.",,
+B1,312,Meowth,Pay Day,draw_cards,1,,Draw a card.,10,10
+B1,313,Persian,Shadow Claw,flip_discard_random_from_opponent_hand,1,,"Flip a coin. If heads, discard a random card from your opponent's hand.",40,40
+B1,316,Bidoof,Super Fang,halve_opponent_hp,,,"Halve your opponent's Active Pokémon's remaining HP, rounded down.",,
+B1,317,Decidueye ex,Pierce the Pain,bench_damage_to_damaged_only,100,,"This attack does 100 damage to 1 of your opponent's Pokémon that have damage on them.",,
+B1,318,Incineroar ex,Fire Fang,inflict_status,burned,,Your opponent's Active Pokémon is now Burned.,30,30
+B1,318,Incineroar ex,Scar-Charged Smash,bonus_damage_if_self_damaged,60,,"If this Pokémon has damage on it, this attack does 60 more damage.",80,80
+B1,319,Palkia ex,Dimensional Storm,discard_energy_and_bench_damage,water,3|20,Discard 3 {W} Energy from this Pokémon. This attack also does 20 damage to each of your opponent's Benched Pokémon.,150,150
+B1,320,Primarina ex,Hydro Pump,extra_damage_if_extra_energy_attached,water,1|40,"If this Pokémon has at least 1 extra {W} Energy attached, this attack does 40 more damage.",40,40
+B1,320,Primarina ex,Sparkling Aria,heal_self,20,,Heal 20 damage from this Pokémon.,100,100
+B1,321,Pikachu ex,Thunderbolt,discard_energy_all,,,Discard all Energy from this Pokémon.,150,150
+B1,322,Tapu Koko ex,Plasma Hurricane,attach_energy_from_zone,lightning,1,Take a {L} Energy from your Energy Zone and attach it to this Pokémon.,20,20
+B1,323,Lycanroc ex,Lycanfang,discard_energy_specific,fighting,1,Discard a {F} Energy from this Pokémon.,130,130
+B1,325,Alolan Dugtrio ex,Triplet Headbutt,flip_multiplier,3,60,Flip 3 coins. This attack does 60 damage for each heads.,60,60
+B1,326,Dialga ex,Metallic Turbo,attach_multiple_energy_to_bench_one,metal,2,Take 2 {M} Energy from your Energy Zone and attach it to 1 of your Benched Pokémon.,30,30
+B1,327,Bibarel ex,Carefree Press,heal_self,30,,Heal 30 damage from this Pokémon.,100,100
+B1,328,Arceus ex,Ultimate Force,bonus_damage_for_each_bench,20,,"This attack does 20 more damage for each of your Benched Pokémon.",70,70

@@ -1,7 +1,12 @@
+#!/usr/bin/env python3
 import requests
 import pandas as pd
+import urllib3
 
-SET_ID = "A3b"
+# Disable SSL warnings for development (certificate chain issue)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+SET_ID = "B1"
 BASE_URL = f"https://api.tcgdex.net/v2/en/sets/{SET_ID}"
 MOVE_EFFECTS_FILE = f"{SET_ID.lower()}_move_effects.csv"
 ABILITY_EFFECTS_FILE = f"{SET_ID.lower()}_ability_effects.csv"
@@ -10,7 +15,8 @@ TRAINER_EFFECTS_FILE = f"{SET_ID.lower()}_trainer_effects.csv"
 
 def fetch_json(url):
     try:
-        return requests.get(url).json()
+        # Disable SSL verification for development (certificate chain issue)
+        return requests.get(url, verify=False).json()
     except Exception as e:
         print(f"Failed to fetch {url}: {e}")
         return None

@@ -30,6 +30,62 @@ const popup = msg => globalThis.showPopup?.(msg) ?? console.log('[popup]', msg);
 const parseInt10 = (v, def = 0) => parseInt(v, 10) || def;
 const normStr = s => String(s || '').trim().toLowerCase().replace(/['']/g, "'").replace(/\s+/g, ' ');
 
+// Helper function to shuffle deck and trigger animations
+function shuffleDeckAndAnimate(state, pk) {
+  const deck = state[pk]?.deck || [];
+  if (deck.length > 0) {
+    shuffleArray(deck);
+    // Trigger shuffle animation
+    const owner = pk === 'p1' ? 'player1' : 'player2';
+    if (globalThis.animateDeckShuffle) {
+      globalThis.animateDeckShuffle(owner);
+    }
+  }
+}
+
+// Helper function to animate card draw from search
+async function animateCardDrawFromSearch(pk, card = null) {
+  const owner = pk === 'p1' ? 'player1' : 'player2';
+  if (globalThis.animateCardDraw) {
+    const handDiv = owner === 'player1' ? 
+      (globalThis.p1HandDiv || document.getElementById('p1Hand')) : 
+      (globalThis.p2HandDiv || document.getElementById('p2Hand'));
+    if (handDiv) {
+      // For single card draws, calculate index and total
+      const currentHandSize = globalThis.playerState?.[owner]?.hand?.length || 0;
+      await globalThis.animateCardDraw(owner, handDiv, card, currentHandSize, 1);
+    }
+  }
+}
+
+// Helper function to animate multiple card draws (for draw_on_evolution)
+async function animateMultipleCardDraws(pk, count, cards = null) {
+  const owner = pk === 'p1' ? 'player1' : 'player2';
+  if (globalThis.animateCardDraw) {
+    const handDiv = owner === 'player1' ? 
+      (globalThis.p1HandDiv || document.getElementById('p1Hand')) : 
+      (globalThis.p2HandDiv || document.getElementById('p2Hand'));
+    if (handDiv) {
+      // Stagger the animations and wait for all to complete
+      const animationPromises = [];
+      const currentHandSize = globalThis.playerState?.[owner]?.hand?.length || 0;
+      for (let i = 0; i < count; i++) {
+        const delay = i * 200; // 200ms delay between each card (slower)
+        animationPromises.push(
+          new Promise(resolve => {
+            setTimeout(async () => {
+              const card = cards && cards[i] ? cards[i] : null;
+              await globalThis.animateCardDraw(owner, handDiv, card, currentHandSize + i, count);
+              resolve();
+            }, delay);
+          })
+        );
+      }
+      await Promise.all(animationPromises);
+    }
+  }
+}
+
 function shuffleArray(arr) {
   if (!arr?.length) return;
   for (let i = arr.length - 1; i > 0; i--) {
@@ -46,6 +102,10 @@ const getBenchDiv = pk => globalThis.benchFor?.(pkToPlayer(pk)) ?? document?.get
 const getActiveImg = pk => getActiveDiv(pk)?.querySelector('img') ?? null;
 const getBenchImgs = pk => Array.from(getBenchDiv(pk)?.querySelectorAll('img') ?? []);
 const getAllPokemonImgs = pk => [getActiveImg(pk), ...getBenchImgs(pk)].filter(Boolean);
+
+// Make helper functions globally available for battle.html
+globalThis.getBenchImgs = getBenchImgs;
+globalThis.getAllPokemonImgs = getAllPokemonImgs;
 
 function getSlotFromImg(img) {
   return img?.closest('.card-slot') ?? null;
@@ -182,17 +242,59 @@ function removeEnergy(img, type, count) {
   const slot = getSlotFromImg(img);
   if (!slot || count <= 0) return 0;
   
-  const pips = slot.querySelectorAll('.energy-pip');
+  // Determine owner from img element
+  const owner = img.closest('#player1') ? 'player1' : 'player2';
+  
+  const pips = Array.from(slot.querySelectorAll('.energy-pip'));
   const target = type?.toLowerCase() ?? null;
   let removed = 0;
   
+  // Track energy types being removed for discard pile
+  const energyTypesRemoved = {};
+  
   for (const pip of pips) {
     if (removed >= count) break;
-    if (!target || pip.dataset.type === target) {
+    // Match energy type (case-insensitive comparison)
+    const pipType = (pip.dataset.type || 'colorless').toLowerCase();
+    if (!target || pipType === target) {
+      energyTypesRemoved[pipType] = (energyTypesRemoved[pipType] || 0) + 1;
       pip.remove();
       removed++;
     }
   }
+  
+  // Add removed energy to discard pile
+  // playerState is now exposed via globalThis.playerState in battle.html
+  if (removed > 0 && globalThis.playerState?.[owner]?.discard) {
+    // Ensure energyCounts exists
+    if (!globalThis.playerState[owner].discard.energyCounts) {
+      globalThis.playerState[owner].discard.energyCounts = {};
+    }
+    
+    for (const [energyType, amount] of Object.entries(energyTypesRemoved)) {
+      const current = globalThis.playerState[owner].discard.energyCounts[energyType] || 0;
+      globalThis.playerState[owner].discard.energyCounts[energyType] = current + amount;
+      console.log(`[removeEnergy] Added ${amount} ${energyType} energy to ${owner} discard (was: ${current}, now: ${current + amount})`);
+    }
+    
+    // Update discard UI if drawer is open
+    if (typeof globalThis.renderDiscard === 'function') {
+      const drawer = owner === 'player1' ? 
+        (globalThis.p1DiscardDrawer || document.getElementById('p1DiscardDrawer')) :
+        (globalThis.p2DiscardDrawer || document.getElementById('p2DiscardDrawer'));
+      if (drawer && drawer.classList.contains('show')) {
+        globalThis.renderDiscard(owner);
+      }
+    }
+    
+    console.log(`[removeEnergy] Successfully added ${removed} energy to ${owner} discard pile:`, energyTypesRemoved);
+    console.log(`[removeEnergy] Current discard energyCounts:`, JSON.stringify(globalThis.playerState[owner].discard.energyCounts));
+  } else if (removed > 0) {
+    console.error(`[removeEnergy] ERROR: Could not access playerState for ${owner}. Removed ${removed} energy but did not add to discard.`);
+    console.error(`[removeEnergy] globalThis.playerState:`, globalThis.playerState);
+    console.error(`[removeEnergy] owner:`, owner);
+  }
+  
   return removed;
 }
 
@@ -357,20 +459,95 @@ function hasArceusInPlay(pk) {
 /* ============================
    USER SELECTION HELPER
 ============================ */
+// Global flag to track if selection is active
+let isSelectionActive = false;
+
 function awaitSelection(candidates, glowClass = 'heal-glow') {
   return new Promise((resolve, reject) => {
-    candidates.forEach(img => img.classList.add(glowClass));
+    // Set global flag
+    isSelectionActive = true;
+    globalThis.__selectionActive = true;
+    
+    // Filter out cards in hand - only allow Pokémon in play (active/bench)
+    const validCandidates = candidates.filter(img => {
+      // Check if the image is in the hand
+      const inHand = img.closest('.hand');
+      if (inHand) {
+        console.log('[awaitSelection] Filtered out card in hand:', img.alt);
+        return false;
+      }
+      // Only allow images that are in active or bench areas
+      const inActive = img.closest('.active');
+      const inBench = img.closest('.bench');
+      if (!inActive && !inBench) {
+        console.log('[awaitSelection] Filtered out card not in play:', img.alt);
+        return false;
+      }
+      return true;
+    });
+    
+    if (validCandidates.length === 0) {
+      console.warn('[awaitSelection] No valid candidates after filtering');
+      isSelectionActive = false;
+      globalThis.__selectionActive = false;
+      resolve(null);
+      return;
+    }
+    
+    validCandidates.forEach(img => img.classList.add(glowClass));
     
     const cleanup = () => {
       document.removeEventListener('click', clickHandler, true);
       document.removeEventListener('keydown', escapeHandler);
-      candidates.forEach(c => c.classList.remove(glowClass));
+      validCandidates.forEach(c => c.classList.remove(glowClass));
+      isSelectionActive = false;
+      globalThis.__selectionActive = false;
     };
     
     const clickHandler = e => {
+      // Block clicks on hand cards immediately
+      const clickedInHand = e.target.closest('.hand');
+      if (clickedInHand) {
+        console.log('[awaitSelection] Blocked click on card in hand');
+        e.stopPropagation();
+        e.preventDefault();
+        showPopup('Cannot select cards in hand. Please select a Pokémon in play.');
+        return;
+      }
+      
       const img = e.target.closest('img');
-      if (!img || !candidates.includes(img)) {
+      if (!img) {
         // Clicked outside - cancel selection
+        e.stopPropagation();
+        e.preventDefault();
+        cleanup();
+        resolve(null);
+        return;
+      }
+      
+      // Check if the clicked image has the glow class (is a valid selection)
+      if (!img.classList.contains(glowClass)) {
+        // Clicked on a card that doesn't have the glow - invalid selection
+        e.stopPropagation();
+        e.preventDefault();
+        showPopup('Please select a highlighted Pokémon. Try again.');
+        return;
+      }
+      
+      // Verify it's in validCandidates
+      if (!validCandidates.includes(img)) {
+        // Clicked outside valid candidates - cancel selection
+        e.stopPropagation();
+        e.preventDefault();
+        cleanup();
+        resolve(null);
+        return;
+      }
+      
+      // Double-check: ensure clicked image is not in hand
+      const inHand = img.closest('.hand');
+      if (inHand) {
+        console.log('[awaitSelection] Blocked click on card in hand:', img.alt);
         e.stopPropagation();
         e.preventDefault();
         cleanup();
@@ -407,8 +584,16 @@ function applyStatus(pk, status) {
 /* ============================
    COIN FLIP HELPER
 ============================ */
-async function flipCoin() {
-  return globalThis.doCoinFlip?.() ?? (Math.random() < 0.5 ? 'heads' : 'tails');
+async function flipCoin(pk = null) {
+  // Try to determine pk from context if not provided
+  if (!pk) {
+    // Try to get from global currentPlayer
+    if (typeof globalThis.currentPlayer !== 'undefined' && globalThis.currentPlayer) {
+      pk = globalThis.currentPlayer === 'player1' ? 'p1' : 'p2';
+    }
+  }
+  
+  return globalThis.doCoinFlip?.(pk) ?? (Math.random() < 0.5 ? 'heads' : 'tails');
 }
 
 /* ============================
@@ -562,12 +747,15 @@ const TRAINER_EFFECTS = {
     }
     
     if (!targets.length) {
-      popup(`No damaged ${type}-type Pokémon.`);
-      return;
+      throw new Error('No valid target');
     }
     
     popup(`Choose a ${type}-type Pokémon to heal ${amount} damage.`);
     const chosen = await awaitSelection(targets);
+    
+    if (!chosen) {
+      throw new Error('SELECTION_CANCELLED');
+    }
     
     if (chosen && healImg(chosen, amount)) {
       popup(`Healed ${amount} damage from ${chosen.alt}.`);
@@ -587,14 +775,14 @@ const TRAINER_EFFECTS = {
       } catch {}
     }
     
-    if (!targets.length) { popup(`No ${type}-type Pokémon in play.`); return; }
+    if (!targets.length) { throw new Error('No valid target'); }
     
     popup(`Click a ${type} Pokémon to power up.`);
     const chosen = await awaitSelection(targets);
     if (!chosen) return;
     
     let heads = 0;
-    while ((await flipCoin()) === 'heads') {
+    while ((await flipCoin(pk)) === 'heads') {
       heads++;
       attachEnergy(chosen, type);
     }
@@ -625,7 +813,7 @@ const TRAINER_EFFECTS = {
   return_active_to_hand: async (state, pk, { param2 }) => {
     const allowed = param2?.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) ?? [];
     const activeImg = getActiveImg(pk);
-    if (!activeImg) { popup('No Active Pokémon.'); return; }
+    if (!activeImg) { throw new Error('No valid target'); }
     
     const name = (activeImg.alt || '').toLowerCase();
     if (allowed.length && !allowed.includes(name)) { popup('Invalid target.'); return; }
@@ -652,7 +840,7 @@ const TRAINER_EFFECTS = {
     const names = param2?.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) ?? [];
     const target = getAllPokemonImgs(pk).find(img => names.includes((img.alt || '').toLowerCase()));
     
-    if (!target) { popup('No valid target.'); return; }
+    if (!target) { throw new Error('No valid target'); }
     for (let i = 0; i < count; i++) attachEnergy(target, 'fighting');
     popup(`Attached ${count} Fighting Energy to ${target.alt}.`);
   },
@@ -692,25 +880,387 @@ const TRAINER_EFFECTS = {
   },
 
   view_top_deck: async (state, pk, { param1 }) => {
+    // Hiker: For each of your {F} Pokémon in play, look at that many cards from the top of your deck and put them back in any order.
     const deck = state[pk].deck ?? [];
-    const n = Math.min(parseInt10(param1), deck.length);
-    popup(n ? `Top ${n}: ${deck.slice(0, n).map(c => c.name).join(', ')}` : 'Deck is empty.');
+    if (!deck.length) {
+      popup('Deck is empty.');
+      return;
+    }
+    
+    // Count Fighting Pokemon in play (active + bench)
+    let fightingCount = 0;
+    try {
+      const allPokemon = getAllPokemonImgs(pk);
+      for (const img of allPokemon) {
+        if (!img) continue;
+        try {
+          const meta = await globalThis.fetchCardMeta?.(img.dataset.set, img.dataset.num);
+          if (meta?.types) {
+            const types = meta.types.map(t => String(t || '').toLowerCase());
+            if (types.includes('fighting') || types.includes('fight')) {
+              fightingCount++;
+            }
+          }
+        } catch (err) {
+          console.error('[Hiker] Error checking Pokemon type:', err);
+        }
+      }
+    } catch (err) {
+      console.error('[Hiker] Error counting Fighting Pokemon:', err);
+    }
+    
+    if (fightingCount === 0) {
+      popup('You have no Fighting Pokémon in play.');
+      return;
+    }
+    
+    // Look at that many cards from the top
+    const n = Math.min(fightingCount, deck.length);
+    const topCards = deck.slice(0, n);
+    
+    if (n === 0) {
+      popup('Deck is empty.');
+      return;
+    }
+    
+    // Show visual UI for reordering cards
+    return new Promise((resolve) => {
+      const backdrop = document.getElementById('hikerReorderBackdrop');
+      const cardsContainer = document.getElementById('hikerReorderCards');
+      const title = document.getElementById('hikerReorderTitle');
+      const desc = document.getElementById('hikerReorderDesc');
+      const doneBtn = document.getElementById('hikerReorderDone');
+      
+      if (!backdrop || !cardsContainer || !title || !desc || !doneBtn) {
+        console.error('[Hiker] Modal elements not found');
+        popup('Error: Could not open card reorder UI.');
+        resolve();
+        return;
+      }
+      
+      // Clear previous cards
+      cardsContainer.innerHTML = '';
+      
+      // Set title and description
+      title.textContent = `Reorder Top ${n} Cards`;
+      desc.textContent = `Drag cards to reorder them. The leftmost card will be on top of your deck.`;
+      
+      // Create a working copy of cards that can be reordered
+      let reorderedCards = [...topCards];
+      let draggedCard = null;
+      let draggedIndex = -1;
+      let dropIndex = -1;
+      
+      // Function to render cards
+      const renderCards = async () => {
+        cardsContainer.innerHTML = '';
+        
+        for (let i = 0; i < reorderedCards.length; i++) {
+          const card = reorderedCards[i];
+          const cardDiv = document.createElement('div');
+          cardDiv.draggable = true;
+          cardDiv.dataset.index = i;
+          cardDiv.dataset.cardId = `${card.set}-${card.number || card.num}`;
+          cardDiv.style.cssText = `
+            position: relative;
+            width: calc(var(--card-w) * 1.5);
+            height: calc(var(--card-h) * 1.5);
+            cursor: grab;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #6e4e9c;
+            background: #1a1a2e;
+            user-select: none;
+          `;
+          
+          // Add CSS for drag-over state
+          if (!document.getElementById('hiker-drag-styles')) {
+            const style = document.createElement('style');
+            style.id = 'hiker-drag-styles';
+            style.textContent = `
+              .hiker-drag-over {
+                border-color: #9d7dd4 !important;
+                box-shadow: 0 0 16px rgba(157, 125, 212, 0.6) !important;
+                transform: scale(1.05) !important;
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          
+          // Get card image
+          let cardImageUrl = card.imgUrl || '';
+          if (!cardImageUrl && card.set && (card.number || card.num)) {
+            try {
+              const meta = await globalThis.fetchCardMeta?.(card.set, card.number || card.num);
+              if (meta?.image) {
+                cardImageUrl = meta.image + '/high.png';
+              }
+            } catch (err) {
+              console.error('[Hiker] Error fetching card image:', err);
+            }
+          }
+          
+          const img = document.createElement('img');
+          img.src = cardImageUrl || 'imgs/cardback.png';
+          img.style.cssText = `
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            pointer-events: none;
+          `;
+          img.alt = card.name || 'Card';
+          img.draggable = false;
+          
+          // Position indicator
+          const posLabel = document.createElement('div');
+          posLabel.textContent = `${i + 1}`;
+          posLabel.style.cssText = `
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: rgba(110, 78, 156, 0.9);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 10;
+            pointer-events: none;
+          `;
+          
+          cardDiv.appendChild(img);
+          cardDiv.appendChild(posLabel);
+          
+          // Drag start
+          cardDiv.addEventListener('dragstart', (e) => {
+            draggedCard = card;
+            draggedIndex = i;
+            cardDiv.style.opacity = '0.5';
+            cardDiv.style.cursor = 'grabbing';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', cardDiv.outerHTML);
+            // Create a custom drag image
+            const dragImg = cardDiv.cloneNode(true);
+            dragImg.style.cssText = `
+              position: fixed;
+              width: calc(var(--card-w) * 1.5);
+              height: calc(var(--card-h) * 1.5);
+              pointer-events: none;
+              z-index: 10000;
+              opacity: 0.9;
+            `;
+            document.body.appendChild(dragImg);
+            e.dataTransfer.setDragImage(dragImg, dragImg.offsetWidth / 2, dragImg.offsetHeight / 2);
+            setTimeout(() => document.body.removeChild(dragImg), 0);
+          });
+          
+          // Drag end
+          cardDiv.addEventListener('dragend', (e) => {
+            cardDiv.style.opacity = '1';
+            cardDiv.style.cursor = 'grab';
+            // Remove all drop indicators
+            document.querySelectorAll('.hiker-drop-indicator').forEach(el => el.remove());
+            document.querySelectorAll('.hiker-drag-over').forEach(el => {
+              el.classList.remove('hiker-drag-over');
+            });
+            draggedCard = null;
+            draggedIndex = -1;
+            dropIndex = -1;
+          });
+          
+          // Drag over - show drop indicator
+          cardDiv.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const targetIndex = parseInt(cardDiv.dataset.index, 10);
+            if (targetIndex === draggedIndex) return;
+            
+            // Remove existing indicators
+            document.querySelectorAll('.hiker-drop-indicator').forEach(el => el.remove());
+            
+            // Add drop indicator before or after this card
+            const rect = cardDiv.getBoundingClientRect();
+            const containerRect = cardsContainer.getBoundingClientRect();
+            const mouseX = e.clientX;
+            const cardCenterX = rect.left + rect.width / 2;
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'hiker-drop-indicator';
+            indicator.style.cssText = `
+              position: absolute;
+              width: 4px;
+              height: calc(var(--card-h) * 1.5);
+              background: #6e4e9c;
+              border-radius: 2px;
+              z-index: 1000;
+              pointer-events: none;
+              box-shadow: 0 0 8px rgba(110, 78, 156, 0.8);
+            `;
+            
+            if (mouseX < cardCenterX) {
+              // Insert before this card
+              indicator.style.left = `${rect.left - containerRect.left - 2}px`;
+              dropIndex = targetIndex;
+            } else {
+              // Insert after this card
+              indicator.style.left = `${rect.right - containerRect.left - 2}px`;
+              dropIndex = targetIndex + 1;
+            }
+            
+            indicator.style.top = `${rect.top - containerRect.top}px`;
+            cardsContainer.appendChild(indicator);
+            
+            cardDiv.classList.add('hiker-drag-over');
+          });
+          
+          // Drag leave
+          cardDiv.addEventListener('dragleave', (e) => {
+            // Only remove indicator if we're actually leaving the card area
+            if (!cardDiv.contains(e.relatedTarget)) {
+              cardDiv.classList.remove('hiker-drag-over');
+            }
+          });
+          
+          // Drop
+          cardDiv.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const targetIndex = parseInt(cardDiv.dataset.index, 10);
+            let insertIndex = dropIndex;
+            
+            // If dropIndex wasn't set, determine based on mouse position
+            if (insertIndex === -1) {
+              const rect = cardDiv.getBoundingClientRect();
+              const cardCenterX = rect.left + rect.width / 2;
+              insertIndex = e.clientX < cardCenterX ? targetIndex : targetIndex + 1;
+            }
+            
+            // Adjust insertIndex if dragging from before the target
+            if (draggedIndex < insertIndex) {
+              insertIndex--;
+            }
+            
+            // Don't do anything if dropping on itself
+            if (draggedIndex === insertIndex || (draggedIndex === targetIndex && insertIndex === targetIndex + 1 && draggedIndex === targetIndex)) {
+              return;
+            }
+            
+            // Remove card from old position
+            reorderedCards.splice(draggedIndex, 1);
+            // Insert at new position
+            reorderedCards.splice(insertIndex, 0, draggedCard);
+            
+            // Re-render
+            renderCards();
+          });
+          
+          // Hover effects
+          cardDiv.addEventListener('mouseenter', () => {
+            if (!draggedCard) {
+              cardDiv.style.transform = 'scale(1.05)';
+              cardDiv.style.boxShadow = '0 8px 24px rgba(110, 78, 156, 0.6)';
+            }
+          });
+          cardDiv.addEventListener('mouseleave', () => {
+            if (!draggedCard) {
+              cardDiv.style.transform = 'scale(1)';
+              cardDiv.style.boxShadow = 'none';
+            }
+          });
+          
+          cardsContainer.appendChild(cardDiv);
+        }
+      };
+      
+      // Initial render
+      renderCards();
+      
+      // Show modal
+      backdrop.classList.add('show');
+      
+      // Done button handler
+      const handleDone = () => {
+        // Update deck with new order
+        // Remove the top n cards
+        deck.splice(0, n);
+        // Insert reordered cards at the top
+        deck.unshift(...reorderedCards);
+        
+        // Hide modal
+        backdrop.classList.remove('show');
+        
+        // Clean up
+        doneBtn.removeEventListener('click', handleDone);
+        if (escapeHandler) {
+          document.removeEventListener('keydown', escapeHandler);
+        }
+        
+        popup(`Reordered ${n} cards on top of deck.`);
+        console.log(`[Hiker] Reordered ${n} cards (${fightingCount} Fighting Pokémon in play)`);
+        resolve();
+      };
+      
+      doneBtn.addEventListener('click', handleDone);
+      
+      // Close on Escape
+      const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+          handleDone();
+        }
+      };
+      document.addEventListener('keydown', escapeHandler);
+    });
   },
 
   search_basic_pokemon: async (state, pk) => {
     const deck = state[pk].deck ?? [];
     if (!deck.length) { popup('Deck is empty.'); return; }
     
-    for (const card of deck) {
+    // Batch fetch metadata for better performance
+    const metaPromises = deck.map(async (card) => {
       try {
-        const meta = await fetch(`https://api.tcgdex.net/v2/en/sets/${card.set}/${card.number || card.num}`).then(r => r.json());
-        if (meta.category === 'Pokemon' && meta.stage?.toLowerCase() === 'basic') {
-          deck.splice(deck.indexOf(card), 1);
+        const meta = await globalThis.fetchCardMeta?.(card.set, card.number || card.num) || 
+                     await fetch(`https://api.tcgdex.net/v2/en/sets/${card.set}/${card.number || card.num}`).then(r => r.json());
+        return { card, meta };
+      } catch {
+        return { card, meta: null };
+      }
+    });
+    
+    const results = await Promise.all(metaPromises);
+    for (const { card, meta } of results) {
+      if (meta && meta.category === 'Pokemon' && meta.stage?.toLowerCase() === 'basic') {
+          // Use findIndex with proper comparison to avoid reference issues
+          const deckIndex = deck.findIndex(c => c.set === card.set && (c.number || c.num) === (card.number || card.num));
+          if (deckIndex !== -1) {
+            deck.splice(deckIndex, 1);
+          }
+        
+        // Add to hand immediately (no animation)
           state[pk].hand.push(card);
+        
+        // Shuffle deck
+        shuffleDeckAndAnimate(state, pk);
+        
+        // Update UI immediately
+        if (globalThis.renderAllHands) {
+          globalThis.renderAllHands();
+        }
+        if (globalThis.updateDeckBubbles) {
+          globalThis.updateDeckBubbles();
+        }
+        
           popup(`Found ${card.name}!`);
           return;
         }
-      } catch {}
     }
     popup('No Basic Pokémon found.');
   },
@@ -1047,7 +1597,8 @@ const TRAINER_EFFECTS = {
     
     // Swap them
     const handIdx = hand.indexOf(selected);
-    const deckIdx = deck.indexOf(randomFromDeck);
+    // Use findIndex with proper comparison to avoid reference issues
+    const deckIdx = deck.findIndex(c => c.set === randomFromDeck.set && (c.number || c.num) === (randomFromDeck.number || randomFromDeck.num));
     
     if (handIdx >= 0 && deckIdx >= 0) {
       hand[handIdx] = randomFromDeck;
@@ -1072,8 +1623,7 @@ const TRAINER_EFFECTS = {
     });
     
     if (!damagedBench.length) {
-      popup('No damaged bench Pokemon.');
-      return;
+      throw new Error('No valid target');
     }
     
     popup('Choose a damaged bench Pokemon to switch in');
@@ -1135,7 +1685,11 @@ const TRAINER_EFFECTS = {
     for (const card of deck) {
       const cardName = (card.name || '').toLowerCase();
       if (names.some(n => cardName.includes(n))) {
-        deck.splice(deck.indexOf(card), 1);
+        // Use findIndex with proper comparison to avoid reference issues
+        const deckIndex = deck.findIndex(c => c.set === card.set && (c.number || c.num) === (card.number || card.num));
+        if (deckIndex !== -1) {
+          deck.splice(deckIndex, 1);
+        }
         state[pk].hand.push(card);
         popup(`Found ${card.name}!`);
         return;
@@ -1192,7 +1746,7 @@ const TRAINER_EFFECTS = {
     const active = getActiveImg(pk);
     const bench = getBenchImgs(pk);
     
-    if (!active) { popup('No active Pokemon.'); return; }
+    if (!active) { throw new Error('No valid target'); }
     
     // Find bench Pokemon with energy
     const benchWithEnergy = bench.filter(img => {
@@ -1202,8 +1756,7 @@ const TRAINER_EFFECTS = {
     });
     
     if (!benchWithEnergy.length) {
-      popup('No bench Pokemon have energy.');
-      return;
+      throw new Error('No valid target');
     }
     
     popup('Choose a bench Pokemon to move energy from');
@@ -1494,7 +2047,7 @@ const TRAINER_EFFECTS = {
     }
     
     let heads = 0;
-    while ((await flipCoin()) === 'heads') {
+    while ((await flipCoin(pk)) === 'heads') {
       heads++;
     }
     
@@ -1887,6 +2440,9 @@ const TRAINER_EFFECTS = {
       const { handCard, stage2Meta } = pairsForBasic[0];
       console.log('[Rare Candy] Evolving', chosenBasic.alt, '→', stage2Meta.name);
       
+      // Set flag on the basic Pokemon to indicate it will evolve via Rare Candy
+      chosenBasic.dataset.evolvedViaRareCandy = 'true';
+      
       await globalThis.evolveCard(
         chosenBasic, stage2Meta, handCard, owner,
         handCard.set, handCard.number || handCard.num
@@ -1896,12 +2452,41 @@ const TRAINER_EFFECTS = {
       console.log(`[Rare Candy] Success!`);
       
     } else {
+      // Multiple Stage 2 options - let user choose
       popup(`Choose which Stage 2 to evolve ${chosenBasic.alt} into.`);
-      const validNames = pairsForBasic.map(p => p.stage2Meta.name).join(', ');
-      popup(`Valid Stage 2 cards: ${validNames}. Using first for now.`);
       
-      const { handCard, stage2Meta } = pairsForBasic[0];
-      console.log('[Rare Candy] Multiple options, using:', stage2Meta.name);
+      // Set up selection system similar to Pokemon Communication
+      globalThis.__rareCandySelection = {
+        pk,
+        owner,
+        chosenBasic,
+        pairsForBasic
+      };
+      globalThis.__rareCandyActive = true;
+      
+      // Render hand to show glowing cards
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+      }
+      
+      // Wait for selection
+      const selectedPair = await new Promise((resolve) => {
+        globalThis.__rareCandyResolve = resolve;
+      });
+      
+      // Clean up
+      globalThis.__rareCandyActive = false;
+      globalThis.__rareCandySelection = null;
+      globalThis.__rareCandyResolve = null;
+      
+      if (!selectedPair) {
+        throw new Error('Evolution cancelled.');
+      }
+      
+      const { handCard, stage2Meta } = selectedPair;
+      
+      // Set flag on the basic Pokemon to indicate it will evolve via Rare Candy
+      chosenBasic.dataset.evolvedViaRareCandy = 'true';
       
       await globalThis.evolveCard(
         chosenBasic, stage2Meta, handCard, owner,
@@ -1909,7 +2494,6 @@ const TRAINER_EFFECTS = {
       );
       
       popup(`Rare Candy: ${chosenBasic.alt} evolved into ${stage2Meta.name}!`);
-      console.log(`[Rare Candy] Success!`);
     }
   },
 
@@ -2022,8 +2606,7 @@ const TRAINER_EFFECTS = {
     }
     
     if (!eligible.length) {
-      popup(`No eligible Pokémon with damage.`);
-      return;
+      throw new Error('No valid target');
     }
     
     popup(`Choose ${param2} with damage.`);
@@ -2081,8 +2664,7 @@ const TRAINER_EFFECTS = {
     }
     
     if (!eligible.length) {
-      popup(`No damaged ${type}-type Pokémon.`);
-      return;
+      throw new Error('No valid target');
     }
     
     popup(`Choose a damaged ${type}-type Pokémon to return to hand.`);
@@ -2185,24 +2767,36 @@ const TRAINER_EFFECTS = {
           
           if (isGiantCape || isLeafCape) {
             const hpBonus = isGiantCape ? 20 : 30;
-            delete slot.dataset.maxHp;
             
             const cardImg = slot.querySelector('img');
             if (cardImg) {
+              // Get base HP (should be stored in img.dataset.hp, not modified)
               const baseHp = parseInt10(cardImg.dataset.hp);
               const curHp = parseInt10(cardImg.dataset.chp);
               
-              // Remove the HP bonus - if current HP is now <= 0, this Pokemon should be KO'd
+              // Remove the HP bonus from current HP
               const newCurHp = curHp - hpBonus;
+              
+              // Delete maxHp BEFORE updating HP display to ensure setHpOnImg uses base HP
+              delete slot.dataset.maxHp;
               
               if (newCurHp <= 0) {
                 // Mark for KO after we finish removing all tools
                 pokemonToKO.push({ img: cardImg, wasActive: getActiveImg(oppPk) === cardImg });
                 console.log(`[Guzma] ${cardImg.alt} will be KO'd (HP: ${curHp} - ${hpBonus} = ${newCurHp})`);
               } else {
-                // Just update HP normally
+                // Update HP display - maxHp is already deleted, so it will use baseHp
+                // Use globalThis.setHpOnImage if available (from battle.html), otherwise use local setHpOnImg
+                if (globalThis.setHpOnImage) {
+                  globalThis.setHpOnImage(cardImg, baseHp, newCurHp);
+                } else {
                 setHpOnImg(cardImg, baseHp, newCurHp);
               }
+                console.log(`[Guzma] ${cardImg.alt} HP reduced: ${curHp}/${baseHp + hpBonus} → ${newCurHp}/${baseHp} (maxHp deleted, should display ${newCurHp}/${baseHp})`);
+              }
+            } else {
+              // No card image found, just delete maxHp
+              delete slot.dataset.maxHp;
             }
           }
           
@@ -2307,8 +2901,7 @@ const TRAINER_EFFECTS = {
     }
     
     if (!eligible.length) {
-      popup(`No damaged ${stage} Pokémon.`);
-      return;
+      throw new Error('No valid target');
     }
     
     popup(`Choose a ${stage} Pokémon to heal ${amount} damage.`);
@@ -2429,20 +3022,29 @@ const TRAINER_EFFECTS = {
     // Pick random match
     const chosen = matches[Math.floor(Math.random() * matches.length)];
     
-    // Remove from deck and add to hand
-    const deckIndex = deck.indexOf(chosen);
+    // Remove from deck
+    // Use findIndex with proper comparison to avoid reference issues
+    const deckIndex = deck.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
     if (deckIndex !== -1) {
       deck.splice(deckIndex, 1);
+      
+      // Add to hand immediately (no animation)
       state[pk].hand = state[pk].hand || [];
       state[pk].hand.push(chosen);
       
+      // Shuffle deck
+      shuffleDeckAndAnimate(state, pk);
+      
+      // Update UI immediately
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+      }
+      if (globalThis.updateDeckBubbles) {
+        globalThis.updateDeckBubbles();
+      }
+      
       popup(`Found ${chosen.name}! Added to hand.`);
       console.log(`[Gladion] Added to hand:`, chosen.name);
-      
-      // Update hand UI if available
-      if (globalThis.renderHand) {
-        globalThis.renderHand(pk);
-      }
     }
   },
   
@@ -2608,31 +3210,72 @@ const TRAINER_EFFECTS = {
       return;
     }
     
-    // Create choice UI
-    popup(`Eevee Bag: Choose effect for ${eeveelutions.length} Eeveelution(s)`);
+    // Show choice dialog
+    const choice = await new Promise((resolve) => {
+      const backdrop = document.getElementById('choiceDialogBackdrop');
+      const title = document.getElementById('choiceDialogTitle');
+      const desc = document.getElementById('choiceDialogDesc');
+      const buttonsContainer = document.getElementById('choiceDialogButtons');
+      
+      if (!backdrop || !title || !desc || !buttonsContainer) {
+        console.error('[Eevee Bag] Choice dialog elements not found');
+        resolve(null);
+        return;
+      }
+      
+      // Set title and description
+      title.textContent = 'Eevee Bag';
+      desc.textContent = `Choose 1 effect for your ${eeveelutions.length} Eeveelution${eeveelutions.length > 1 ? 's' : ''}:`;
+      
+      // Clear previous buttons
+      buttonsContainer.innerHTML = '';
+      
+      // Create Boost button
+      const boostBtn = document.createElement('button');
+      boostBtn.textContent = `Boost: +${boostAmount} damage this turn`;
+      boostBtn.style.cssText = 'padding:14px 24px;background:#00d4ff;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;min-width:200px;';
+      boostBtn.onmouseover = () => boostBtn.style.background = '#00b8e6';
+      boostBtn.onmouseout = () => boostBtn.style.background = '#00d4ff';
+      boostBtn.onclick = () => {
+        backdrop.classList.remove('show');
+        resolve('boost');
+      };
+      
+      // Create Heal button
+      const healBtn = document.createElement('button');
+      healBtn.textContent = `Heal: ${healAmount} damage from each`;
+      healBtn.style.cssText = 'padding:14px 24px;background:#22c55e;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;min-width:200px;';
+      healBtn.onmouseover = () => healBtn.style.background = '#16a34a';
+      healBtn.onmouseout = () => healBtn.style.background = '#22c55e';
+      healBtn.onclick = () => {
+        backdrop.classList.remove('show');
+        resolve('heal');
+      };
+      
+      // Add buttons to container
+      buttonsContainer.appendChild(boostBtn);
+      buttonsContainer.appendChild(healBtn);
+      
+      // Show the dialog
+      backdrop.classList.add('show');
+      
+      // Close on backdrop click
+      const backdropClickHandler = (e) => {
+        if (e.target === backdrop) {
+          backdrop.classList.remove('show');
+          backdrop.removeEventListener('click', backdropClickHandler);
+          resolve(null);
+        }
+      };
+      backdrop.addEventListener('click', backdropClickHandler);
+    });
     
-    // Simple selection approach: Let user select from dummy options
-    const boostOption = document.createElement('div');
-    boostOption.textContent = `Boost: +${boostAmount} damage this turn`;
-    boostOption.style.cursor = 'pointer';
+    if (!choice) {
+      console.log('[Eevee Bag] Choice cancelled');
+      return;
+    }
     
-    const healOption = document.createElement('div');
-    healOption.textContent = `Heal: ${healAmount} damage from each`;
-    healOption.style.cursor = 'pointer';
-    
-    // Use awaitSelection with special choice markers
-    const boostMarker = eeveelutions[0]; // Use first Eeveelution as boost marker
-    const healMarker = eeveelutions.length > 1 ? eeveelutions[1] : eeveelutions[0]; // Use second or first
-    
-    popup('Click an Eeveelution: First one = Boost, Second one = Heal (or same if only 1)');
-    const choice = await awaitSelection(eeveelutions);
-    
-    if (!choice) return;
-    
-    // Determine choice based on which was selected
-    const chosenIndex = eeveelutions.indexOf(choice);
-    
-    if (chosenIndex === 0 || eeveelutions.length === 1) {
+    if (choice === 'boost') {
       // Boost option
       if (!globalThis.state) globalThis.state = {};
       if (!globalThis.state.damageBoost) globalThis.state.damageBoost = {};
@@ -2646,7 +3289,7 @@ const TRAINER_EFFECTS = {
       
       popup(`Eevee Bag: Eeveelutions will do +${boostAmount} damage this turn!`);
       console.log(`[Eevee Bag] Boost activated: +${boostAmount} damage`);
-    } else {
+    } else if (choice === 'heal') {
       // Heal option
       for (const img of eeveelutions) {
         healImg(img, healAmount);
@@ -2675,13 +3318,21 @@ const TRAINER_EFFECTS = {
       return;
     }
     
-    // Find all Supporter cards (excluding Penny itself)
+    // Find all Supporter cards (excluding Penny itself) by fetching metadata
     const supporters = [];
     for (const card of deck) {
-      if (card.category === 'Trainer' && 
-          card.trainerType === 'Supporter' && 
-          card.name !== 'Penny') {
+      try {
+        const meta = await globalThis.fetchCardMeta?.(card.set, card.number || card.num) || 
+                     await fetch(`https://api.tcgdx.net/v2/en/sets/${card.set}/${card.number || card.num}`).then(r => r.json());
+        
+        if (meta.category === 'Trainer' && 
+            meta.trainerType === 'Supporter' && 
+            meta.name !== 'Penny') {
         supporters.push(card);
+        }
+      } catch (e) {
+        // Skip cards that can't be fetched
+        console.warn('[Penny] Could not fetch metadata for card:', card);
       }
     }
     
@@ -2693,31 +3344,820 @@ const TRAINER_EFFECTS = {
     // Pick random supporter
     const chosen = supporters[Math.floor(Math.random() * supporters.length)];
     
-    popup(`Penny copies: ${chosen.name}!`);
-    console.log(`[Penny] Copying:`, chosen);
+    // Get the chosen card's metadata
+    let chosenMeta = null;
+    let chosenName = chosen.name || 'Unknown';
+    let chosenImage = chosen.image || '';
     
-    // Shuffle the chosen card back into opponent's deck
-    // (it was just revealed, not removed)
+    try {
+      chosenMeta = await globalThis.fetchCardMeta?.(chosen.set, chosen.number || chosen.num);
+      if (chosenMeta) {
+        chosenName = chosenMeta.name || chosenName;
+        chosenImage = chosenMeta.image ? `${chosenMeta.image}/high.png` : chosenImage;
+      }
+    } catch {}
+    
+    // Display the chosen card visually for 1 second
+    const handBackdrop = document.getElementById('handBackdrop');
+    const handImg = document.getElementById('handImg');
+    const handTitle = document.getElementById('handTitle');
+    const handType = document.getElementById('handType');
+    const handEffect = document.getElementById('handEffect');
+    
+    if (handBackdrop && handImg && handTitle && handType && handEffect) {
+      // Set up the card display
+      handImg.src = chosenImage || 'imgs/cardback.png';
+      handTitle.textContent = chosenName;
+      handType.textContent = 'Supporter';
+      handType.style.background = '#8b5cf6'; // Purple for Supporter
+      handEffect.textContent = chosenMeta?.effect || chosenMeta?.description || 'Penny copies this card\'s effect.';
+      
+      // Show the modal
+      handBackdrop.classList.add('show');
+      
+      // Wait 1 second
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Hide the modal
+      handBackdrop.classList.remove('show');
+    }
+    
+    popup(`Penny copies: ${chosenName}!`);
+    console.log(`[Penny] Copying:`, chosenName, chosen);
+    
+    // Look up the effect from TRAINER_EFFECT_DATA
+    const cardId = `${chosen.set}-${String(chosen.number || chosen.num).padStart(3, '0')}`;
+    const effectData = typeof globalThis.TRAINER_EFFECT_DATA !== 'undefined' ? 
+      globalThis.TRAINER_EFFECT_DATA.find(x => x.id === cardId) : null;
+    
+    if (!effectData || !effectData.effect_type) {
+      popup(`${chosenName} effect not found in database.`);
+      console.log(`[Penny] Effect data not found for:`, cardId);
+      return;
+    }
+    
+    // Shuffle the chosen card back into opponent's deck (it was just revealed, not removed)
+    // The card is already in the deck, we just need to shuffle it
+    shuffleArray(deck);
+    
+    if (globalThis.shuffleDeckAndAnimate) {
+      globalThis.shuffleDeckAndAnimate(state, opp);
+    }
     
     // Now execute the chosen supporter's effect as if this player played it
-    if (chosen.effect_type && TRAINER_EFFECTS[chosen.effect_type]) {
+    const handler = TRAINER_EFFECTS[effectData.effect_type];
+    
+    if (handler) {
       try {
-        await TRAINER_EFFECTS[chosen.effect_type](state, pk, {
-          param1: chosen.param1,
-          param2: chosen.param2
+        await handler(state, pk, {
+          param1: effectData.param1,
+          param2: effectData.param2
         });
-        console.log(`[Penny] Successfully executed ${chosen.name} effect`);
+        console.log(`[Penny] Successfully executed ${chosenName} effect`);
       } catch (err) {
         console.error(`[Penny] Failed to execute effect:`, err);
-        popup(`Failed to execute ${chosen.name} effect.`);
+        popup(`Failed to execute ${chosenName} effect.`);
       }
     } else {
-      popup(`${chosen.name} effect not implemented.`);
-      console.log(`[Penny] Effect type not found:`, chosen.effect_type);
+      popup(`${chosenName} effect (${effectData.effect_type}) not implemented.`);
+      console.log(`[Penny] Effect type not found:`, effectData.effect_type);
     }
   },
 
   // 🆕 A3a/A3b TRAINER EFFECTS - END
+  
+  // ========================================
+  // 🆕 A3a/A3b TOOL EFFECTS - START
+  // ========================================
+  
+  // Electrical Cord - Move energy on knockout
+  move_energy_on_knockout_tool: async (state, pk, { param1, param2 }) => {
+    // This tool's effect is triggered in battle.html when the Pokemon is KO'd
+    // param1: energy type (e.g., "lightning")
+    // param2: count to move (e.g., "2")
+    // The implementation is in handleKnockOut() function
+    // This function just confirms attachment
+    const energyType = (param1 || 'lightning').toLowerCase();
+    const count = parseInt10(param2, 2);
+    popup(`Electrical Cord attached! Will move ${count} ${energyType} Energy to bench on KO.`);
+    console.log(`[Electrical Cord] Tool attached - will move ${count} ${energyType} energy on KO`);
+  },
+  
+  // Beastite - Boost damage per point
+  boost_damage_per_point: async (state, pk, { param1 }) => {
+    // This tool's effect is passive and calculated during damage calculation
+    // param1: damage per point (e.g., "10")
+    // The implementation is in battle.html damage calculation
+    // This function just confirms attachment
+    const perPoint = parseInt10(param1, 10);
+    popup(`Beastite attached! +${perPoint} damage per point you have.`);
+    console.log(`[Beastite] Tool attached - +${perPoint} damage per point`);
+  },
+  
+  // Leftovers - Heal at end of turn
+  heal_active_end_of_turn_tool: async (state, pk, { param1 }) => {
+    // This tool's effect is triggered at end of turn in battle.html
+    // param1: heal amount (e.g., "10")
+    // The implementation is in endTurn() or similar function
+    // This function just confirms attachment
+    const amount = parseInt10(param1, 10);
+    popup(`Leftovers attached! Will heal ${amount} damage at end of turn if active.`);
+    console.log(`[Leftovers] Tool attached - will heal ${amount} at end of turn`);
+  },
+  
+  // 🆕 A3a/A3b TOOL EFFECTS - END
+  // 🆕 A4 TRAINER EFFECTS - START
+  
+  // Discard specific energy type from opponent
+  discard_energy_type_from_opponent: async (state, pk, { param1, param2 }) => {
+    const energyType = (param1 || '').toLowerCase();
+    const count = parseInt10(param2, 1);
+    const oppImg = getActiveImg(oppPk(pk));
+    
+    if (!oppImg) {
+      popup('No opponent Active Pokémon.');
+      return;
+    }
+    
+    const removed = removeEnergy(oppImg, energyType, count);
+    if (removed > 0) {
+      popup(`Discarded ${removed} ${energyType} Energy from opponent!`);
+    } else {
+      popup(`No ${energyType} Energy to discard.`);
+    }
+  },
+  
+  // Flip to revive Pokémon from discard
+  flip_revive_from_discard: async (state, pk, { param1 }) => {
+    // param1: "basic" or specific Pokemon name
+    const target = (param1 || 'basic').toLowerCase();
+    const owner = pk === 'p1' ? 'player1' : 'player2';
+    
+    // Get discard pile
+    const discard = state[pk]?.discard || [];
+    const pokemonCards = [];
+    
+    for (const card of discard) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta.category === 'Pokemon') {
+          if (target === 'basic' && meta.stage?.toLowerCase() === 'basic') {
+            pokemonCards.push(card);
+          } else if (target !== 'basic' && (card.name || '').toLowerCase().includes(target)) {
+            pokemonCards.push(card);
+          }
+        }
+      } catch {}
+    }
+    
+    if (pokemonCards.length === 0) {
+      popup('No valid Pokémon in discard pile.');
+      return;
+    }
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      // Choose which Pokemon to revive
+      popup('HEADS → Choose a Pokémon to revive.');
+      // For simplicity, pick first matching card
+      const chosen = pokemonCards[0];
+      
+      // Remove from discard
+      const index = discard.indexOf(chosen);
+      if (index !== -1) discard.splice(index, 1);
+      
+      // Add to hand
+      state[pk].hand = state[pk].hand || [];
+      state[pk].hand.push(chosen);
+      
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+      }
+      
+      popup(`Revived ${chosen.name || 'Pokémon'}!`);
+    } else {
+      popup('TAILS → No effect.');
+    }
+  },
+  
+  // Guarantee next coin flip is heads
+  guarantee_coin_flip: async (state, pk, { param1 }) => {
+    // Store flag for next coin flip
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.guaranteedHeads) globalThis.state.guaranteedHeads = {};
+    
+    globalThis.state.guaranteedHeads[pk] = true;
+    popup('Next coin flip will be heads!');
+  },
+  
+  // Move multiple energy types
+  move_energy_type_multiple: async (state, pk, { param1, param2 }) => {
+    // param1: "fire,water" or "fire;water;lightning" (comma or semicolon-separated types)
+    // param2: "active" or "bench" (target), or empty (defaults to active)
+    const types = (param1 || '').split(/[,;]/).map(t => t.trim().toLowerCase()).filter(Boolean);
+    const target = (param2 || 'active').toLowerCase();
+    
+    if (types.length === 0) {
+      popup('No energy types specified.');
+      return;
+    }
+    
+    const targetImg = target === 'active' ? getActiveImg(pk) : null;
+    if (!targetImg && target === 'active') {
+      popup('No Active Pokémon.');
+      return;
+    }
+    
+    let totalMoved = 0;
+    
+    if (target === 'active') {
+      // Move from bench to active (Elemental Switch: move ONE energy from ONE benched Pokémon)
+      const benchImgs = getBenchImgs(pk);
+      if (benchImgs.length === 0) {
+        popup('No benched Pokémon.');
+        return;
+      }
+      
+      // Find all benched Pokémon that have at least one of the specified energy types
+      const candidates = [];
+      for (const img of benchImgs) {
+        const slot = getSlotFromImg(img);
+        if (!slot) continue;
+        
+        const energyPips = slot.querySelectorAll('.energy-pip');
+        for (const pip of energyPips) {
+          const pipType = pip.dataset.type?.toLowerCase();
+          if (pipType && types.includes(pipType)) {
+            candidates.push(img);
+            break; // Found at least one matching energy, add this Pokémon
+          }
+        }
+      }
+      
+      if (candidates.length === 0) {
+        popup('No Energy to move.');
+        return;
+      }
+      
+      // Choose which benched Pokémon to move energy from
+      popup(`Choose a Benched Pokémon with ${types.join(', ')} Energy.`);
+      const sourceImg = await awaitSelection(candidates);
+      
+      if (!sourceImg) {
+        return;
+      }
+      
+      // Find the first matching energy type on the chosen Pokémon
+      const sourceSlot = getSlotFromImg(sourceImg);
+      if (!sourceSlot) return;
+      
+      const energyPips = Array.from(sourceSlot.querySelectorAll('.energy-pip'));
+      for (const pip of energyPips) {
+        const pipType = pip.dataset.type?.toLowerCase();
+        if (pipType && types.includes(pipType)) {
+          // Move this one energy
+          const toBox = getEnergyBox(getSlotFromImg(targetImg), true);
+          if (toBox) {
+            toBox.appendChild(pip);
+            totalMoved = 1;
+            popup(`Moved 1 {${pipType.toUpperCase()}} Energy to ${targetImg.alt}!`);
+          }
+          break; // Only move one energy
+        }
+      }
+    } else {
+      // Move from active to bench
+      const activeImg = getActiveImg(pk);
+      if (!activeImg) {
+        popup('No Active Pokémon.');
+        return;
+      }
+      
+      const benchImgs = getBenchImgs(pk);
+      if (benchImgs.length === 0) {
+        popup('No benched Pokémon.');
+        return;
+      }
+      
+      popup('Choose a benched Pokémon to move Energy to.');
+      const chosen = await awaitSelection(benchImgs);
+      
+      if (chosen) {
+        for (const type of types) {
+          const moved = moveEnergy(activeImg, chosen, type);
+          totalMoved += moved;
+        }
+        
+        if (totalMoved > 0) {
+          popup(`Moved ${totalMoved} Energy (${types.join(', ')})!`);
+        } else {
+          popup('No Energy to move.');
+        }
+      }
+    }
+  },
+  
+  // Reduce all incoming damage next turn
+  reduce_all_incoming_damage_next_turn: async (state, pk, { param1 }) => {
+    const reduction = parseInt10(param1, 20);
+    
+    globalThis.__specialEffects ??= { p1: {}, p2: {} };
+    if (!globalThis.__specialEffects[pk].damageReduction) {
+      globalThis.__specialEffects[pk].damageReduction = 0;
+    }
+    
+    globalThis.__specialEffects[pk].damageReduction += reduction;
+    popup(`All incoming damage reduced by ${reduction} next turn!`);
+  },
+  
+  // Reduce incoming damage (Tool)
+  reduce_incoming_damage: async (state, pk, { param1 }) => {
+    const reduction = parseInt10(param1, 20);
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) {
+      popup('No Active Pokémon.');
+      return;
+    }
+    
+    // Store reduction on the Pokemon
+    activeImg.dataset.damageReduction = String(reduction);
+    popup(`Incoming damage reduced by ${reduction}!`);
+  },
+  
+  // Put KO'd Pokémon to hand instead of discard
+  rescue_to_hand: async (state, pk, { param1 }) => {
+    // This is handled in battle.html handleKnockOut function
+    // Just mark that rescue is active
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.rescueToHand) globalThis.state.rescueToHand = {};
+    
+    globalThis.state.rescueToHand[pk] = true;
+    popup('If a Pokémon is Knocked Out, put it in your hand instead of discard!');
+  },
+  
+  // Shuffle opponent's hand
+  shuffle_opponent_hand: async (state, pk, { param1 }) => {
+    // Silver: Your opponent reveals their hand. Choose a Supporter card you find there and shuffle it into your opponent's deck.
+    const opp = oppPk(pk);
+    const hand = state[opp]?.hand || [];
+    const deck = state[opp]?.deck || [];
+    
+    if (hand.length === 0) {
+      popup('Opponent has no cards in hand.');
+      return;
+    }
+    
+    // Find all Supporter cards in opponent's hand
+    const supporters = [];
+    for (const card of hand) {
+      try {
+        const meta = await globalThis.fetchCardMeta?.(card.set, card.number || card.num) || 
+                     await fetch(`https://api.tcgdx.net/v2/en/sets/${card.set}/${card.number || card.num}`).then(r => r.json());
+        if (meta.category === 'Trainer' && meta.trainerType === 'Supporter') {
+          supporters.push(card);
+        }
+      } catch (e) {
+        // Skip cards that can't be fetched
+        console.warn('[Silver] Could not fetch metadata for card:', card);
+      }
+    }
+    
+    if (supporters.length === 0) {
+      popup('No Supporter cards in opponent\'s hand.');
+      return;
+    }
+    
+    // Reveal opponent's hand temporarily by rendering it without hiding
+    const oppOwner = opp === 'p1' ? 'player1' : 'player2';
+    const oppHandDivId = oppOwner === 'player1' ? 'p1Hand' : 'p2Hand';
+    const oppHandDiv = document.getElementById(oppHandDivId);
+    
+    // Store original hide state
+    const originalHide = oppOwner === 'player1' ? 
+      (typeof currentPlayer !== 'undefined' && currentPlayer === 'player2') :
+      (typeof currentPlayer !== 'undefined' && currentPlayer === 'player1');
+    
+    // Temporarily reveal the opponent's hand
+    if (oppHandDiv && globalThis.renderHand) {
+      globalThis.renderHand(oppHandDiv, hand, false, false);
+      // Remove disable-clicks class to allow clicking
+      oppHandDiv.classList.remove('disable-clicks');
+    }
+    
+    // Show popup with supporter names
+    const supporterNames = supporters.map(c => c.name).join(', ');
+    popup(`Opponent's hand revealed. Choose a Supporter card.`);
+    
+    // Wait a moment for the hand to render
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Create temporary card elements for selection (only Supporters)
+    const supporterElements = [];
+    if (oppHandDiv) {
+      const allCards = oppHandDiv.querySelectorAll('.card-img');
+      console.log(`[Silver] Found ${allCards.length} cards in opponent's hand`);
+      for (const cardEl of allCards) {
+        const cardSet = cardEl.dataset.set;
+        const cardNum = cardEl.dataset.num;
+        console.log(`[Silver] Checking card: ${cardSet}-${cardNum}`);
+        // Check if this card is a Supporter
+        const isSupporter = supporters.some(c => 
+          c.set === cardSet && String(c.number || c.num) === String(cardNum)
+        );
+        if (isSupporter) {
+          supporterElements.push(cardEl);
+          cardEl.classList.add('heal-glow'); // Highlight Supporter cards
+          console.log(`[Silver] Added Supporter to selection: ${cardSet}-${cardNum}`);
+        }
+      }
+    }
+    
+    console.log(`[Silver] Found ${supporterElements.length} Supporter elements to select from`);
+    
+    if (supporterElements.length === 0) {
+      // Fallback: if we can't find the elements, try to use renderAllHands and try again
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        const allCards = oppHandDiv?.querySelectorAll('.card-img') || [];
+        for (const cardEl of allCards) {
+          const cardSet = cardEl.dataset.set;
+          const cardNum = cardEl.dataset.num;
+          const isSupporter = supporters.some(c => 
+            c.set === cardSet && String(c.number || c.num) === String(cardNum)
+          );
+          if (isSupporter) {
+            supporterElements.push(cardEl);
+            cardEl.classList.add('heal-glow');
+          }
+        }
+      }
+      
+      if (supporterElements.length === 0) {
+        popup(`No Supporter cards found in opponent's hand.`);
+        // Re-hide opponent's hand
+        if (oppHandDiv && globalThis.renderHand) {
+          globalThis.renderHand(oppHandDiv, hand, originalHide, false);
+        } else if (globalThis.renderAllHands) {
+          globalThis.renderAllHands();
+        }
+        return;
+      }
+    }
+    
+    // Set a flag to allow clicking opponent's hand during selection
+    globalThis.__silverSelectionActive = true;
+    
+    // Let player choose a Supporter card
+    const chosenEl = await awaitSelection(supporterElements, 'heal-glow');
+    
+    // Clear the flag
+    globalThis.__silverSelectionActive = false;
+    
+    // Re-hide opponent's hand and restore disable-clicks
+    if (oppHandDiv && globalThis.renderHand) {
+      globalThis.renderHand(oppHandDiv, hand, originalHide, false);
+      // Restore disable-clicks if it should be disabled
+      const shouldDisable = oppOwner === 'player1' ? 
+        (typeof currentPlayer !== 'undefined' && currentPlayer === 'player2') :
+        (typeof currentPlayer !== 'undefined' && currentPlayer === 'player1');
+      if (shouldDisable) {
+        oppHandDiv.classList.add('disable-clicks');
+      }
+    } else if (globalThis.renderAllHands) {
+      globalThis.renderAllHands();
+    }
+    
+    if (!chosenEl) {
+      popup('No Supporter chosen.');
+      return;
+    }
+    
+    // Find the card in the hand array
+    const chosenSet = chosenEl.dataset.set;
+    const chosenNum = chosenEl.dataset.num;
+    const handIndex = hand.findIndex(c => 
+      c.set === chosenSet && String(c.number || c.num) === String(chosenNum)
+    );
+    
+    if (handIndex === -1) {
+      popup('Error: Could not find chosen card.');
+      return;
+    }
+    
+    // Remove chosen Supporter from hand and shuffle into deck
+    const removed = hand.splice(handIndex, 1)[0];
+    deck.push(removed);
+    shuffleArray(deck);
+    
+    if (globalThis.shuffleDeckAndAnimate) {
+      globalThis.shuffleDeckAndAnimate(state, opp);
+    }
+    
+    // Update UI
+    if (globalThis.renderAllHands) {
+      globalThis.renderAllHands();
+    }
+    if (globalThis.updateDeckBubbles) {
+      globalThis.updateDeckBubbles();
+    }
+    
+    popup(`Shuffled ${removed.name} into opponent's deck!`);
+  },
+  
+  // Switch active Pokémon
+  switch_active: async (state, pk, { param1 }, context = {}) => {
+    // Trigger promotion flow
+    const owner = pk === 'p1' ? 'player1' : 'player2';
+    
+    // 🆕 Lyra: Only usable if active Pokémon has damage
+    const activeImg = getActiveImg(pk);
+    if (activeImg) {
+      const maxHp = parseInt10(activeImg.dataset.hp);
+      const curHp = parseInt10(activeImg.dataset.chp, maxHp);
+      if (curHp >= maxHp) {
+        throw new Error('Lyra can only be used when your Active Pokémon has damage on it.');
+      }
+    } else {
+      throw new Error('No Active Pokémon.');
+    }
+    
+    if (globalThis.beginPromotionFlow) {
+      await globalThis.beginPromotionFlow(owner);
+      popup('Switched Active Pokémon.');
+    } else {
+      throw new Error('Switch effect not available.');
+    }
+  },
+  
+  // 🆕 A4 TRAINER EFFECTS - END
+
+  // ========================================
+  // 🆕 A4a NEW TRAINER EFFECTS START
+  // ========================================
+
+  // 1. Memory Light (Tool): Use attacks from previous evolutions
+  use_previous_evolution_attacks: async (state, pk, { param1, param2 }, context = {}) => {
+    // This is handled in battle.html when showing attack menu
+    // Store flag on the Pokémon that has this tool attached
+    const targetImg = globalThis.toolAttachTarget;
+    if (targetImg) {
+      targetImg.dataset.usePreviousEvolutionAttacks = 'true';
+      popup('Memory Light: This Pokémon can use attacks from previous evolutions!');
+      console.log('[use_previous_evolution_attacks] Flag set on Pokémon');
+    }
+  },
+
+  // 2. Whitney (Supporter): Heal and remove status
+  heal_and_remove_status: async (state, pk, { param1 }, context = {}) => {
+    const amount = parseInt10(param1, 60);
+    
+    // Find Miltank in play
+    const allPokemon = getAllPokemonImgs(pk);
+    const miltanks = [];
+    
+    for (const img of allPokemon) {
+      try {
+        const meta = await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
+        const name = (meta.name || '').toLowerCase();
+        if (name.includes('miltank')) {
+          miltanks.push(img);
+        }
+      } catch {}
+    }
+    
+    if (miltanks.length === 0) {
+      popup('No Miltank in play.');
+      return;
+    }
+    
+    // Let player choose which Miltank
+    const selected = await awaitSelection(miltanks, 'Select a Miltank to heal:');
+    if (!selected) return;
+    
+    // Heal
+    healImg(selected, amount);
+    
+    // Remove status
+    selected.dataset.status = '';
+    const statusIndicator = selected.closest('.card-slot')?.querySelector('.status-indicator');
+    if (statusIndicator) statusIndicator.remove();
+    
+    popup(`Healed ${amount} damage and removed status from ${selected.alt || 'Miltank'}!`);
+  },
+
+  // 3. Traveling Merchant (Supporter): Search for tools
+  search_tools_into_hand: async (state, pk, { param1 }, context = {}) => {
+    const numCards = parseInt10(param1, 4);
+    const deck = state[pk].deck || [];
+    
+    if (deck.length === 0) {
+      popup('Deck is empty!');
+      return;
+    }
+    
+    const topCards = deck.slice(0, Math.min(numCards, deck.length));
+    const tools = [];
+    
+    // Check each card
+    for (const card of topCards) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta && String(meta.trainerType || '').toLowerCase() === 'tool') {
+          tools.push(card);
+        }
+      } catch {}
+    }
+    
+    // Remove tools from deck and add to hand
+    for (const tool of tools) {
+      const idx = deck.findIndex(c => c.set === tool.set && (c.number || c.num) === (tool.number || tool.num));
+      if (idx >= 0) {
+        deck.splice(idx, 1);
+        state[pk].hand.push(tool);
+      }
+    }
+    
+    // Shuffle remaining cards back
+    const remaining = topCards.filter(c => !tools.some(t => t.set === c.set && (t.number || t.num) === (c.number || c.num)));
+    for (const card of remaining) {
+      const idx = deck.findIndex(c => c.set === card.set && (c.number || c.num) === (card.number || card.num));
+      if (idx >= 0) {
+        deck.splice(idx, 1);
+      }
+    }
+    
+    // Shuffle deck
+    shuffle(deck);
+    
+    // Add remaining cards back to bottom
+    deck.push(...remaining);
+    
+    renderAllHands();
+    updateDeckBubbles();
+    
+    if (tools.length > 0) {
+      popup(`Found ${tools.length} Tool card(s) and added to hand!`);
+    } else {
+      popup('No Tool cards found in top cards.');
+    }
+  },
+
+  // 4. Morty (Supporter): Reorder opponent's deck
+  reorder_opponent_deck: async (state, pk, { param1, param2 }, context = {}) => {
+    const oppPkKey = oppPk(pk);
+    const oppDeck = state[oppPkKey].deck || [];
+    
+    // Count Psychic Pokémon in play
+    const allPokemon = getAllPokemonImgs(pk);
+    let psychicCount = 0;
+    
+    for (const img of allPokemon) {
+      try {
+        const meta = await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
+        const types = meta.types || [];
+        if (types.some(t => String(t).toLowerCase() === 'psychic')) {
+          psychicCount++;
+        }
+      } catch {}
+    }
+    
+    if (psychicCount === 0) {
+      popup('No Psychic Pokémon in play.');
+      return;
+    }
+    
+    const numCards = Math.min(psychicCount, oppDeck.length);
+    
+    if (numCards === 0) {
+      popup('Opponent\'s deck is empty!');
+      return;
+    }
+    
+    // Use Hiker's reorder UI
+    const topCards = oppDeck.slice(0, numCards);
+    
+    // Show reorder modal (reuse Hiker's UI)
+    const backdrop = document.getElementById('hikerReorderBackdrop');
+    const cardsContainer = document.getElementById('hikerReorderCards');
+    const title = document.getElementById('hikerReorderTitle');
+    const desc = document.getElementById('hikerReorderDesc');
+    const doneBtn = document.getElementById('hikerReorderDone');
+    
+    if (!backdrop || !cardsContainer) {
+      popup('Reorder UI not available.');
+      return;
+    }
+    
+    title.textContent = 'Reorder Opponent\'s Deck';
+    desc.textContent = `Reorder the top ${numCards} cards of your opponent's deck.`;
+    cardsContainer.innerHTML = '';
+    
+    const reorderedCards = [...topCards];
+    
+    // Render cards
+    for (let i = 0; i < topCards.length; i++) {
+      const card = topCards[i];
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'hiker-card-draggable';
+      cardDiv.style.cssText = 'position:relative;cursor:grab;';
+      cardDiv.dataset.index = String(i);
+      
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        const img = document.createElement('img');
+        img.src = meta.image || 'imgs/cardback.png';
+        img.style.cssText = 'width:120px;height:168px;border-radius:8px;border:2px solid #334155;';
+        cardDiv.appendChild(img);
+        
+        const label = document.createElement('div');
+        label.textContent = `Position ${i + 1}`;
+        label.style.cssText = 'text-align:center;margin-top:4px;font-size:12px;color:#cbd5e1;';
+        cardDiv.appendChild(label);
+      } catch {
+        const placeholder = document.createElement('div');
+        placeholder.textContent = card.name || 'Card';
+        placeholder.style.cssText = 'width:120px;height:168px;border:2px solid #334155;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#1e293b;color:#cbd5e1;';
+        cardDiv.appendChild(placeholder);
+      }
+      
+      cardsContainer.appendChild(cardDiv);
+    }
+    
+    // Setup drag and drop (reuse Hiker's logic)
+    let draggedIndex = null;
+    
+    cardsContainer.querySelectorAll('.hiker-card-draggable').forEach((cardDiv, idx) => {
+      cardDiv.addEventListener('dragstart', (e) => {
+        draggedIndex = idx;
+        cardDiv.style.opacity = '0.5';
+      });
+      
+      cardDiv.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (draggedIndex === null) return;
+        
+        const afterElement = getDragAfterElement(cardsContainer, e.clientX);
+        const dragging = cardsContainer.children[draggedIndex];
+        
+        if (afterElement == null) {
+          cardsContainer.appendChild(dragging);
+        } else {
+          cardsContainer.insertBefore(dragging, afterElement);
+        }
+      });
+      
+      cardDiv.addEventListener('dragend', () => {
+        cardDiv.style.opacity = '1';
+        draggedIndex = null;
+        
+        // Update reorderedCards array
+        reorderedCards.length = 0;
+        Array.from(cardsContainer.children).forEach((child, i) => {
+          const origIdx = parseInt10(child.dataset.index);
+          reorderedCards.push(topCards[origIdx]);
+        });
+      });
+    });
+    
+    function getDragAfterElement(container, x) {
+      const draggableElements = [...container.querySelectorAll('.hiker-card-draggable:not(.dragging)')];
+      
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = x - box.left - box.width / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    
+    backdrop.classList.add('show');
+    
+    // Wait for Done button
+    await new Promise(resolve => {
+      const handler = () => {
+        backdrop.classList.remove('show');
+        doneBtn.removeEventListener('click', handler);
+        resolve();
+      };
+      doneBtn.addEventListener('click', handler);
+    });
+    
+    // Update deck
+    oppDeck.splice(0, numCards);
+    oppDeck.unshift(...reorderedCards);
+    
+    updateDeckBubbles();
+    popup(`Reordered top ${numCards} cards of opponent's deck!`);
+  },
+
+  // ========================================
+  // 🆕 A4a NEW TRAINER EFFECTS END
+  // ========================================
 };
 
 globalThis.TRAINER_EFFECTS = TRAINER_EFFECTS;
@@ -2741,23 +4181,62 @@ const MOVE_HANDLERS = {
   
   flip_inflict_status_if_heads: async (s, pk, { param1 }, ctx) => {
     if (!ctx.isFinal) return;
-    if ((await flipCoin()) === 'heads') { applyStatus(oppPk(pk), param1); popup(`HEADS → ${param1}!`); }
+    if ((await flipCoin(pk)) === 'heads') { applyStatus(oppPk(pk), param1); popup(`HEADS → ${param1}!`); }
     else popup('TAILS → no effect.');
   },
   
   flip_inflict_effect_if_heads: async (s, pk, { param1, param2 }, ctx) => {
     if (!ctx.isFinal) return;
     
-    if ((await flipCoin()) === 'tails') {
-      popup('TAILS → no effect.');
-      return;
-    }
-    
     const effect = param1?.toLowerCase();
     const opp = oppPk(pk);
     
     // Initialize special effects storage if needed
     globalThis.__specialEffects ??= { p1: {}, p2: {} };
+    
+    // Check if this is a "flip until tails" effect (like Guzzlord ex's Grindcore)
+    const effectText = ctx.moveRowText || '';
+    const isFlipUntilTails = /flip.*until.*tails/i.test(effectText) || /for each heads/i.test(effectText);
+    
+    if (isFlipUntilTails && effect === 'discard_energy') {
+      // Guzzlord ex's Grindcore: Flip until tails, discard energy for each heads
+      let headsCount = 0;
+      let flipResult = await flipCoin(pk);
+      
+      while (flipResult === 'heads') {
+        headsCount++;
+        const oppImg = getActiveImg(opp);
+        if (oppImg) {
+          const count = parseInt10(param2, 1);
+          const removed = removeEnergy(oppImg, null, count);
+          if (removed > 0) {
+            popup(`HEADS (${headsCount}) → Discarded ${removed} Energy!`);
+          } else {
+            popup(`HEADS (${headsCount}) → No Energy to discard.`);
+            break; // No more energy, stop flipping
+          }
+        } else {
+          popup(`HEADS (${headsCount}) → No opponent Active Pokémon.`);
+          break;
+        }
+        
+        // Flip again for next iteration
+        flipResult = await flipCoin(pk);
+      }
+      
+      if (headsCount === 0) {
+        popup('TAILS → No effect.');
+      } else if (flipResult === 'tails') {
+        popup(`TAILS after ${headsCount} heads.`);
+      }
+      return;
+    }
+    
+    // Single flip effect
+    if ((await flipCoin(pk)) === 'tails') {
+      popup('TAILS → no effect.');
+      return;
+    }
     
     switch (effect) {
       case 'attack_lock':
@@ -2768,6 +4247,22 @@ const MOVE_HANDLERS = {
       case 'prevent_damage_next_turn':
         globalThis.__specialEffects[pk].preventDamage = true;
         popup("HEADS → This Pokémon will take no damage next turn!");
+        break;
+        
+      case 'discard_energy':
+        // Single flip discard energy
+        const oppImg = getActiveImg(opp);
+        if (oppImg) {
+          const count = parseInt10(param2, 1);
+          const removed = removeEnergy(oppImg, null, count);
+          if (removed > 0) {
+            popup(`HEADS → Discarded ${removed} Energy from opponent!`);
+          } else {
+            popup('HEADS → No Energy to discard.');
+          }
+        } else {
+          popup('HEADS → No opponent Active Pokémon.');
+        }
         break;
         
       default:
@@ -2781,6 +4276,24 @@ const MOVE_HANDLERS = {
     }
   },
   
+  // Direct handler for cant_attack_next_turn (Dragonite ex - Giga Impact, Aggron - Giga Impact, etc.)
+  cant_attack_next_turn: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    // Initialize special effects storage if needed
+    globalThis.__specialEffects ??= { p1: {}, p2: {} };
+    if (!globalThis.__specialEffects[pk]) globalThis.__specialEffects[pk] = {};
+    
+    // Set attack lock for next turn (similar to Big Beat, but for all attacks)
+    // Store the turn number when lock was applied, so we can clear it after the locked turn
+    const currentTurn = globalThis.turnNumber || 0;
+    globalThis.__specialEffects[pk].attackLock = {
+      locked: true,
+      lockedOnTurn: currentTurn
+    };
+    popup("During your next turn, this Pokémon can't attack.");
+  },
+  
   inflict_effect: async (s, pk, { param1, param2 }, ctx) => {
     if (!ctx.isFinal) return;
     
@@ -2789,6 +4302,11 @@ const MOVE_HANDLERS = {
     
     // Initialize special effects storage if needed
     globalThis.__specialEffects ??= { p1: {}, p2: {} };
+    
+    // Pass moveName to context for cant_attack_next_turn handler
+    if (effect === 'cant_attack_next_turn' && ctx.moveName) {
+      ctx.moveName = ctx.moveName; // Ensure it's available
+    }
     
     switch (effect) {
       case 'attack_lock':
@@ -2815,6 +4333,82 @@ const MOVE_HANDLERS = {
         const reduction = parseInt10(param2, 20);
         globalThis.__specialEffects[pk].damageReduction = reduction;
         popup(`This Pokémon will take ${reduction} less damage next turn!`);
+        break;
+        
+      case 'cant_attack_next_turn':
+        // Handle both move-specific locks (Buzzwole - Big Beat) and all-attacks locks (Aggron - Giga Impact, Dragonite ex - Giga Impact)
+        const attackerImg = getActiveImg(pk);
+        if (attackerImg) {
+          const instanceId = attackerImg.dataset.instanceId;
+          // Try to get move name from context (passed from applyMoveEffect)
+          const moveName = ctx?.moveName || ctx?.rawCtx?.moveName || '';
+          
+          // Get the move row to check the effect text
+          // Check if the effect text mentions the specific move name (move-specific) or just "can't attack" (all attacks)
+          let isMoveSpecific = false;
+          if (moveName) {
+            // Try to get the text from context first (passed from applyMoveEffect)
+            let text = ctx?.moveRowText || '';
+            
+            // If not in context, try to get the move row
+            if (!text) {
+              try {
+                // Ensure CSV is loaded
+                await loadMoveEffects();
+                // Use the getMoveRow function from this file (not global)
+                const moveRow = getMoveRow(attackerImg.alt, moveName);
+                // The CSV field is called "effect_text" (see CSV header)
+                text = moveRow?.effect_text || moveRow?.text || '';
+              } catch (e) {
+                // If we can't get the text, default to all-attacks lock
+              }
+            }
+            
+            if (text) {
+              const textLower = text.toLowerCase();
+              const moveNameLower = moveName.toLowerCase();
+              // If text contains "can't use [MoveName]" or "cannot use [MoveName]", it's move-specific
+              // If text just says "can't attack" or "cannot attack" (without the move name), it's all attacks
+              isMoveSpecific = textLower.includes(`can't use ${moveNameLower}`) || 
+                              textLower.includes(`cannot use ${moveNameLower}`) ||
+                              textLower.includes(`can't use this ${moveNameLower}`) ||
+                              textLower.includes(`cannot use this ${moveNameLower}`);
+            }
+            // If no text found, default to all-attacks lock (isMoveSpecific stays false)
+          }
+          // If no moveName, default to all-attacks lock (isMoveSpecific stays false)
+          
+          if (instanceId && moveName && isMoveSpecific) {
+            // Move-specific lock (Buzzwole - Big Beat)
+            // Initialize move locks storage
+            if (!globalThis.__moveLocks) globalThis.__moveLocks = { p1: {}, p2: {} };
+            if (!globalThis.__moveLocks[pk]) globalThis.__moveLocks[pk] = {};
+            if (!globalThis.__moveLocks[pk][instanceId]) globalThis.__moveLocks[pk][instanceId] = {};
+            
+            // Lock this specific move for this specific Pokemon instance
+            // Store the turn number when the lock was applied
+            const moveNameLower = moveName.toLowerCase();
+            const currentTurn = globalThis.turnNumber || 0;
+            globalThis.__moveLocks[pk][instanceId][moveNameLower] = {
+              locked: true,
+              lockedOnTurn: currentTurn
+            };
+            popup(`During your next turn, this Pokémon can't use ${moveName}.`);
+          } else {
+            // All-attacks lock (Aggron - Giga Impact, Dragonite ex - Giga Impact, Necrozma - Prismatic Laser)
+            // Use the existing attackLock system
+            if (!globalThis.__specialEffects) globalThis.__specialEffects = { p1: {}, p2: {} };
+            if (!globalThis.__specialEffects[pk]) globalThis.__specialEffects[pk] = {};
+            globalThis.__specialEffects[pk].attackLock = true;
+            popup("During your next turn, this Pokémon can't attack.");
+          }
+        } else {
+          // Fallback if no active Pokemon found
+          if (!globalThis.__specialEffects) globalThis.__specialEffects = { p1: {}, p2: {} };
+          if (!globalThis.__specialEffects[pk]) globalThis.__specialEffects[pk] = {};
+          globalThis.__specialEffects[pk].attackLock = true;
+          popup("During your next turn, this Pokémon can't attack.");
+        }
         break;
         
       default:
@@ -2857,7 +4451,12 @@ const MOVE_HANDLERS = {
   },
   
   bonus_damage_for_each_bench: async (s, pk, { param1 }, ctx) => {
-    ctx.addBonus(getBenchImgs(pk).length * parseInt10(param1));
+    // Count both player's and opponent's BENCHED Pokémon only (for Suicune ex - Crystal Waltz)
+    // getBenchImgs() only returns images from the bench div, not active
+    const ownBench = getBenchImgs(pk).length;
+    const oppBench = getBenchImgs(oppPk(pk)).length;
+    const totalBench = ownBench + oppBench;
+    ctx.addBonus(totalBench * parseInt10(param1));
   },
   
   bonus_damage_for_each_typed_bench: async (s, pk, { param1, param2 }, ctx) => {
@@ -2886,28 +4485,264 @@ const MOVE_HANDLERS = {
     }
   },
   
+  // 🆕 A4 - Bonus damage if this Pokémon was damaged last turn
+  bonus_damage_if_damaged_last_turn: async (s, pk, { param1 }, ctx) => {
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    // Check if this Pokemon was damaged during opponent's last turn
+    // Track this in global state when damage is dealt
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.damagedLastTurn) globalThis.state.damagedLastTurn = {};
+    
+    const instanceId = activeImg.dataset.instanceId;
+    const wasDamaged = instanceId && globalThis.state.damagedLastTurn[instanceId];
+    
+    if (wasDamaged) {
+      ctx.addBonus(parseInt10(param1));
+      popup(`Reply Strongly: +${param1} damage (was damaged last turn)!`);
+    }
+  },
+  
+  // 🆕 A4 - Bonus damage if opponent is Evolution Pokémon
+  bonus_damage_if_evolution: async (s, pk, { param1 }, ctx) => {
+    const oppImg = getActiveImg(oppPk(pk));
+    if (!oppImg) return;
+    
+    try {
+      const meta = await globalThis.fetchCardMeta(oppImg.dataset.set, oppImg.dataset.num);
+      const stage = meta.stage?.toLowerCase();
+      if (stage === 'stage1' || stage === 'stage2' || stage === 'vmax' || stage === 'vstar') {
+        ctx.addBonus(parseInt10(param1));
+        popup(`Cross-Cut: +${param1} damage (opponent is Evolution)!`);
+      }
+    } catch {}
+  },
+  
+  // 🆕 A4 - Bonus damage if this Pokémon has no damage
+  bonus_damage_if_no_damage_self: async (s, pk, { param1 }, ctx) => {
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    const { base, cur } = getHpFromImg(activeImg);
+    if (cur >= base) {
+      ctx.addBonus(parseInt10(param1));
+      popup(`Single Lunge: +${param1} damage (no damage on this Pokémon)!`);
+    }
+  },
+  
+  // 🆕 A4 - Bonus damage if opponent is Burned
+  bonus_damage_if_opponent_burned: async (s, pk, { param1 }, ctx) => {
+    const oppImg = getActiveImg(oppPk(pk));
+    if (oppImg?.dataset.status?.toLowerCase() === 'burned') {
+      ctx.addBonus(parseInt10(param1));
+      popup(`+${param1} damage (opponent is Burned)!`);
+    }
+  },
+  
+  // 🆕 A4 - Bonus damage if switched in this turn
+  bonus_damage_if_switched_in: async (s, pk, { param1 }, ctx) => {
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    const playedTurn = parseInt(activeImg.dataset.playedTurn || '0', 10);
+    if (playedTurn === globalThis.turnNumber) {
+      ctx.addBonus(parseInt10(param1));
+      popup(`+${param1} damage (switched in this turn)!`);
+    }
+  },
+  
+  // 🆕 A4 - Bonus damage if this Pokémon has a Tool attached
+  bonus_damage_if_tool: async (s, pk, { param1 }, ctx) => {
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    const slot = getSlotFromImg(activeImg);
+    const hasTool = slot?.querySelector('.tool-attachment') !== null;
+    
+    if (hasTool) {
+      ctx.addBonus(parseInt10(param1));
+      popup(`+${param1} damage (Tool attached)!`);
+    }
+  },
+  
+  // 🆕 A4 - Bonus damage if opponent is specific type
+  bonus_damage_if_type: async (s, pk, { param1, param2 }, ctx) => {
+    const oppImg = getActiveImg(oppPk(pk));
+    if (!oppImg) return;
+    
+    const targetType = (param1 || '').toLowerCase();
+    try {
+      const meta = await globalThis.fetchCardMeta(oppImg.dataset.set, oppImg.dataset.num);
+      if (meta.types?.some(t => t.toLowerCase() === targetType)) {
+        ctx.addBonus(parseInt10(param2));
+        popup(`+${param2} damage (opponent is ${targetType}-type)!`);
+      }
+    } catch {}
+  },
+  
+  // 🆕 A4 - Boost damage for next attack
+  boost_next_attack: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.damageBoost) globalThis.state.damageBoost = {};
+    if (!globalThis.state.damageBoost[pk]) globalThis.state.damageBoost[pk] = {};
+    
+    const activeImg = getActiveImg(pk);
+    const instanceId = activeImg?.dataset.instanceId;
+    if (instanceId) {
+      globalThis.state.damageBoost[pk][instanceId] = {
+        amount: parseInt10(param1),
+        duration: 'next_attack'
+      };
+      popup(`Next attack does +${param1} damage!`);
+    }
+  },
+  
+  // 🆕 A4 - Discard bench Pokémon for bonus damage
+  discard_bench_for_bonus_damage: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const benchImgs = getBenchImgs(pk);
+    if (benchImgs.length === 0) {
+      popup('No benched Pokémon to discard.');
+      return;
+    }
+    
+    popup(`Choose a benched Pokémon to discard for +${param2} damage.`);
+    const chosen = await awaitSelection(benchImgs);
+    
+    if (chosen) {
+      // Discard the chosen Pokémon (move to discard pile)
+      if (globalThis.pushCardToDiscard) {
+        const owner = pk === 'p1' ? 'player1' : 'player2';
+        globalThis.pushCardToDiscard(owner, chosen);
+      }
+      
+      // Remove from bench
+      const slot = chosen.closest('.card-slot');
+      if (slot) {
+        slot.remove();
+      }
+      
+      ctx.addBonus(parseInt10(param2));
+      popup(`Discarded ${chosen.alt} for +${param2} damage!`);
+    }
+  },
+  
   extra_damage_if_extra_energy_attached: async (s, pk, { param1, param2 }, ctx) => {
-    const [needed, bonus] = (param2 || '').split('|').map(v => parseInt10(v));
-    if (countEnergy(getActiveImg(pk), param1?.toLowerCase()) >= needed) {
+    const img = getActiveImg(pk);
+    if (!img) return;
+    
+    let energyType, needed, bonus;
+    
+    // Check if param1 contains "|" (format: "2|60" for Gigantic Press)
+    if (param1 && param1.includes('|')) {
+      // Format: param1 = "2|60", param2 = empty
+      // Energy type should be Fighting (based on card text "{F} Energy")
+      const parts = param1.split('|').map(v => parseInt10(v));
+      needed = parts[0] || 2;
+      bonus = parts[1] || 60;
+      energyType = 'fighting'; // Default to Fighting for Donphan ex
+    } else {
+      // Format: param1 = energy type, param2 = "2|50" (for Machamp Power Press)
+      energyType = (param1 || 'fighting').toLowerCase();
+      const parts = (param2 || '').split('|').map(v => parseInt10(v));
+      needed = parts[0] || 2;
+      bonus = parts[1] || 50;
+    }
+    
+    // Count total energy of the required type
+    const totalEnergy = countEnergy(img, energyType);
+    console.log(`[extra_damage_if_extra_energy] ${img.alt}: ${totalEnergy} total ${energyType} energy`);
+    
+    // Get attack cost to calculate "extra" energy
+    // "Extra" means beyond what's needed for the attack
+    let attackCost = 0;
+    
+    // First, try to use attack cost from context (passed directly from battle.html)
+    if (ctx.rawCtx?.attackCost && Array.isArray(ctx.rawCtx.attackCost)) {
+      // Count how many of the required energy type are in the attack cost
+      attackCost = ctx.rawCtx.attackCost.filter(c => {
+        const costType = String(c || '').toLowerCase();
+        // Handle various energy type name variations
+        if (energyType === 'fighting') {
+          return costType === 'fighting' || costType === 'fight';
+        }
+        return costType === energyType;
+      }).length;
+      console.log(`[extra_damage_if_extra_energy] Using attack cost from context: ${attackCost} ${energyType} energy (cost array: ${JSON.stringify(ctx.rawCtx.attackCost)})`);
+    } else {
+      // Fallback: fetch from metadata
+      try {
+        if (ctx.moveName && img.dataset.set && img.dataset.num) {
+          const meta = await globalThis.fetchCardMeta?.(img.dataset.set, img.dataset.num);
+          if (meta?.attacks) {
+            const attack = meta.attacks.find(a => normStr(a.name) === normStr(ctx.moveName));
+            if (attack?.cost) {
+              // Count how many of the required energy type are in the attack cost
+              // Normalize energy type names (fighting vs Fighting)
+              attackCost = (attack.cost || []).filter(c => {
+                const costType = String(c || '').toLowerCase();
+                // Handle various energy type name variations
+                if (energyType === 'fighting') {
+                  return costType === 'fighting' || costType === 'fight';
+                }
+                return costType === energyType;
+              }).length;
+              console.log(`[extra_damage_if_extra_energy] Attack cost for ${ctx.moveName}: ${attackCost} ${energyType} energy (cost array: ${JSON.stringify(attack.cost)})`);
+            } else {
+              console.log(`[extra_damage_if_extra_energy] Attack ${ctx.moveName} has no cost, assuming 1`);
+              attackCost = 1; // Default to 1 if no cost specified
+            }
+          } else {
+            console.log(`[extra_damage_if_extra_energy] No attacks found in metadata, assuming cost 1`);
+            attackCost = 1;
+          }
+        } else {
+          console.log(`[extra_damage_if_extra_energy] Missing moveName (${ctx.moveName}) or card data, assuming cost 1`);
+          attackCost = 1;
+        }
+      } catch (err) {
+        console.error('[extra_damage_if_extra_energy] Error fetching attack cost:', err);
+        // Fallback: assume attack cost is 1
+        attackCost = 1;
+      }
+    }
+    
+    // Calculate extra energy (total - attack cost)
+    const extraEnergy = Math.max(0, totalEnergy - attackCost);
+    console.log(`[extra_damage_if_extra_energy] ${img.alt}: ${extraEnergy} extra ${energyType} energy (${totalEnergy} total - ${attackCost} cost), need ${needed}, isFinal=${ctx.isFinal}`);
+    console.log(`[extra_damage_if_extra_energy] Before addBonus: damage=${ctx.damage}, isMultiplicative=${ctx.isMultiplicative}`);
+    
+    if (extraEnergy >= needed) {
+      const beforeDamage = ctx.damage;
       ctx.addBonus(bonus);
+      console.log(`[extra_damage_if_extra_energy] Added bonus: +${bonus}, damage changed from ${beforeDamage} to ${ctx.damage}`);
+      if (ctx.isFinal) {
+        popup(`Extra ${energyType} Energy: +${bonus} damage! (${extraEnergy} extra, need ${needed})`);
+      }
+    } else {
+      console.log(`[extra_damage_if_extra_energy] ${img.alt}: ${extraEnergy} extra ${energyType} energy < ${needed}, no bonus`);
     }
   },
 
   // Flip-based damage
   flip_bonus_damage_if_heads: async (s, pk, { param2 }, ctx) => {
     if (!ctx.isFinal) return;
-    if ((await flipCoin()) === 'heads') ctx.addBonus(parseInt10(param2));
+    if ((await flipCoin(pk)) === 'heads') ctx.addBonus(parseInt10(param2));
   },
   
   flip_bonus_damage_with_self_damage: async (s, pk, { param1, param2 }, ctx) => {
     if (!ctx.isFinal) return;
-    if ((await flipCoin()) === 'heads') ctx.addBonus(parseInt10(param1));
+    if ((await flipCoin(pk)) === 'heads') ctx.addBonus(parseInt10(param1));
     else damageImg(getActiveImg(pk), parseInt10(param2));
   },
   
   flip_bonus_if_double_heads: async (s, pk, { param1 }, ctx) => {
     if (!ctx.isFinal) return;
-    if ((await flipCoin()) === 'heads' && (await flipCoin()) === 'heads') {
+    if ((await flipCoin(pk)) === 'heads' && (await flipCoin(pk)) === 'heads') {
       ctx.addBonus(parseInt10(param1));
     }
   },
@@ -2916,7 +4751,7 @@ const MOVE_HANDLERS = {
     if (!ctx.isFinal) return;
     let heads = 0;
     for (let i = 0; i < parseInt10(param1); i++) {
-      if ((await flipCoin()) === 'heads') heads++;
+      if ((await flipCoin(pk)) === 'heads') heads++;
     }
     ctx.setOverride(heads * parseInt10(param2));
   },
@@ -2924,13 +4759,157 @@ const MOVE_HANDLERS = {
   flip_until_tails_multiplier: async (s, pk, { param1 }, ctx) => {
     if (!ctx.isFinal) return;
     let heads = 0;
-    while ((await flipCoin()) === 'heads') heads++;
+    while ((await flipCoin(pk)) === 'heads') heads++;
     ctx.setOverride(heads * parseInt10(param1));
   },
   
-  flip_do_nothing_if_tails: async (s, pk, p, ctx) => {
+  flip_do_nothing_if_tails: async (s, pk, { param1 }, ctx) => {
     if (!ctx.isFinal) return;
-    if ((await flipCoin()) === 'tails') ctx.setOverride(0);
+    
+    // Check if this is actually a "bonus damage if heads" effect (like Type: Null's Quick Blow)
+    const effectText = ctx.moveRowText || '';
+    const isBonusDamage = /if heads.*does.*more damage/i.test(effectText) || /if heads.*\+/i.test(effectText);
+    
+    if (isBonusDamage && param1) {
+      // Type: Null's Quick Blow: If heads, add bonus damage
+      const bonus = parseInt10(param1, 20);
+      if ((await flipCoin(pk)) === 'heads') {
+        ctx.addBonus(bonus);
+        popup(`HEADS → +${bonus} damage!`);
+      } else {
+        popup('TAILS → no bonus damage.');
+      }
+    } else {
+      // Original behavior: do nothing if tails
+      if ((await flipCoin(pk)) === 'tails') {
+        ctx.setOverride(0);
+        popup('TAILS → Attack does nothing.');
+      } else {
+        popup('HEADS → Attack proceeds.');
+      }
+    }
+  },
+  
+  // 🆕 A4 - Flip to block opponent's attack
+  flip_block_attack: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      const opp = oppPk(pk);
+      globalThis.__specialEffects ??= { p1: {}, p2: {} };
+      globalThis.__specialEffects[opp].attackLock = true;
+      popup('HEADS → Opponent cannot attack next turn!');
+    } else {
+      popup('TAILS → No effect.');
+    }
+  },
+  
+  // 🆕 A4 - Flip multiplier with bonus damage per head
+  flip_multiplier_bonus: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const flips = parseInt10(param1, 2);
+    const baseDamage = parseInt10(param2, 0);
+    const bonusPerHead = parseInt10(ctx.moveRowText?.match(/\+(\d+)/)?.[1] || '0', 0);
+    
+    let heads = 0;
+    for (let i = 0; i < flips; i++) {
+      if ((await flipCoin(pk)) === 'heads') heads++;
+    }
+    
+    const totalDamage = (heads * baseDamage) + (heads * bonusPerHead);
+    ctx.setOverride(totalDamage);
+    popup(`${heads} heads → ${totalDamage} damage!`);
+  },
+  
+  // 🆕 A4 - Flip multiplier that confuses self
+  flip_multiplier_self_confuse: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const flips = parseInt10(param1, 2);
+    const damagePerHead = parseInt10(param2, 0);
+    
+    let heads = 0;
+    for (let i = 0; i < flips; i++) {
+      if ((await flipCoin(pk)) === 'heads') heads++;
+    }
+    
+    ctx.setOverride(heads * damagePerHead);
+    
+    // Confuse self
+    const activeImg = getActiveImg(pk);
+    if (activeImg) {
+      applyStatus(pk, 'confusion');
+      popup(`${heads} heads → ${heads * damagePerHead} damage, but ${activeImg.alt} is now Confused!`);
+    }
+  },
+  
+  // 🆕 A4 - Flip to prevent damage next turn
+  flip_prevent_damage_next_turn: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      globalThis.__specialEffects ??= { p1: {}, p2: {} };
+      globalThis.__specialEffects[pk].preventDamage = true;
+      popup('HEADS → This Pokémon will take no damage next turn!');
+    } else {
+      popup('TAILS → No effect.');
+    }
+  },
+  
+  // 🆕 A4 - Flip to set opponent's HP to fixed amount
+  flip_set_hp: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const targetHp = parseInt10(param1, 10);
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      const oppImg = getActiveImg(oppPk(pk));
+      if (oppImg) {
+        const slot = oppImg.closest('.card-slot');
+        const maxHp = parseInt10(oppImg.dataset.hp, 0);
+        const newHp = Math.min(targetHp, maxHp);
+        
+        oppImg.dataset.chp = String(newHp);
+        if (globalThis.setHpOnImage) {
+          globalThis.setHpOnImage(oppImg, maxHp, newHp);
+        }
+        
+        popup(`HEADS → Set opponent's HP to ${newHp}!`);
+      }
+    } else {
+      popup('TAILS → No effect.');
+    }
+  },
+  
+  // 🆕 A4 - Flip to shuffle random card from opponent hand
+  flip_shuffle_random_from_hand: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      const opp = oppPk(pk);
+      const hand = s[opp]?.hand || [];
+      
+      if (hand.length === 0) {
+        popup('HEADS → Opponent has no cards in hand.');
+        return;
+      }
+      
+      const randomIndex = Math.floor(Math.random() * hand.length);
+      const card = hand.splice(randomIndex, 1)[0];
+      
+      // Add to deck and shuffle
+      const deck = s[opp]?.deck || [];
+      deck.push(card);
+      
+      if (globalThis.shuffleDeckAndAnimate) {
+        globalThis.shuffleDeckAndAnimate(s, opp);
+      }
+      
+      popup(`HEADS → Shuffled ${card.name || 'a card'} from opponent's hand into their deck!`);
+    } else {
+      popup('TAILS → No effect.');
+    }
   },
 
   // Energy discard
@@ -2954,7 +4933,7 @@ const MOVE_HANDLERS = {
   
   flip_discard_random_from_opponent: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
-    if ((await flipCoin()) === 'heads') {
+    if ((await flipCoin(pk)) === 'heads') {
       removeEnergy(getActiveImg(oppPk(pk)), null, 1);
       popup('HEADS → discarded opponent Energy.');
     } else popup('TAILS.');
@@ -3221,7 +5200,7 @@ const MOVE_HANDLERS = {
     
     let heads = 0;
     for (let i = 0; i < energyCount; i++) {
-      if ((await flipCoin()) === 'heads') heads++;
+      if ((await flipCoin(pk)) === 'heads') heads++;
     }
     
     const totalDmg = heads * dmgPerHeads;
@@ -3292,11 +5271,28 @@ const MOVE_HANDLERS = {
   // Energy attachment
   attach_energy_from_zone: async (s, pk, { param1, param2 }, ctx) => {
     if (!ctx.isFinal) return;
-    const type = (param1 || 'colorless').toLowerCase();
+    // Map single letter energy types to full names (w -> water, f -> fire, etc.)
+    const energyTypeMap = {
+      'w': 'water',
+      'f': 'fire',
+      'g': 'grass',
+      'l': 'lightning',
+      'p': 'psychic',
+      'r': 'fighting',
+      'd': 'darkness',
+      'm': 'metal',
+      'n': 'dragon',
+      'c': 'colorless'
+    };
+    let type = (param1 || 'colorless').toLowerCase();
+    // Convert single letter to full name if needed
+    if (energyTypeMap[type]) {
+      type = energyTypeMap[type];
+    }
     
     if (param2 === 'count_heads') {
       let heads = 0;
-      for (let i = 0; i < 3; i++) if ((await flipCoin()) === 'heads') heads++;
+      for (let i = 0; i < 3; i++) if ((await flipCoin(pk)) === 'heads') heads++;
       
       const targets = [];
       for (const img of getBenchImgs(pk)) {
@@ -3323,17 +5319,268 @@ const MOVE_HANDLERS = {
       return;
     }
     
-    if (param2 === 'to_bench') {
-      const targets = getBenchImgs(pk);
-      if (!targets.length) { popup('No bench targets.'); return; }
+    if (param2 === 'to_bench' || !param2 || param2 === '') {
+      // Get benched Basic Pokémon
+      const benchImgs = getBenchImgs(pk);
+      const basicTargets = [];
       
-      popup('Choose bench target.');
-      const chosen = await awaitSelection(targets);
+      for (const img of benchImgs) {
+        try {
+          // Check if set and num are valid before fetching
+          const set = img.dataset.set;
+          const num = img.dataset.num;
+          if (!set || !num || set === 'undefined' || num === 'undefined') {
+            console.warn('[attach_energy_from_zone] Skipping Pokemon with invalid set/num:', img.alt, 'set:', set, 'num:', num);
+            continue;
+          }
+          const meta = await globalThis.fetchCardMeta(set, num);
+          if (meta && meta.category === 'Pokemon' && meta.stage?.toLowerCase() === 'basic') {
+            basicTargets.push(img);
+          }
+        } catch (err) {
+          console.error('[attach_energy_from_zone] Error checking Pokemon:', img.alt, err);
+          // Continue to next Pokemon instead of breaking
+        }
+      }
+      
+      if (!basicTargets.length) {
+        popup('No Benched Basic Pokémon.');
+        return;
+      }
+      
+      popup('Choose a Benched Basic Pokémon.');
+      const chosen = await awaitSelection(basicTargets);
       if (chosen) {
         attachEnergy(chosen, type);
         popup(`Attached ${type} Energy to ${chosen.alt}.`);
       }
     }
+  },
+  
+  // 🆕 A4 - Attach multiple energy types from zone
+  attach_multiple_energy_from_zone: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    // param1: "fire,water" or "fire;water;lightning" (comma or semicolon-separated types)
+    // param2: "2" (count per type), "1,1" (count per type), or "to_bench" (attach to bench Basic Pokémon)
+    const types = (param1 || '').split(/[,;]/).map(t => t.trim().toLowerCase()).filter(Boolean);
+    const counts = (param2 || '1').split(',').map(c => parseInt10(c.trim(), 1));
+    
+    // Check if attaching to bench Basic Pokémon (Ho-Oh ex Phoenix Turbo)
+    if (param2 === 'to_bench') {
+      const benchImgs = getBenchImgs(pk);
+      const basicPokemon = [];
+      
+      // Filter to only Basic Pokémon
+      for (const img of benchImgs) {
+        try {
+          const meta = await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
+          if (meta.stage?.toLowerCase() === 'basic') {
+            basicPokemon.push(img);
+          }
+        } catch {}
+      }
+      
+      if (basicPokemon.length === 0) {
+        popup('No Basic Pokémon on your Bench.');
+        return;
+      }
+      
+      // Attach each energy type to a chosen Basic Pokémon
+      let totalAttached = 0;
+      for (let i = 0; i < types.length; i++) {
+        const type = types[i];
+        
+        popup(`Choose a Basic Pokémon to attach {${type.toUpperCase()}} Energy to.`);
+        const chosen = await awaitSelection(basicPokemon);
+        
+        if (chosen) {
+          attachEnergy(chosen, type);
+          totalAttached++;
+          popup(`Attached {${type.toUpperCase()}} Energy to ${chosen.alt}!`);
+        } else {
+          popup(`Skipped {${type.toUpperCase()}} Energy.`);
+        }
+      }
+      
+      if (totalAttached > 0) {
+        popup(`Phoenix Turbo: Attached ${totalAttached} Energy to Basic Pokémon!`);
+      }
+      return;
+    }
+    
+    // Default: attach to active Pokémon
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    let totalAttached = 0;
+    for (let i = 0; i < types.length; i++) {
+      const type = types[i];
+      const count = counts[i] || counts[0] || 1;
+      
+      for (let j = 0; j < count; j++) {
+        attachEnergy(activeImg, type);
+        totalAttached++;
+      }
+    }
+    
+    popup(`Attached ${totalAttached} Energy (${types.join(', ')})!`);
+  },
+  
+  // 🆕 A4 - Change energy type on opponent
+  change_energy_type: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    // param1: "fire" (type to change from)
+    // param2: "water" (type to change to)
+    const fromType = (param1 || '').toLowerCase();
+    const toType = (param2 || '').toLowerCase();
+    
+    const oppImg = getActiveImg(oppPk(pk));
+    if (!oppImg) return;
+    
+    const slot = getSlotFromImg(oppImg);
+    const energyBox = slot?.querySelector('.energy-pips');
+    if (!energyBox) return;
+    
+    const pips = Array.from(energyBox.querySelectorAll('.energy-pip'));
+    const typePips = pips.filter(p => p.dataset.type === fromType);
+    
+    if (typePips.length === 0) {
+      popup(`No ${fromType} Energy to change.`);
+      return;
+    }
+    
+    // Change all matching energy types
+    for (const pip of typePips) {
+      pip.dataset.type = toType;
+      pip.style.backgroundImage = `url('${ENERGY_ICONS[toType] || ''}')`;
+    }
+    
+    popup(`Changed ${typePips.length} ${fromType} Energy to ${toType}!`);
+  },
+  
+  // 🆕 A4 - Move all energy from active to bench
+  move_all_energy_to_bench: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    const activeSlot = getSlotFromImg(activeImg);
+    const activeEnergyBox = activeSlot?.querySelector('.energy-pips');
+    if (!activeEnergyBox || activeEnergyBox.children.length === 0) {
+      popup('No Energy to move.');
+      return;
+    }
+    
+    const benchImgs = getBenchImgs(pk);
+    if (benchImgs.length === 0) {
+      popup('No benched Pokémon to move Energy to.');
+      return;
+    }
+    
+    popup('Choose a benched Pokémon to move all Energy to.');
+    const chosen = await awaitSelection(benchImgs);
+    
+    if (chosen) {
+      const benchSlot = getSlotFromImg(chosen);
+      let benchEnergyBox = benchSlot?.querySelector('.energy-pips');
+      if (!benchEnergyBox) {
+        benchEnergyBox = document.createElement('div');
+        benchEnergyBox.className = 'energy-pips';
+        benchSlot.appendChild(benchEnergyBox);
+      }
+      
+      // Move all energy pips
+      const pips = Array.from(activeEnergyBox.children);
+      for (const pip of pips) {
+        benchEnergyBox.appendChild(pip);
+      }
+      
+      popup(`Moved all Energy to ${chosen.alt}!`);
+    }
+  },
+  
+  // 🆕 A4 - Discard random card from opponent hand
+  discard_random_from_opponent_hand: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const opp = oppPk(pk);
+    const hand = s[opp]?.hand || [];
+    
+    if (hand.length === 0) {
+      popup('Opponent has no cards in hand.');
+      return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * hand.length);
+    const card = hand.splice(randomIndex, 1)[0];
+    
+    if (globalThis.pushCardToDiscard) {
+      const owner = opp === 'p1' ? 'player1' : 'player2';
+      const fakeImg = document.createElement('img');
+      fakeImg.dataset.set = card.set;
+      fakeImg.dataset.num = card.num;
+      globalThis.pushCardToDiscard(owner, fakeImg);
+    }
+    
+    popup(`Discarded ${card.name || 'a card'} from opponent's hand!`);
+    
+    // Update hand UI
+    if (globalThis.renderAllHands) {
+      globalThis.renderAllHands();
+    }
+  },
+  
+  // 🆕 A4 - Draw until hand size equals opponent
+  draw_until_equal_hand: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const opp = oppPk(pk);
+    const myHand = s[pk]?.hand || [];
+    const oppHand = s[opp]?.hand || [];
+    const deck = s[pk]?.deck || [];
+    
+    const targetSize = oppHand.length;
+    const currentSize = myHand.length;
+    const needed = Math.max(0, targetSize - currentSize);
+    
+    if (needed === 0) {
+      popup('Your hand size already matches opponent.');
+      return;
+    }
+    
+    if (deck.length < needed) {
+      popup(`Only ${deck.length} cards in deck (need ${needed}).`);
+      return;
+    }
+    
+    // Draw cards
+    const drawn = deck.splice(0, needed);
+    myHand.push(...drawn);
+    
+    if (globalThis.drawCards) {
+      globalThis.drawCards(s, pk, needed);
+    }
+    
+    popup(`Drew ${needed} card(s) to match opponent's hand size!`);
+  },
+  
+  // 🆕 A4 - Increase opponent's attack energy cost
+  increase_energy_cost: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const increase = parseInt10(param1, 1);
+    const opp = oppPk(pk);
+    
+    globalThis.__specialEffects ??= { p1: {}, p2: {} };
+    if (!globalThis.__specialEffects[opp].energyCostIncrease) {
+      globalThis.__specialEffects[opp].energyCostIncrease = 0;
+    }
+    
+    globalThis.__specialEffects[opp].energyCostIncrease += increase;
+    popup(`Opponent's attacks cost +${increase} Energy!`);
   },
 
   // Switching
@@ -3355,10 +5602,65 @@ const MOVE_HANDLERS = {
     const deck = s[pk].deck ?? [];
     if (!deck.length) { popup('Deck empty.'); return; }
     
-    const idx = (Math.random() * deck.length) | 0;
-    const card = deck.splice(idx, 1)[0];
-    s[pk].hand.push(card);
-    popup(`Found ${card.name}.`);
+    // Filter for Pokemon cards only
+    const pokemonCards = [];
+    const requiredType = (param1 || '').toLowerCase().trim();
+    
+    // Batch fetch metadata for better performance
+    const metaPromises = deck.map(async (card) => {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        return { card, meta };
+      } catch (e) {
+        return { card, meta: null };
+      }
+    });
+    
+    const results = await Promise.all(metaPromises);
+    for (const { card, meta } of results) {
+      if (meta && meta.category === 'Pokemon') {
+        // If type is specified, check if Pokemon has that type
+        if (requiredType) {
+          const hasType = meta.types?.some(t => t.toLowerCase() === requiredType);
+          if (hasType) {
+            pokemonCards.push(card);
+          }
+        } else {
+          // No type specified, add all Pokemon
+          pokemonCards.push(card);
+        }
+      }
+    }
+    
+    if (pokemonCards.length === 0) {
+      popup(requiredType ? `No ${requiredType}-type Pokémon in deck.` : 'No Pokémon in deck.');
+      return;
+    }
+    
+    // Pick random Pokemon
+    const idx = Math.floor(Math.random() * pokemonCards.length);
+    const chosen = pokemonCards[idx];
+    
+    // Remove from deck and add to hand
+    // Use findIndex with proper comparison to avoid reference issues
+    const deckIndex = deck.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
+    if (deckIndex !== -1) {
+      deck.splice(deckIndex, 1);
+      (s[pk].hand ||= []).push(chosen);
+      
+      // Shuffle deck
+      shuffleDeckAndAnimate(s, pk);
+      
+      // Update UI immediately
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+      }
+      if (globalThis.updateDeckBubbles) {
+        globalThis.updateDeckBubbles();
+      }
+      
+      popup(`Found ${chosen.name}.`);
+    }
   },
   
   search_specific_into_bench: async (s, pk, { param1 }, ctx) => {
@@ -3461,44 +5763,186 @@ const MOVE_HANDLERS = {
     }
   },
 
-  // Multi-target random damage (Dragonite's Draco Meteor) - NOW IMPLEMENTED ✅
+  // Multi-target random damage (Dragonite's Draco Meteor, Magcargo's Spurt Fire) - NOW IMPLEMENTED ✅
   random_multi_target_damage: async (s, pk, { param1, param2 }, ctx) => {
     if (!ctx.isFinal) return;
     
     const times = parseInt10(param1, 4);
     const dmg = parseInt10(param2, 50);
-    const targets = getAllPokemonImgs(oppPk(pk));
     
-    if (!targets.length) {
+    // Get attacker for Oricorio check and to exclude from targets if needed
+    const attackerImg = ctx?.attackerImg || getActiveImg(pk);
+    
+    // Check if this move can target your own Pokemon (e.g., Magcargo's Spurt Fire)
+    // by checking the move row text for "either yours or your opponent's"
+    const moveRow = getMoveRow(attackerImg?.alt || '', ctx.moveName || '');
+    const canTargetOwn = moveRow?.text?.toLowerCase().includes('either yours or your opponent') || 
+                         moveRow?.effect_text?.toLowerCase().includes('either yours or your opponent');
+    
+    // Build initial target pool - ensure we're getting Pokemon IMAGES, not slots
+    let initialTargets = [];
+    if (canTargetOwn) {
+      // Can target either your own Pokemon or opponent's Pokemon (excluding attacker)
+      const myPokemon = getAllPokemonImgs(pk).filter(img => img && img !== attackerImg && img.tagName === 'IMG');
+      const oppPokemon = getAllPokemonImgs(oppPk(pk)).filter(img => img && img.tagName === 'IMG');
+      initialTargets = [...myPokemon, ...oppPokemon];
+    } else {
+      // Only target opponent's Pokemon (includes active and benched)
+      // Filter to ensure we only have IMG elements, not slots or other elements
+      initialTargets = getAllPokemonImgs(oppPk(pk)).filter(img => img && img.tagName === 'IMG');
+    }
+    
+    if (!initialTargets.length) {
       popup('No targets available.');
+      // Set damage to 0 since no targets available
+      ctx.setOverride(0);
       return;
     }
     
-    // Get attacker for Oricorio check
-    const attackerImg = ctx?.attackerImg || getActiveImg(pk);
-    
     const hitLog = {};
+    const koedPokemon = new Set(); // Track KO'd Pokemon to handle after all selections
     
+    console.log(`[random_multi_target_damage] Starting: ${times} selections, ${dmg} damage each`);
+    console.log(`[random_multi_target_damage] Initial targets:`, initialTargets.map(img => ({ name: img.alt, hp: getHpFromImg(img).cur })));
+    
+    // Randomly select targets (can select the same Pokemon multiple times)
+    // If only one Pokemon exists, it will be selected all 'times' and take full damage
+    // We continue selecting even if Pokemon are KO'd - we just filter them out from the pool
     for (let i = 0; i < times; i++) {
-      const chosen = targets[Math.floor(Math.random() * targets.length)];
-      damageImg(chosen, dmg, attackerImg);
+      // Refresh available targets each iteration - only include alive Pokemon that are still in DOM
+      const availableTargets = initialTargets.filter(img => {
+        // Ensure it's an IMG element and still in the DOM
+        if (!img || img.tagName !== 'IMG' || !img.parentElement) {
+          return false;
+        }
+        // Skip if this Pokemon was already KO'd in a previous selection
+        if (koedPokemon.has(img)) {
+          return false;
+        }
+        // Check if Pokemon is still alive (has HP > 0)
+        const { cur } = getHpFromImg(img);
+        return cur > 0;
+      });
+      
+      console.log(`[random_multi_target_damage] Selection ${i + 1}/${times}: ${availableTargets.length} available targets`);
+      
+      // If no targets available, stop (all Pokemon are KO'd)
+      if (availableTargets.length === 0) {
+        console.log(`[random_multi_target_damage] No targets available, stopping early`);
+        break;
+      }
+      
+      // Select a random target from available Pokemon (IMG elements only)
+      const chosen = availableTargets[Math.floor(Math.random() * availableTargets.length)];
+      
+      // Ensure chosen is an IMG element
+      if (!chosen || chosen.tagName !== 'IMG') {
+        console.warn('[random_multi_target_damage] Invalid target, skipping:', chosen);
+        continue;
+      }
+      
+      // Get HP before damage (store it in case Pokemon is removed)
+      const beforeHp = getHpFromImg(chosen).cur;
+      const expectedAfterHp = Math.max(0, beforeHp - dmg);
+      const chosenName = chosen.alt || 'Unknown';
+      const chosenSet = chosen.dataset.set;
+      const chosenNum = chosen.dataset.num;
+      console.log(`[random_multi_target_damage] Selected: ${chosenName} (${chosenSet}-${chosenNum}), HP before: ${beforeHp}`);
+      
+      // Verify the image is still valid before applying damage
+      if (!chosen || chosen.tagName !== 'IMG' || !chosen.parentElement) {
+        console.warn('[random_multi_target_damage] Target invalid before damage, skipping');
+        continue;
+      }
+      
+      // Apply damage to the Pokemon image
+      const result = damageImg(chosen, dmg, attackerImg);
+      
+      // Verify damage was applied by checking HP immediately after
+      // Use a small delay to ensure DOM updates are complete
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      // Verify the image is still the same and in DOM
+      if (!chosen || chosen.tagName !== 'IMG' || !chosen.parentElement) {
+        console.warn('[random_multi_target_damage] Target removed after damage, using expected HP');
+        // Use expected HP if image was removed
+        const afterHp = expectedAfterHp;
+        console.log(`[random_multi_target_damage] Applied ${dmg} damage, HP after: ${afterHp} (expected, image removed), KO'd: ${result.knocked}`);
+      } else {
+        // Verify it's still the same Pokemon
+        const currentName = chosen.alt || 'Unknown';
+        const currentSet = chosen.dataset.set;
+        const currentNum = chosen.dataset.num;
+        
+        if (currentName !== chosenName || currentSet !== chosenSet || currentNum !== chosenNum) {
+          console.warn(`[random_multi_target_damage] Pokemon changed after damage! Was: ${chosenName} (${chosenSet}-${chosenNum}), Now: ${currentName} (${currentSet}-${currentNum})`);
+        }
+        
+        const actualHp = getHpFromImg(chosen).cur;
+        console.log(`[random_multi_target_damage] Applied ${dmg} damage, HP after: ${actualHp}, KO'd: ${result.knocked}`);
+        
+        // Verify damage was actually applied
+        if (actualHp > expectedAfterHp + 1) { // Allow 1 HP difference for rounding
+          console.error(`[random_multi_target_damage] ⚠️ Damage not applied correctly! Expected: ${expectedAfterHp}, Got: ${actualHp}`);
+        }
+      }
+      
+      // Add visual feedback (damage flash)
+      const slot = getSlotFromImg(chosen);
+      if (slot) {
+        slot.classList.add('damage-flash');
+        setTimeout(() => slot.classList.remove('damage-flash'), 400);
+      }
+      
+      // Track KO'd Pokemon (but don't handle KO yet - do it after all selections)
+      if (result.knocked) {
+        koedPokemon.add(chosen);
+      }
       
       const name = chosen.alt || 'Unknown';
       hitLog[name] = (hitLog[name] || 0) + 1;
     }
     
+    // Handle all KO'd Pokemon after all selections are complete
+    for (const koedImg of koedPokemon) {
+      // Only handle KO if the image is still in the DOM
+      if (koedImg && koedImg.parentElement && koedImg.tagName === 'IMG') {
+        const owner = koedImg.closest('#player1') ? 'player1' : 'player2';
+        const ownerPk = owner === 'player1' ? 'p1' : 'p2';
+        const wasActive = koedImg.closest('.active') !== null;
+        
+        // Delay KO handling slightly to allow damage animations to complete
+        setTimeout(async () => {
+          if (typeof globalThis.handleKnockOut === 'function' && koedImg.parentElement) {
+            const gameEnded = await globalThis.handleKnockOut(owner, koedImg, wasActive);
+            // If active Pokemon was KO'd and game didn't end, trigger promotion
+            if (!gameEnded && wasActive && typeof globalThis.beginPromotionFlow === 'function') {
+              await globalThis.beginPromotionFlow(owner);
+            }
+          }
+        }, 100 * (koedPokemon.size > 1 ? Array.from(koedPokemon).indexOf(koedImg) : 0));
+      }
+    }
+    
+    console.log(`[random_multi_target_damage] Complete. Hit log:`, hitLog);
+    
     const summary = Object.entries(hitLog)
       .map(([name, count]) => `${name} (${count}×${dmg})`)
       .join(', ');
     
-    popup(`Draco Meteor hit: ${summary}`);
+    const moveName = ctx.moveName || 'Attack';
+    popup(`${moveName} hit: ${summary}`);
+    
+    // Set damage to 0 since all damage is applied directly to random targets
+    // No damage should be applied to the active Pokemon through normal flow
+    ctx.setOverride(0);
   },
   
   // Aerodactyl's Primal Wingbeat - NOW IMPLEMENTED ✅
   flip_force_shuffle_opponent_pokemon_into_deck: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    if ((await flipCoin()) === 'tails') {
+    if ((await flipCoin(pk)) === 'tails') {
       popup('TAILS → no effect.');
       return;
     }
@@ -3541,7 +5985,7 @@ const MOVE_HANDLERS = {
   flip_discard_random_from_opponent_hand: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    if ((await flipCoin()) === 'tails') {
+    if ((await flipCoin(pk)) === 'tails') {
       popup('TAILS → no effect.');
       return;
     }
@@ -3657,16 +6101,25 @@ const MOVE_HANDLERS = {
       return;
     }
     
-    // Find all basic Pokemon in deck
+    // Shuffle deck before searching
+    shuffleDeckAndAnimate(s, pk);
+    
+    // Find all basic Pokemon in deck - batch fetch metadata for better performance
     const basics = [];
-    for (const card of deck) {
+    const metaPromises = deck.map(async (card) => {
       try {
         const meta = await globalThis.fetchCardMeta(card.set, card.num);
-        if (meta.category?.toLowerCase() === 'pokemon' && meta.stage?.toLowerCase() === 'basic') {
-          basics.push(card);
-        }
+        return { card, meta };
       } catch (err) {
         console.error('[search_basic_to_bench] Failed to check card:', err);
+        return { card, meta: null };
+      }
+    });
+    
+    const results = await Promise.all(metaPromises);
+    for (const { card, meta } of results) {
+      if (meta && meta.category?.toLowerCase() === 'pokemon' && meta.stage?.toLowerCase() === 'basic') {
+        basics.push(card);
       }
     }
     
@@ -4007,7 +6460,7 @@ const MOVE_HANDLERS = {
     
     let heads = 0;
     for (let i = 0; i < flipCount; i++) {
-      if ((await flipCoin()) === 'heads') heads++;
+      if ((await flipCoin(pk)) === 'heads') heads++;
     }
     
     const damage = heads * damagePerHeads;
@@ -4033,7 +6486,7 @@ const MOVE_HANDLERS = {
     
     let heads = 0;
     for (let i = 0; i < flipCount; i++) {
-      if ((await flipCoin()) === 'heads') heads++;
+      if ((await flipCoin(pk)) === 'heads') heads++;
     }
     
     const damage = heads * damagePerHeads;
@@ -4049,7 +6502,7 @@ const MOVE_HANDLERS = {
     const bonusPerHeads = parseInt10(param1, 30);
     
     let heads = 0;
-    while ((await flipCoin()) === 'heads') {
+    while ((await flipCoin(pk)) === 'heads') {
       heads++;
     }
     
@@ -4185,7 +6638,7 @@ const MOVE_HANDLERS = {
   return_opponent_active_to_hand: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    if ((await flipCoin()) === 'tails') {
+    if ((await flipCoin(pk)) === 'tails') {
       popup('TAILS → no effect.');
       return;
     }
@@ -4237,7 +6690,7 @@ const MOVE_HANDLERS = {
   flip_prevent_damage_and_effects: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    if ((await flipCoin()) === 'heads') {
+    if ((await flipCoin(pk)) === 'heads') {
       globalThis.__specialEffects ??= { p1: {}, p2: {} };
       globalThis.__specialEffects[pk].preventDamage = true;
       popup('HEADS → This Pokémon will take no damage next turn!');
@@ -4269,7 +6722,7 @@ const MOVE_HANDLERS = {
   flip_reveal_shuffle_opponent_card: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    if ((await flipCoin()) === 'tails') {
+    if ((await flipCoin(pk)) === 'tails') {
       popup('TAILS → no effect.');
       return;
     }
@@ -4384,7 +6837,7 @@ const MOVE_HANDLERS = {
   flip_inflict_effect_self_if_tails: async (s, pk, { param1 }, ctx) => {
     if (!ctx.isFinal) return;
     
-    if ((await flipCoin()) === 'heads') {
+    if ((await flipCoin(pk)) === 'heads') {
       popup('HEADS → no additional effect.');
       return;
     }
@@ -4461,7 +6914,7 @@ const MOVE_HANDLERS = {
     const bonusPerHeads = parseInt10(param1, 40);
     let heads = 0;
     
-    while ((await flipCoin()) === 'heads') {
+    while ((await flipCoin(pk)) === 'heads') {
       heads++;
     }
     
@@ -4581,7 +7034,7 @@ const MOVE_HANDLERS = {
     // Flip once for each energy
     let heads = 0;
     for (let i = 0; i < typeCount; i++) {
-      if ((await flipCoin()) === 'heads') heads++;
+      if ((await flipCoin(pk)) === 'heads') heads++;
     }
     
     const totalDamage = heads * damagePerHeads;
@@ -4605,6 +7058,8 @@ const MOVE_HANDLERS = {
   bonus_damage_conditional: async (s, pk, { param1, param2 }, ctx) => {
     const amount = parseInt10(param1, 0);
     const condition = (param2 || '').toLowerCase();
+    
+    console.log(`[bonus_damage_conditional] Called with pk=${pk}, param1=${param1}, param2=${param2}, condition=${condition}, amount=${amount}`);
     
     const attacker = getActiveImg(pk);
     const defender = getActiveImg(oppPk(pk));
@@ -4659,12 +7114,27 @@ const MOVE_HANDLERS = {
         // Silvally - Brave Buddies
         if (!globalThis.__supporterPlayedThisTurn) globalThis.__supporterPlayedThisTurn = { p1: false, p2: false };
         conditionMet = globalThis.__supporterPlayedThisTurn[pk] === true;
+        console.log(`[Brave Buddies] Checking supporter flag for ${pk}:`, globalThis.__supporterPlayedThisTurn[pk], 'conditionMet:', conditionMet);
+        console.log(`[Brave Buddies] Full supporter flags:`, globalThis.__supporterPlayedThisTurn);
         break;
     }
     
     if (conditionMet) {
       ctx.addBonus(amount);
       console.log(`[bonus_damage_conditional] +${amount} damage (${condition})`);
+      // Show popup for user feedback
+      if (typeof popup === 'function') {
+        const conditionName = condition === 'supporter_played_this_turn' ? 'Supporter played this turn' :
+                             condition === 'opponent_basic' ? 'Opponent is Basic' :
+                             condition === 'opponent_has_ability' ? 'Opponent has Ability' :
+                             condition === 'opponent_has_more_hp' ? 'Opponent has more HP' :
+                             condition === 'opponent_has_status' ? 'Opponent has Status' :
+                             condition === 'own_bench_damaged' ? 'Own Bench damaged' :
+                             condition === 'switched_in' ? 'Switched in this turn' : condition;
+        popup(`Brave Buddies: +${amount} damage (${conditionName})!`);
+      }
+    } else {
+      console.log(`[bonus_damage_conditional] Condition not met: ${condition}`);
     }
   },
   
@@ -4949,7 +7419,7 @@ const MOVE_HANDLERS = {
     let headsCount = 0;
     
     for (let i = 0; i < flipCount; i++) {
-      const result = await flipCoin();
+      const result = await flipCoin(pk);
       if (result === 'heads') headsCount++;
     }
     
@@ -4966,7 +7436,7 @@ const MOVE_HANDLERS = {
   flip_discard_energy_if_heads: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    const result = await flipCoin();
+    const result = await flipCoin(pk);
     
     if (result === 'heads') {
       const oppImg = getActiveImg(oppPk(pk));
@@ -5000,7 +7470,7 @@ const MOVE_HANDLERS = {
     if (!ctx.isFinal) return;
     
     const selfDamage = parseInt10(param1, 20);
-    const result = await flipCoin();
+    const result = await flipCoin(pk);
     
     if (result === 'tails') {
       const selfImg = getActiveImg(pk);
@@ -5020,7 +7490,7 @@ const MOVE_HANDLERS = {
     
     // Keep flipping until tails
     while (true) {
-      const result = await flipCoin();
+      const result = await flipCoin(pk);
       if (result === 'heads') {
         headsCount++;
       } else {
@@ -5040,7 +7510,7 @@ const MOVE_HANDLERS = {
   flip_prevent_damage_and_effects_next_turn: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    const result = await flipCoin();
+    const result = await flipCoin(pk);
     
     if (result === 'heads') {
       const selfImg = getActiveImg(pk);
@@ -5059,7 +7529,7 @@ const MOVE_HANDLERS = {
   flip_reveal_and_shuffle: async (s, pk, p, ctx) => {
     if (!ctx.isFinal) return;
     
-    const result = await flipCoin();
+    const result = await flipCoin(pk);
     
     if (result === 'heads') {
       const oppDeck = s[oppPk(pk)].deck || [];
@@ -5140,7 +7610,8 @@ const MOVE_HANDLERS = {
     }
     
     // Add to hand
-    const idx = deck.indexOf(chosen.card);
+    // Use findIndex with proper comparison to avoid reference issues
+    const idx = deck.findIndex(c => c.set === chosen.card.set && (c.number || c.num) === (chosen.card.number || chosen.card.num));
     if (idx >= 0) {
       deck.splice(idx, 1);
       (s[pk].hand ||= []).push(chosen.card);
@@ -5181,8 +7652,11 @@ const MOVE_HANDLERS = {
     
     // Take first match and put on bench
     const card = matches[0];
-    const idx = deck.indexOf(card);
+    // Use findIndex with proper comparison to avoid reference issues
+    const idx = deck.findIndex(c => c.set === card.set && (c.number || c.num) === (card.number || card.num));
+    if (idx !== -1) {
     deck.splice(idx, 1);
+    }
     
     // Put on bench through UI
     if (globalThis.putCardOnBench) {
@@ -5301,26 +7775,62 @@ const MOVE_HANDLERS = {
   // ========================================
   
   // Espeon - Energy Crush (20 for each energy on ALL opponent Pokemon)
-  bonus_damage_for_each_energy_on_all_opponent_pokemon: async (s, pk, p, ctx) => {
-    if (ctx.isFinal) return;
-    
-    const perEnergy = parseInt10(p.param1, 20);
+  bonus_damage_per_energy_on_opponent_all: async (s, pk, { param1 }, ctx) => {
+    const perEnergy = parseInt10(param1, 20);
     let totalEnergy = 0;
     
-    // Count energy on all opponent Pokemon
-    const oppPokemon = getAllPokemonImgs(oppPk(pk));
+    // Get opponent's pk - ensure we have the correct opponent
+    const opp = oppPk(pk);
+    const attackerOwner = pk === 'p1' ? 'player1' : 'player2';
+    const oppOwner = opp === 'p1' ? 'player1' : 'player2';
+    
+    console.log(`[Energy Crush] isFinal=${ctx.isFinal}, Attacker: ${pk} (${attackerOwner}), Opponent: ${opp} (${oppOwner})`);
+    
+    // Count energy on all opponent Pokemon (active + bench) - ONLY opponent
+    // Use explicit DOM queries to ensure we get the right player's Pokemon
+    const oppActiveDiv = opp === 'p1' ? 
+      (globalThis.p1Active || document.getElementById('p1Active')) : 
+      (globalThis.p2Active || document.getElementById('p2Active'));
+    const oppBenchDiv = opp === 'p1' ? 
+      (globalThis.p1Bench || document.getElementById('p1Bench')) : 
+      (globalThis.p2Bench || document.getElementById('p2Bench'));
+    
+    const oppActive = oppActiveDiv?.querySelector('img');
+    const oppBenchImgs = Array.from(oppBenchDiv?.querySelectorAll('img') ?? []);
+    const oppPokemon = [oppActive, ...oppBenchImgs].filter(Boolean);
+    
+    console.log(`[Energy Crush] Found ${oppPokemon.length} opponent Pokemon (active: ${!!oppActive}, bench: ${oppBenchImgs.length})`);
+    
+    // Double-check: verify these are actually opponent's Pokemon by checking their parent containers
     for (const img of oppPokemon) {
-      const slot = getSlotFromImg(img);
-      const energyBox = slot?.querySelector('.energy-pips');
-      if (energyBox) {
-        const pips = energyBox.querySelectorAll('.energy-pip');
-        totalEnergy += pips.length;
+      if (!img) continue;
+      
+      // Verify this Pokemon belongs to the opponent
+      const imgOwner = img.closest('#player1') ? 'player1' : (img.closest('#player2') ? 'player2' : null);
+      if (imgOwner !== oppOwner) {
+        console.warn(`[Energy Crush] Skipping ${img.alt} - belongs to ${imgOwner}, not ${oppOwner}`);
+        continue;
       }
+      
+      const energyCount = countEnergy(img);
+      totalEnergy += energyCount;
+      console.log(`[Energy Crush] ${img.alt} (${imgOwner}): ${energyCount} energy (total so far: ${totalEnergy})`);
     }
     
     const bonus = totalEnergy * perEnergy;
-    ctx.damage += bonus;
-    console.log(`[Energy Crush] +${bonus} damage for ${totalEnergy} energy on opponent's Pokemon`);
+    console.log(`[Energy Crush] Adding bonus: ${bonus} (${totalEnergy} energy × ${perEnergy} per energy), isFinal=${ctx.isFinal}, current damage=${ctx.damage}`);
+    ctx.addBonus(bonus);
+    console.log(`[Energy Crush] After addBonus: damage=${ctx.damage}`);
+    if (ctx.isFinal) {
+      popup(`Energy Crush: +${bonus} damage (${totalEnergy} energy on opponent's Pokemon)`);
+    }
+    console.log(`[Energy Crush] Final: +${bonus} damage for ${totalEnergy} energy on opponent's Pokemon`);
+  },
+  
+  // Alias for backwards compatibility
+  bonus_damage_for_each_energy_on_all_opponent_pokemon: async (s, pk, p, ctx) => {
+    // Redirect to the correct handler
+    return MOVE_HANDLERS.bonus_damage_per_energy_on_opponent_all(s, pk, { param1: p.param1 }, ctx);
   }
   
   // Bonus damage for each specific energy type attached to THIS Pokemon
@@ -5388,9 +7898,16 @@ const MOVE_HANDLERS = {
   
   // Vanillite/Vanillish/Slurpuff - Sweets Relay (bonus if this move used last turn)
   ,bonus_damage_if_last_move_name_used: async (s, pk, p, ctx) => {
-    if (ctx.isFinal) return;
+    // Only apply bonus during final damage calculation
+    if (!ctx.isFinal) {
+      // Record this move for next turn (do this in preview phase to track it)
+      if (!globalThis.__moveHistory) globalThis.__moveHistory = { p1: [], p2: [] };
+      if (!globalThis.__moveHistory[pk]) globalThis.__moveHistory[pk] = [];
+      // Don't record yet in preview, wait for final
+      return;
+    }
     
-    const moveName = p.param1 || '';
+    const moveName = p.param1 || 'Sweets Relay'; // Default to "Sweets Relay" if not specified
     const bonus = parseInt10(p.param2, 20);
     
     // Check if this move was used last turn by any of player's Pokemon
@@ -5402,22 +7919,19 @@ const MOVE_HANDLERS = {
     );
     
     if (usedLastTurn) {
-      ctx.damage += bonus;
+      ctx.addBonus(bonus);
       popup(`${moveName}: +${bonus} damage (used last turn)!`);
       console.log(`[${moveName}] +${bonus} damage for using last turn`);
     }
     
     // Record this move for next turn (do this in isFinal phase)
-    if (ctx.isFinal) {
-      if (!globalThis.__moveHistory) globalThis.__moveHistory = { p1: [], p2: [] };
       if (!globalThis.__moveHistory[pk]) globalThis.__moveHistory[pk] = [];
-      globalThis.__moveHistory[pk].push({ name: ctx.moveName, turn: globalThis.turnNumber });
+    globalThis.__moveHistory[pk].push({ name: ctx.moveName || moveName, turn: globalThis.turnNumber });
       
       // Clear old moves (only keep moves from last turn)
       globalThis.__moveHistory[pk] = globalThis.__moveHistory[pk].filter(m => 
         m.turn >= globalThis.turnNumber - 1
       );
-    }
   }
   
   // Damage times how many times this move name was used
@@ -5443,6 +7957,36 @@ const MOVE_HANDLERS = {
       if (!globalThis.__moveUseCount) globalThis.__moveUseCount = { p1: {}, p2: {} };
       if (!globalThis.__moveUseCount[pk]) globalThis.__moveUseCount[pk] = {};
       globalThis.__moveUseCount[pk][moveName] = (globalThis.__moveUseCount[pk][moveName] || 0) + 1;
+    }
+  }
+  
+  // Damage per time another move name was used during the game (e.g., Sweets Overload)
+  ,damage_per_other_move_used: async (s, pk, p, ctx) => {
+    if (ctx.isFinal) return;
+    
+    const moveNameToCount = (p.param1 || '').trim(); // e.g., "Sweets Relay"
+    const damagePerUse = parseInt10(p.param2, 40); // e.g., 40
+    
+    if (!moveNameToCount) {
+      console.warn('[damage_per_other_move_used] No move name specified in param1');
+      return;
+    }
+    
+    // Track how many times the specified move has been used during the game
+    if (!globalThis.__moveUseCount) globalThis.__moveUseCount = { p1: {}, p2: {} };
+    if (!globalThis.__moveUseCount[pk]) globalThis.__moveUseCount[pk] = {};
+    
+    // Count how many times this move was used (case-insensitive)
+    const count = globalThis.__moveUseCount[pk][moveNameToCount] || 0;
+    
+    // Add damage = count * damagePerUse
+    const bonusDamage = count * damagePerUse;
+    ctx.addBonus(bonusDamage);
+    
+    console.log(`[Sweets Overload] +${bonusDamage} damage (${moveNameToCount} used ${count} times × ${damagePerUse})`);
+    
+    if (bonusDamage > 0) {
+      popup(`Sweets Overload: +${bonusDamage} damage (${moveNameToCount} used ${count} time${count !== 1 ? 's' : ''})!`);
     }
   }
   
@@ -5566,6 +8110,320 @@ const MOVE_HANDLERS = {
   // 🆕 A3a/A3b NEW MOVE EFFECTS END
   // ========================================
 
+  // ========================================
+  // 🆕 A4a NEW MOVE EFFECTS START
+  // ========================================
+
+  // 1. Kingler - KO Crab: Flip 2 coins, if both heads, bonus damage
+  ,flip_both_heads_bonus: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const bonus = parseInt10(param1, 80);
+    const coin1 = await flipCoin(pk);
+    const coin2 = await flipCoin(pk);
+    
+    if (coin1 === 'heads' && coin2 === 'heads') {
+      ctx.addBonus(bonus);
+      popup(`HEADS + HEADS → +${bonus} damage!`);
+    } else {
+      popup(`Coin flips: ${coin1.toUpperCase()} + ${coin2.toUpperCase()} → No bonus.`);
+    }
+  },
+
+  // 2. Miltank - Rolling Frenzy: Stacking damage boost
+  stacking_damage_boost: async (s, pk, { param1 }, ctx) => {
+    const boost = parseInt10(param1, 30);
+    const img = getActiveImg(pk);
+    if (!img) return;
+    
+    // Store stacking boost on the Pokémon
+    const currentStacks = parseInt10(img.dataset.stackingDamageBoost || '0', 0);
+    const newStacks = currentStacks + 1;
+    img.dataset.stackingDamageBoost = String(newStacks);
+    
+    const totalBoost = boost * newStacks;
+    ctx.addBonus(totalBoost);
+    
+    if (ctx.isFinal) {
+      popup(`Rolling Frenzy: +${totalBoost} damage (${newStacks} stack${newStacks > 1 ? 's' : ''})!`);
+    }
+  },
+
+  // 3. Boltund - Defiant Spark: Reduce energy cost if damaged
+  reduce_energy_cost_if_damaged: async (s, pk, { param1 }, ctx) => {
+    // This is handled in battle.html during energy cost checking
+    // param1 format: "1|l" = cost reduction|energy type
+    // Store on the Pokémon for battle.html to check
+    const img = getActiveImg(pk);
+    if (!img) return;
+    
+    const { base, cur } = getHpFromImg(img);
+    const hasDamage = cur < base;
+    
+    if (hasDamage && param1) {
+      const [costReduction, energyType] = param1.split('|');
+      img.dataset.reducedEnergyCostIfDamaged = param1;
+      if (ctx.isFinal) {
+        popup(`Defiant Spark: Attack cost reduced to ${costReduction} ${energyType.toUpperCase()} Energy!`);
+      }
+    }
+  },
+
+  // 4. Latias - Crossing Flights: Bonus if named Pokémon on bench
+  bonus_damage_if_named_bench: async (s, pk, { param1, param2 }, ctx) => {
+    const pokemonName = (param1 || '').toLowerCase();
+    const bonus = parseInt10(param2, 20);
+    
+    if (!pokemonName) return;
+    
+    const benchImgs = getBenchImgs(pk);
+    let found = false;
+    
+    for (const benchImg of benchImgs) {
+      try {
+        const meta = await globalThis.fetchCardMeta(benchImg.dataset.set, benchImg.dataset.num);
+        const name = (meta.name || '').toLowerCase();
+        if (name.includes(pokemonName) || pokemonName.includes(name)) {
+          found = true;
+          break;
+        }
+      } catch {}
+    }
+    
+    if (found) {
+      ctx.addBonus(bonus);
+      if (ctx.isFinal) {
+        popup(`+${bonus} damage (${param1} on bench)!`);
+      }
+    }
+  },
+
+  // 5. Altaria - Dragon Arcana: Bonus if multiple energy types attached
+  bonus_damage_if_multiple_energy_types: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1, 60);
+    const img = getActiveImg(pk);
+    if (!img) return;
+    
+    const slot = img.closest('.card-slot');
+    if (!slot) return;
+    
+    const energyPips = Array.from(slot.querySelectorAll('.energy-pip'));
+    const energyTypes = new Set();
+    
+    energyPips.forEach(pip => {
+      const type = pip.dataset.type?.toLowerCase();
+      if (type) energyTypes.add(type);
+    });
+    
+    if (energyTypes.size >= 2) {
+      ctx.addBonus(bonus);
+      if (ctx.isFinal) {
+        popup(`+${bonus} damage (${energyTypes.size} different energy types)!`);
+      }
+    }
+  },
+
+  // 6. Mismagius - Cursed Prose: Damage at end of opponent's next turn
+  damage_end_of_opponent_turn: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const damage = parseInt10(param1, 90);
+    const oppPkKey = oppPk(pk);
+    
+    // Store damage to apply at end of opponent's next turn
+    if (!globalThis.__endOfTurnDamage) globalThis.__endOfTurnDamage = {};
+    if (!globalThis.__endOfTurnDamage[oppPkKey]) globalThis.__endOfTurnDamage[oppPkKey] = [];
+    
+    globalThis.__endOfTurnDamage[oppPkKey].push({
+      damage,
+      source: pk,
+      turn: globalThis.turnNumber || 0
+    });
+    
+    popup(`Cursed Prose: ${damage} damage will be dealt at end of opponent's next turn!`);
+  },
+
+  // 7. Slowking - Litter: Discard tools for damage
+  discard_tools_for_damage: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const maxTools = parseInt10(param1, 2);
+    const hand = s[pk].hand || [];
+    
+    // Find tool cards in hand
+    const tools = [];
+    for (const card of hand) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta && String(meta.trainerType || '').toLowerCase() === 'tool') {
+          tools.push(card);
+        }
+      } catch {}
+    }
+    
+    if (tools.length === 0) {
+      popup('No Tool cards in hand to discard.');
+      return;
+    }
+    
+    // Let player choose which tools to discard (up to maxTools)
+    const selectedTools = await new Promise(resolve => {
+      if (tools.length <= maxTools) {
+        resolve(tools);
+        return;
+      }
+      
+      // TODO: Implement selection UI for multiple tools
+      // For now, just use first maxTools
+      resolve(tools.slice(0, maxTools));
+    });
+    
+    const damagePerTool = 50; // From CSV
+    const totalDamage = selectedTools.length * damagePerTool;
+    
+    // Discard selected tools
+    for (const tool of selectedTools) {
+      const idx = hand.findIndex(c => c.set === tool.set && (c.number || c.num) === (tool.number || tool.num));
+      if (idx >= 0) {
+        hand.splice(idx, 1);
+        pushCardToDiscard(pkToPlayer(pk), tool);
+      }
+    }
+    
+    renderAllHands();
+    ctx.addBonus(totalDamage);
+    popup(`Discarded ${selectedTools.length} Tool card(s) → +${totalDamage} damage!`);
+  },
+
+  // 8. Tentacruel - Stun Poison: Flip to inflict both poisoned and paralyzed
+  flip_inflict_status_both: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const statuses = (param1 || 'poisoned_paralyzed').split('_');
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      const oppImg = getActiveImg(oppPk(pk));
+      if (oppImg) {
+        // Apply both statuses
+        for (const status of statuses) {
+          if (status) {
+            applyStatus(oppPk(pk), status);
+          }
+        }
+        popup(`HEADS → Opponent is now ${statuses.join(' and ')}!`);
+      }
+    } else {
+      popup('TAILS → No status effect.');
+    }
+  },
+
+  // 9. Celebi - Temporal Leaves: Devolve opponent
+  devolve_opponent: async (s, pk, p, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const oppImg = getActiveImg(oppPk(pk));
+    if (!oppImg) return;
+    
+    try {
+      const meta = await globalThis.fetchCardMeta(oppImg.dataset.set, oppImg.dataset.num);
+      const stage = (meta.stage || '').toLowerCase();
+      
+      if (stage === 'basic') {
+        popup('Opponent\'s Pokémon is already Basic.');
+        return;
+      }
+      
+      // Find evolution card in discard or hand
+      const evolveFrom = meta.evolveFrom || '';
+      if (!evolveFrom) {
+        popup('Cannot devolve: No evolution data found.');
+        return;
+      }
+      
+      // For now, just remove the evolution card and put it in opponent's hand
+      // This is a simplified version - full implementation would need to handle the evolution chain
+      popup(`Devolved opponent's ${meta.name} to ${evolveFrom}!`);
+      
+      // Remove current card and add evolution to hand
+      const owner = oppImg.closest('#player1') ? 'player1' : 'player2';
+      const slot = oppImg.closest('.card-slot');
+      
+      // Create evolution card object
+      const evolutionCard = {
+        set: oppImg.dataset.set,
+        num: oppImg.dataset.num,
+        name: evolveFrom
+      };
+      
+      // Remove current card
+      slot.innerHTML = '';
+      markSlot(slot, false);
+      
+      // Add evolution to hand
+      playerState[owner].hand.push(evolutionCard);
+      renderAllHands();
+      
+    } catch (err) {
+      console.error('[devolve] Error:', err);
+      popup('Error devolving opponent.');
+    }
+  },
+
+  // 10. Psyduck - Headache: Prevent supporter next turn
+  prevent_supporter_next_turn: async (s, pk, p, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const oppPkKey = oppPk(pk);
+    if (!globalThis.__specialEffects) globalThis.__specialEffects = {};
+    if (!globalThis.__specialEffects[oppPkKey]) globalThis.__specialEffects[oppPkKey] = {};
+    
+    globalThis.__specialEffects[oppPkKey].preventSupporter = true;
+    popup('Opponent cannot use Supporter cards next turn!');
+  },
+
+  // 11. Dugtrio - Cliff Crumbler: Discard top card, bonus if specific type
+  discard_top_own_deck_bonus_if_type: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const requiredType = (param1 || '').toLowerCase();
+    const bonus = parseInt10(param2, 60);
+    const deck = s[pk].deck || [];
+    
+    if (deck.length === 0) {
+      popup('Deck is empty!');
+      return;
+    }
+    
+    const topCard = deck[0];
+    deck.shift(); // Remove from deck
+    
+    try {
+      const meta = await globalThis.fetchCardMeta(topCard.set, topCard.number || topCard.num);
+      const cardType = (meta.types || [])[0]?.toLowerCase() || '';
+      const category = (meta.category || '').toLowerCase();
+      
+      if (category === 'pokemon' && cardType === requiredType) {
+        ctx.addBonus(bonus);
+        popup(`Discarded ${meta.name} (${requiredType}) → +${bonus} damage!`);
+      } else {
+        popup(`Discarded ${meta.name || 'card'} (not ${requiredType} Pokémon).`);
+      }
+    } catch (err) {
+      console.error('[discard_top_bonus] Error:', err);
+      popup('Discarded top card (error checking type).');
+    }
+  },
+
+  // 12. Phanpy - Flail: Damage equal to self damage (alias for existing handler)
+  damage_equal_to_self_damage: async (s, pk, p, ctx) => {
+    // Use existing handler
+    return MOVE_HANDLERS.bonus_damage_equal_to_self_damage(s, pk, p, ctx);
+  },
+
+  // ========================================
+  // 🆕 A4a NEW MOVE EFFECTS END
+  // ========================================
+
 };
 
 globalThis.MOVE_EFFECT_HANDLERS = MOVE_HANDLERS;
@@ -5613,6 +8471,31 @@ async function applyMoveEffect(state, pk, attackName, baseDamage, ctx = {}) {
   if (!img) return baseDamage;
   
   const isFinal = ctx.isFinal ?? true;
+  
+  // Check for multiplicative damage (x or × in damage notation or attack damage)
+  // Need to check this early for Arceus boost
+  const row = getMoveRow(img.alt, attackName);
+  const isMultiplicative = ctx.isMultiplicative || row?.damageNotation?.includes('×') || row?.damageNotation?.toLowerCase().includes('x');
+  const multiplier = ctx.multiplier || 1;
+  let totalBonuses = 0; // Track bonuses separately for multiplicative attacks
+  
+  // 🆕 For attacks that only do damage based on benched Pokémon (bonus_damage_for_each_bench), base damage should be 0
+  // This must be checked BEFORE setting damage = baseDamage to prevent the CSV's damageBase from being used
+  if (row?.effect_type === 'bonus_damage_for_each_bench') {
+    baseDamage = 0;
+  }
+  
+  // For Energy Crush (bonus_damage_per_energy_on_opponent_all), base damage should be 0
+  if (row?.effect_type === 'bonus_damage_per_energy_on_opponent_all') {
+    baseDamage = 0;
+  }
+  
+  // For random_multi_target_damage (Draco Meteor), base damage should be 0
+  // All damage is applied directly to random targets, not the active Pokemon
+  if (row?.effect_type === 'random_multi_target_damage') {
+    baseDamage = 0;
+  }
+  
   let damage = baseDamage;
   
   // 🆕 ARCEUS PASSIVE ABILITY - boost_damage_if_arceus
@@ -5633,7 +8516,11 @@ async function applyMoveEffect(state, pk, attackName, baseDamage, ctx = {}) {
         console.log(`[arceus-damage-debug] Found boost ability, checking for Arceus...`);
         if (hasArceusInPlay(pk)) {
           const arceusDamageBoost = parseInt10(abilityRow.param1, 30);
+          if (isMultiplicative) {
+            totalBonuses += arceusDamageBoost;
+          } else {
           damage += arceusDamageBoost;
+          }
           console.log(`[Arceus boost] +${arceusDamageBoost} damage (Arceus in play)`);
         } else {
           console.log(`[arceus-damage-debug] ${img.alt} has ability but no Arceus in play`);
@@ -5647,49 +8534,123 @@ async function applyMoveEffect(state, pk, attackName, baseDamage, ctx = {}) {
     console.log(`[arceus-boost-SKIP] Skipped because: img=${!!img}, isFinal=${isFinal}, set=${img?.dataset?.set}, num=${img?.dataset?.num}`);
   }
   
-  const row = getMoveRow(img.alt, attackName);
+  if (!row?.effect_type) {
+    // Return early - for multiplicative, return totalBonuses
+    if (isMultiplicative) {
+      return { damage: totalBonuses, totalBonuses: totalBonuses };
+    }
+    return damage;
+  }
   
-  if (!row?.effect_type) return damage;
-  if (row.damageNotation?.includes('×')) baseDamage = 0;
+  // For multiplicative attacks, base damage should be 0
+  if (isMultiplicative) {
+    baseDamage = 0;
+    damage = 0;
+  } else if (row.damageNotation?.includes('×')) {
+    baseDamage = 0;
+    damage = 0;
+  }
+  
+  // Note: bonus_damage_for_each_bench and bonus_damage_per_energy_on_opponent_all are already handled above
   
   const handler = MOVE_HANDLERS[row.effect_type];
   if (!handler) {
     console.warn('[move] Missing handler:', row.effect_type);
+    if (isMultiplicative) {
+      return { damage: totalBonuses, totalBonuses: totalBonuses };
+    }
     return baseDamage;
   }
   
   const context = {
     damage,  // 🆕 Add damage to context for new A3a/A3b effects
     moveName: attackName,  // 🆕 Add move name for tracking effects
+    moveRowText: row?.effect_text || row?.text || '',  // 🆕 Add move row text for cant_attack_next_turn handler (CSV field is effect_text)
     isFinal,
     rawCtx: ctx,
-    addBonus: amt => { damage += amt; },
-    setOverride: v => { damage = v; }
+    isMultiplicative: isMultiplicative,  // 🆕 Pass multiplicative flag to handlers
+    multiplier: multiplier,  // 🆕 Pass multiplier to handlers
+    addBonus: amt => { 
+      if (isMultiplicative) {
+        // For multiplicative attacks, track bonuses separately
+        totalBonuses += amt;
+        context.totalBonuses = totalBonuses;
+      } else {
+        // For regular attacks, add to damage
+        damage += amt;
+        context.damage = damage; // Keep context.damage in sync
+      }
+    },
+    setOverride: v => { 
+      damage = v;
+      context.damage = damage; // Keep context.damage in sync
+    },
+    totalBonuses: 0  // 🆕 Track bonuses for multiplicative attacks
   };
   
   
   await handler(state, pk, { param1: row.param1, param2: row.param2 }, context);
   
   // 🆕 Update damage from context (for effects that modify ctx.damage directly)
-  // Only update if context.damage changed from the initial value
-  if (context.damage !== damage) {
+  // This ensures damage is synced even if handler modified context.damage directly
     damage = context.damage;
+  
+  // For multiplicative attacks, use total bonuses
+  if (isMultiplicative) {
+    totalBonuses = context.totalBonuses || totalBonuses;
+    damage = totalBonuses; // Return total bonuses (will be multiplied in battle.html)
+  }
+  
+  // 🆕 A3b - Track all move usage for effects like Sweets Overload
+  // Record move usage in final phase so it can be counted by other moves
+  if (isFinal && attackName) {
+    if (!globalThis.__moveUseCount) globalThis.__moveUseCount = { p1: {}, p2: {} };
+    if (!globalThis.__moveUseCount[pk]) globalThis.__moveUseCount[pk] = {};
+    // Track move usage (case-insensitive key for matching)
+    const moveKey = attackName.trim();
+    globalThis.__moveUseCount[pk][moveKey] = (globalThis.__moveUseCount[pk][moveKey] || 0) + 1;
+    console.log(`[move-tracking] Recorded ${moveKey} usage for ${pk} (total: ${globalThis.__moveUseCount[pk][moveKey]})`);
   }
   
   // Prevent double-counting for preview vs final
+  // Only apply preview cache logic in final mode to prevent double-counting
+  // In preview mode, just store the delta for later use
+  // Skip preview cache for Energy Crush (bonus_damage_per_energy_on_opponent_all) and Crystal Waltz (bonus_damage_for_each_bench) since base damage is 0
   const delta = damage - baseDamage;
+  const isEnergyCrush = row.effect_type === 'bonus_damage_per_energy_on_opponent_all';
+  const isCrystalWaltz = row.effect_type === 'bonus_damage_for_each_bench';
   if (!isFinal) {
     previewCache[pk] = { attack: normStr(attackName), delta };
   } else {
     const prev = previewCache[pk];
-    if (prev?.attack === normStr(attackName)) {
+    if (prev?.attack === normStr(attackName) && !isEnergyCrush && !isCrystalWaltz) {
+      // In final mode, check if the delta changed
+      // If delta is the same, the bonus was correctly calculated in both modes, so keep the damage
+      // If delta is different, we need to adjust (but this shouldn't happen for most effects)
+      if (delta === prev.delta) {
+        // Bonus is the same in both modes, keep the damage as-is
+        // No adjustment needed
+        console.log(`[preview-cache] Delta unchanged (${delta}), keeping damage=${damage}`);
+      } else {
+        // Delta changed, recalculate from base
       damage = baseDamage + (delta - prev.delta);
+        console.log(`[preview-cache] Delta changed (${prev.delta} -> ${delta}), recalculating damage=${damage}`);
+      }
+      // Clear the cache after use
+      previewCache[pk] = null;
+    } else if (prev?.attack === normStr(attackName) && (isEnergyCrush || isCrystalWaltz)) {
+      // For Energy Crush and Crystal Waltz, just use the damage from the handler (bonus already added)
+      // Don't subtract the preview delta since base damage is 0
+      previewCache[pk] = null;
     }
   }
   
-  // Apply global boost (Giovanni)
+  // Apply global boost (Giovanni) - handled in battle.html for multiplicative attacks
+  // For regular attacks, apply here
+  if (!isMultiplicative) {
   const boost = state.temp?.[pk]?.globalDamageBoost || 0;
   if (boost) damage += boost;
+  }
   
   if (isFinal) {
     globalThis.addLog?.(pk, `used <b>${attackName}</b>`, img.src, { name: img.alt });
@@ -5700,12 +8661,19 @@ async function applyMoveEffect(state, pk, attackName, baseDamage, ctx = {}) {
     return { damage, context };
   }
   
+  // For multiplicative attacks, return object with totalBonuses (battle.html will multiply)
+  if (isMultiplicative) {
+    return { damage: totalBonuses, totalBonuses: totalBonuses };
+  }
+  
   return damage;
 }
 
 globalThis.applyMoveEffectFromCsv = applyMoveEffect;
 globalThis.runMoveEffect = applyMoveEffect;
 globalThis.loadMoveEffects = loadMoveEffects;
+globalThis.getMoveRow = getMoveRow;
+globalThis.normStr = normStr;
 
 /* ============================
    ABILITY EFFECTS
@@ -5812,10 +8780,102 @@ const ABILITY_HANDLERS = {
 
   flip_inflict_status: async (s, pk, { param1 }) => {
     const status = param1 || 'asleep';
-    if ((await flipCoin()) === 'heads') {
+    if ((await flipCoin(pk)) === 'heads') {
       applyStatus(oppPk(pk), status);
       popup(`HEADS → ${status}!`);
     } else popup('TAILS → no effect.');
+  },
+
+  // 🆕 A3a ABILITY EFFECTS - Coin flip effects
+  flip_draw_cards: async (s, pk, { param1 }) => {
+    const count = parseInt10(param1, 1);
+    if ((await flipCoin(pk)) === 'heads') {
+      if (globalThis.drawCards) {
+        globalThis.drawCards(s, pk, count);
+        popup(`HEADS → Drew ${count} card(s)!`);
+      } else {
+        popup('HEADS → Draw effect not available.');
+      }
+    } else {
+      popup('TAILS → no effect.');
+    }
+  },
+
+  flip_deal_damage: async (s, pk, { param1, param2 }) => {
+    const damage = parseInt10(param1, 20);
+    const target = param2?.toLowerCase() || 'opponent_active'; // opponent_active, any, self
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      if (target === 'opponent_active' || target === 'any') {
+        // Deal damage to opponent's active or any Pokemon
+        if (target === 'any') {
+          const allOpponent = getAllPokemonImgs(oppPk(pk));
+          if (allOpponent.length === 0) {
+            popup('No opponent Pokémon to damage.');
+            return;
+          }
+          popup('Select target Pokémon.');
+          const targetImg = await awaitSelection(allOpponent);
+          if (targetImg) {
+            damageImg(targetImg, damage);
+            popup(`HEADS → Dealt ${damage} damage to ${targetImg.alt}!`);
+          }
+        } else {
+          const oppImg = getActiveImg(oppPk(pk));
+          if (oppImg) {
+            damageImg(oppImg, damage);
+            popup(`HEADS → Dealt ${damage} damage!`);
+          } else {
+            popup('No opponent Active Pokémon.');
+          }
+        }
+      } else if (target === 'self') {
+        const selfImg = getActiveImg(pk);
+        if (selfImg) {
+          damageImg(selfImg, damage);
+          popup(`HEADS → Dealt ${damage} damage to self!`);
+        }
+      }
+    } else {
+      popup('TAILS → no effect.');
+    }
+  },
+
+  flip_inflict_effect: async (s, pk, { param1, param2 }) => {
+    // param1: effect type (e.g., "discard_energy", "draw_cards", "damage")
+    // param2: effect parameter (e.g., count, damage amount)
+    const effectType = param1?.toLowerCase();
+    const effectParam = param2;
+    
+    if ((await flipCoin(pk)) === 'heads') {
+      if (effectType === 'discard_energy') {
+        const count = parseInt10(effectParam, 1);
+        const oppImg = getActiveImg(oppPk(pk));
+        if (oppImg) {
+          const removed = removeEnergy(oppImg, null, count);
+          popup(`HEADS → Discarded ${removed} Energy from opponent!`);
+        } else {
+          popup('No opponent Active Pokémon.');
+        }
+      } else if (effectType === 'draw_cards') {
+        const count = parseInt10(effectParam, 1);
+        if (globalThis.drawCards) {
+          globalThis.drawCards(s, pk, count);
+          popup(`HEADS → Drew ${count} card(s)!`);
+        }
+      } else if (effectType === 'damage') {
+        const damage = parseInt10(effectParam, 20);
+        const oppImg = getActiveImg(oppPk(pk));
+        if (oppImg) {
+          damageImg(oppImg, damage);
+          popup(`HEADS → Dealt ${damage} damage!`);
+        }
+      } else {
+        popup(`HEADS → Effect type "${effectType}" not implemented.`);
+      }
+    } else {
+      popup('TAILS → no effect.');
+    }
   },
 
   inflict_status: async (s, pk, { param1 }) => {
@@ -6599,7 +9659,7 @@ const ABILITY_HANDLERS = {
     // When Pokemon would be KO'd, flip coin
     // If heads, survive with 10 HP
     
-    const flip = await flipCoin();
+    const flip = await flipCoin(pk);
     
     if (flip === 'heads') {
       // Survive with 10 HP
@@ -6686,7 +9746,7 @@ const ABILITY_HANDLERS = {
   // ===== ACTIVE ABILITIES =====
   
   // Shiinotic - Search for random Pokemon from deck
-  ,search_pokemon_random: async (state, pk) => {
+  ,  search_pokemon_random: async (state, pk) => {
     const deck = state[pk]?.deck || [];
     
     if (deck.length === 0) {
@@ -6694,16 +9754,21 @@ const ABILITY_HANDLERS = {
       return;
     }
     
-    // Find all Pokemon cards
+    // Find all Pokemon cards - batch fetch metadata for better performance
     const pokemonCards = [];
-    for (const card of deck) {
+    const metaPromises = deck.map(async (card) => {
       try {
         const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
-        if (meta.category === 'Pokemon') {
-          pokemonCards.push(card);
-        }
+        return { card, meta };
       } catch (e) {
-        // Skip cards that can't be fetched
+        return { card, meta: null };
+      }
+    });
+    
+    const results = await Promise.all(metaPromises);
+    for (const { card, meta } of results) {
+      if (meta && meta.category === 'Pokemon') {
+        pokemonCards.push(card);
       }
     }
     
@@ -6716,20 +9781,28 @@ const ABILITY_HANDLERS = {
     const chosen = pokemonCards[Math.floor(Math.random() * pokemonCards.length)];
     
     // Remove from deck and add to hand
-    const deckIndex = deck.indexOf(chosen);
+    // Use findIndex with proper comparison to avoid reference issues
+    const deckIndex = deck.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
     if (deckIndex !== -1) {
       deck.splice(deckIndex, 1);
+      
+      // Add to hand immediately (no animation)
       state[pk].hand = state[pk].hand || [];
       state[pk].hand.push(chosen);
       
+      // Shuffle deck
+      shuffleDeckAndAnimate(state, pk);
+      
+      // Update UI immediately
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+      }
+      if (globalThis.updateDeckBubbles) {
+        globalThis.updateDeckBubbles();
+      }
+      
       popup(`Illuminate: Found ${chosen.name}!`);
       console.log('[Illuminate] Added random Pokemon to hand:', chosen.name);
-      
-      // Update UI
-      if (typeof renderHand === 'function') {
-        const owner = pk === 'p1' ? 'player1' : 'player2';
-        renderHand(owner);
-      }
     }
   }
   
@@ -6785,6 +9858,14 @@ const ABILITY_HANDLERS = {
         return;
       }
       
+      // 🆕 A3a - Clear move locks when Pokemon moves to bench (Buzzwole ex - Big Beat)
+      // Clear locks for the Pokemon that is currently active (will move to bench)
+      const activeInstanceId = activeImg.dataset.instanceId;
+      if (activeInstanceId && globalThis.__moveLocks?.[pk]?.[activeInstanceId]) {
+        delete globalThis.__moveLocks[pk][activeInstanceId];
+        console.log(`[Big Beat] Cleared move locks for ${activeImg.alt} (instanceId: ${activeInstanceId}) - moved to bench via Ultra Thrusters`);
+      }
+      
       // Use game's attachment functions
       const activePack = globalThis.detachAttachments(activeSlot);
       const benchPack = globalThis.detachAttachments(benchSlot);
@@ -6823,10 +9904,10 @@ const ABILITY_HANDLERS = {
   // Greninja - Deal 20 damage to any opponent Pokemon
   ,deal_damage_any: async (state, pk, { param1 }) => {
     const damage = parseInt10(param1, 20);
-    const oppPk = oppPk(pk);
+    const oppPkKey = oppPk(pk);
     
     // Get all opponent Pokemon
-    const oppPokemon = getAllPokemonImgs(oppPk);
+    const oppPokemon = getAllPokemonImgs(oppPkKey);
     
     if (oppPokemon.length === 0) {
       popup('No opponent Pokémon to damage.');
@@ -6938,21 +10019,29 @@ const ABILITY_HANDLERS = {
     // Pick random Tool
     const chosen = toolCards[Math.floor(Math.random() * toolCards.length)];
     
-    // Remove from deck and add to hand
-    const deckIndex = deck.indexOf(chosen);
+    // Remove from deck
+    // Use findIndex with proper comparison to avoid reference issues
+    const deckIndex = deck.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
     if (deckIndex !== -1) {
       deck.splice(deckIndex, 1);
+      
+      // Add to hand immediately (no animation)
       state[pk].hand = state[pk].hand || [];
       state[pk].hand.push(chosen);
       
+      // Shuffle deck
+      shuffleDeckAndAnimate(state, pk);
+      
+      // Update UI immediately
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+      }
+      if (globalThis.updateDeckBubbles) {
+        globalThis.updateDeckBubbles();
+      }
+      
       popup(`Catching Tail: Found ${chosen.name}!`);
       console.log('[Catching Tail] Added random Tool to hand:', chosen.name);
-      
-      // Update UI
-      if (typeof renderHand === 'function') {
-        const owner = pk === 'p1' ? 'player1' : 'player2';
-        renderHand(owner);
-      }
     }
   }
   
@@ -7015,22 +10104,105 @@ const ABILITY_HANDLERS = {
     }
     
     // Check if this is the player's first turn
-    // Player 1 first turn = global turn 1
-    // Player 2 first turn = global turn 2
-    const playerTurn = Math.ceil(globalThis.turnNumber / 2);
-    const isFirstTurn = (pk === 'p1' && globalThis.turnNumber === 1) || 
-                        (pk === 'p2' && globalThis.turnNumber === 2);
+    // The ability triggers at the END of the first turn
+    // battle.html already determines the correct player based on firstPlayer and turnNumber
+    // We just need to verify it's turn 1 or 2 (the only turns where first turns can end)
+    // Trust that battle.html passed the correct pk for this turn
     
-    if (!isFirstTurn) {
-      console.log(`[Thunderclap Flash] Not player's first turn (global turn ${globalThis.turnNumber}), skipping`);
+    if (globalThis.turnNumber !== 1 && globalThis.turnNumber !== 2) {
+      console.log(`[Thunderclap Flash] Not a first turn (global turn ${globalThis.turnNumber}), skipping`);
       return;
     }
     
-    // Attach energy
+    console.log(`[Thunderclap Flash] ✓ First turn confirmed (turnNumber: ${globalThis.turnNumber}, pk: ${pk}), proceeding with energy attachment`);
+    
+    // Check if energy type is available in Energy Zone (for validation only)
+    // In TCG Pocket, the Energy Zone is a pool - attaching energy doesn't remove it
+    const playerData = state?.[pk];
+    if (!playerData || !playerData.energyTypes) {
+      console.warn(`[Thunderclap Flash] No player data or energyTypes found for ${pk}`);
+      popup(`Thunderclap Flash: Error accessing Energy Zone!`);
+      return;
+    }
+    
+    // Check if the energy type exists in the Energy Zone (just for validation)
+    const energyTypes = playerData.energyTypes;
+    const hasEnergyType = energyTypes.some(e => e.toLowerCase() === energyType);
+    
+    if (!hasEnergyType) {
+      console.warn(`[Thunderclap Flash] No ${energyType} Energy in Energy Zone`);
+      popup(`Thunderclap Flash: No ${energyType} Energy in Energy Zone!`);
+      return;
+    }
+    
+    // Simply attach the energy to the Pokemon
+    // The Energy Zone remains unchanged - it's a pool you can attach from
+    console.log(`[Thunderclap Flash] Attempting to attach ${energyType} to ${abilityPokemon?.alt || 'unknown Pokemon'}`);
+    console.log(`[Thunderclap Flash] abilityPokemon element:`, abilityPokemon);
+    
+    // Check if abilityPokemon is still in the DOM
+    if (!abilityPokemon || !abilityPokemon.parentElement) {
+      console.error('[Thunderclap Flash] abilityPokemon is not in DOM!');
+      popup(`Thunderclap Flash: Error - Pokemon not found!`);
+      return;
+    }
+    
+    const slot = abilityPokemon.closest('.card-slot');
+    console.log(`[Thunderclap Flash] Found slot:`, !!slot);
+    
     if (typeof attachEnergy === 'function') {
+      try {
       attachEnergy(abilityPokemon, energyType);
+        // Verify the energy was attached by checking for the pip
+        const energyBox = slot?.querySelector('.energy-pips');
+        const energyPips = energyBox?.querySelectorAll('.energy-pip');
+        const hasEnergy = Array.from(energyPips || []).some(pip => pip.dataset.type === energyType);
+        
+        if (hasEnergy) {
       popup(`Thunderclap Flash: Attached ${energyType} Energy!`);
-      console.log(`[Thunderclap Flash] Attached ${energyType} at end of ${pk}'s turn 1 (global turn ${globalThis.turnNumber})`);
+          console.log(`[Thunderclap Flash] Successfully attached ${energyType} at end of ${pk}'s turn 1 (global turn ${globalThis.turnNumber})`);
+        } else {
+          console.warn('[Thunderclap Flash] attachEnergy was called but energy pip not found. Trying fallback...');
+          // Fallback to attachEnergyToSlot
+          const owner = pk === 'p1' ? 'player1' : 'player2';
+          if (slot && typeof globalThis.attachEnergyToSlot === 'function') {
+            globalThis.attachEnergyToSlot(owner, slot, energyType);
+            popup(`Thunderclap Flash: Attached ${energyType} Energy!`);
+            console.log(`[Thunderclap Flash] Attached ${energyType} using attachEnergyToSlot fallback`);
+          }
+        }
+      } catch (err) {
+        console.error('[Thunderclap Flash] Error calling attachEnergy:', err);
+        // Try fallback
+        const owner = pk === 'p1' ? 'player1' : 'player2';
+        if (slot && typeof globalThis.attachEnergyToSlot === 'function') {
+          try {
+            globalThis.attachEnergyToSlot(owner, slot, energyType);
+            popup(`Thunderclap Flash: Attached ${energyType} Energy!`);
+            console.log(`[Thunderclap Flash] Attached ${energyType} using attachEnergyToSlot fallback after error`);
+          } catch (fallbackErr) {
+            console.error('[Thunderclap Flash] Error with attachEnergyToSlot fallback:', fallbackErr);
+            popup(`Thunderclap Flash: Error attaching energy!`);
+          }
+        } else {
+          popup(`Thunderclap Flash: Error attaching energy!`);
+        }
+      }
+    } else {
+      console.error('[Thunderclap Flash] attachEnergy function is not available');
+      // Fallback: try using attachEnergyToSlot if available
+      const owner = pk === 'p1' ? 'player1' : 'player2';
+      if (slot && typeof globalThis.attachEnergyToSlot === 'function') {
+        try {
+          globalThis.attachEnergyToSlot(owner, slot, energyType);
+          popup(`Thunderclap Flash: Attached ${energyType} Energy!`);
+          console.log(`[Thunderclap Flash] Attached ${energyType} using attachEnergyToSlot fallback`);
+        } catch (err) {
+          console.error('[Thunderclap Flash] Error with attachEnergyToSlot fallback:', err);
+        }
+      } else {
+        console.error('[Thunderclap Flash] No fallback available - slot:', !!slot, 'attachEnergyToSlot:', typeof globalThis.attachEnergyToSlot);
+      }
     }
   }
   // Claydol - Prevent all healing (global effect)
@@ -7075,23 +10247,32 @@ const ABILITY_HANDLERS = {
       return;
     }
     
-    // Draw cards
+    // Draw cards (but don't add to hand yet)
     const drawn = [];
     for (let i = 0; i < count && deck.length > 0; i++) {
       const card = deck.shift();
-      state[pk].hand = state[pk].hand || [];
-      state[pk].hand.push(card);
       drawn.push(card);
     }
     
     if (drawn.length > 0) {
+      // Add to hand immediately (no animation)
+      state[pk].hand = state[pk].hand || [];
+      state[pk].hand.push(...drawn);
+      
       popup(`Happy Ribbon: Drew ${drawn.length} card(s)!`);
       console.log('[Happy Ribbon] Drew cards on evolution:', drawn.map(c => c.name));
       
-      // Update UI
-      if (typeof renderHand === 'function') {
-        const owner = pk === 'p1' ? 'player1' : 'player2';
-        renderHand(owner);
+      // Update UI immediately
+      if (typeof globalThis.renderAllHands === 'function') {
+        globalThis.renderAllHands();
+      } else if (typeof renderAllHands === 'function') {
+        renderAllHands();
+      }
+      
+      if (typeof globalThis.updateDeckBubbles === 'function') {
+        globalThis.updateDeckBubbles();
+      } else if (typeof updateDeckBubbles === 'function') {
+        updateDeckBubbles();
       }
     }
   }
@@ -7135,15 +10316,358 @@ const ABILITY_HANDLERS = {
       popup(`Full-Mouth Manner: Healed ${healAmount} damage!`);
       console.log(`[Full-Mouth Manner] Healed ${healAmount} at end of turn`);
     }
-  }
+  },
 
   // 🆕 A3a/A3b ABILITY EFFECTS - END
 
   // 🆕 A2a/A2b ABILITY EFFECTS - END
 
+  // 🆕 A4 ABILITY EFFECTS - START
+  
+  // Move all energy of type to self
+  move_all_energy_type_to_self: async (s, pk, { param1, param2 }, ctx) => {
+    const energyType = (param1 || 'dark').toLowerCase();
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) {
+      popup('Could not identify which Pokemon to move energy to.');
+      return;
+    }
+    
+    // Get all Pokemon (excluding the target)
+    const allPokemon = getAllPokemonImgs(pk).filter(img => img !== sourceImg);
+    const sourceSlot = getSlotFromImg(sourceImg);
+    let targetEnergyBox = sourceSlot?.querySelector('.energy-pips');
+    
+    if (!targetEnergyBox) {
+      targetEnergyBox = document.createElement('div');
+      targetEnergyBox.className = 'energy-pips';
+      sourceSlot.appendChild(targetEnergyBox);
+    }
+    
+    let totalMoved = 0;
+    
+    // Move energy from all other Pokemon
+    for (const img of allPokemon) {
+      const slot = getSlotFromImg(img);
+      const energyBox = slot?.querySelector('.energy-pips');
+      if (!energyBox) continue;
+      
+      const pips = Array.from(energyBox.querySelectorAll('.energy-pip'));
+      const typePips = pips.filter(p => p.dataset.type === energyType);
+      
+      for (const pip of typePips) {
+        pip.remove();
+        const newPip = document.createElement('div');
+        newPip.className = 'energy-pip';
+        newPip.dataset.type = energyType;
+        newPip.style.backgroundImage = `url('${ENERGY_ICONS[energyType] || ''}')`;
+        targetEnergyBox.appendChild(newPip);
+        totalMoved++;
+      }
+    }
+    
+    if (totalMoved > 0) {
+      popup(`Energy Plunder: Moved ${totalMoved} ${energyType} Energy to ${sourceImg.alt}!`);
+    } else {
+      popup(`No ${energyType} Energy to move.`);
+    }
+  },
+  
+  // Boost damage for specific Pokemon
+  boost_damage: async (s, pk, { param1, param2 }, ctx) => {
+    // param1: "20" (damage boost amount)
+    // param2: "active" or "bench" (target)
+    const boost = parseInt10(param1, 20);
+    const target = (param2 || 'active').toLowerCase();
+    
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.damageBoost) globalThis.state.damageBoost = {};
+    if (!globalThis.state.damageBoost[pk]) globalThis.state.damageBoost[pk] = {};
+    
+    if (target === 'active') {
+      const activeImg = getActiveImg(pk);
+      const instanceId = activeImg?.dataset.instanceId;
+      if (instanceId) {
+        globalThis.state.damageBoost[pk][instanceId] = {
+          amount: boost,
+          duration: 'ongoing'
+        };
+        popup(`Lordly Cheering: Active Pokémon's attacks do +${boost} damage!`);
+      }
+    } else if (target === 'bench') {
+      // Boost for all bench Pokemon
+      const benchImgs = getBenchImgs(pk);
+      for (const img of benchImgs) {
+        const instanceId = img.dataset.instanceId;
+        if (instanceId) {
+          globalThis.state.damageBoost[pk][instanceId] = {
+            amount: boost,
+            duration: 'ongoing'
+          };
+        }
+      }
+      popup(`Lordly Cheering: Benched Pokémon's attacks do +${boost} damage!`);
+    }
+  },
+  
+  // Heal damage (ability version)
+  heal: async (s, pk, { param1 }, ctx) => {
+    const amount = parseInt10(param1, 30);
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) {
+      popup('Could not identify which Pokemon to heal.');
+      return;
+    }
+    
+    // Check if ability user is in active spot (for abilities that require active)
+    const activeImg = getActiveImg(pk);
+    if (sourceImg !== activeImg) {
+      popup('This ability can only be used when in the Active Spot.');
+      return;
+    }
+    
+    // Get all Pokemon that can be healed (any Pokemon with damage)
+    const allPokemon = getAllPokemonImgs(pk);
+    const healablePokemon = [];
+    
+    for (const img of allPokemon) {
+      const { base, cur } = getHpFromImg(img);
+      // Check against modified max HP if it exists (for Leaf Cape / Giant Cape)
+      const slot = img.closest('.card-slot');
+      const modifiedMaxHp = slot?.dataset.maxHp ? parseInt10(slot.dataset.maxHp) : null;
+      const maxHp = modifiedMaxHp || base;
+      
+      if (cur < maxHp) {
+        healablePokemon.push(img);
+      }
+    }
+    
+    if (healablePokemon.length === 0) {
+      popup('No damaged Pokémon to heal.');
+      return;
+    }
+    
+    // Let player choose which Pokemon to heal
+    popup(`Choose a Pokémon to heal ${amount} damage.`);
+    const chosen = await awaitSelection(healablePokemon);
+    
+    if (chosen && healImg(chosen, amount)) {
+      popup(`Psychic Healing: Healed ${amount} damage from ${chosen.alt}!`);
+    } else if (chosen) {
+      popup('No damage to heal on that Pokémon.');
+    }
+  },
+  
+  // Prevent status condition
+  prevent_status: async (s, pk, { param1 }, ctx) => {
+    // param1: "sleep" (status to prevent)
+    const status = (param1 || 'sleep').toLowerCase();
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) return;
+    
+    // Mark this Pokemon as protected from this status
+    if (!sourceImg.dataset.statusProtected) {
+      sourceImg.dataset.statusProtected = status;
+      console.log(`[prevent_status] ${sourceImg.alt} is protected from ${status}`);
+    }
+  },
+  
+  // Auto-evolve when energy attached
+  auto_evolve_on_energy_attach: async (s, pk, { param1 }, ctx) => {
+    // This is triggered when energy is attached
+    // param1: "random" or specific Pokemon name
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon;
+    
+    if (!sourceImg) return;
+    
+    // Check if evolution is available in deck
+    const deck = s[pk]?.deck || [];
+    const pokemonCards = [];
+    
+    for (const card of deck) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta.category === 'Pokemon' && meta.evolvesFrom) {
+          const evolvesFrom = meta.evolvesFrom.toLowerCase();
+          const currentName = (sourceImg.alt || '').toLowerCase();
+          if (evolvesFrom === currentName || currentName.includes(evolvesFrom)) {
+            pokemonCards.push(card);
+          }
+        }
+      } catch {}
+    }
+    
+    if (pokemonCards.length === 0) {
+      console.log('[auto_evolve] No evolution available');
+      return;
+    }
+    
+    // Pick random evolution if param1 is "random"
+    const chosen = param1 === 'random' 
+      ? pokemonCards[Math.floor(Math.random() * pokemonCards.length)]
+      : pokemonCards.find(c => (c.name || '').toLowerCase().includes((param1 || '').toLowerCase())) || pokemonCards[0];
+    
+    if (chosen) {
+      // Remove from deck
+      // Use findIndex with proper comparison to avoid reference issues
+      const index = deck.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
+      if (index !== -1) deck.splice(index, 1);
+      
+      // Evolve the Pokemon
+      if (globalThis.evolvePokemon) {
+        globalThis.evolvePokemon(sourceImg, chosen);
+        popup(`Buggy Evolution: Evolved into ${chosen.name}!`);
+      }
+    }
+  },
+  
+  // Discard energy when evolving
+  discard_energy_on_evolution: async (s, pk, { param1 }, ctx) => {
+    // This is triggered when Pokemon evolves
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon;
+    
+    if (!sourceImg) return;
+    
+    const count = parseInt10(param1, 1);
+    const removed = removeEnergy(sourceImg, null, count);
+    
+    if (removed > 0) {
+      popup(`Unruly Claw: Discarded ${removed} Energy on evolution!`);
+    }
+  },
+  
+  // Flip to prevent damage
+  flip_prevent_damage: async (s, pk, { param1 }, ctx) => {
+    // This is checked in battle.html when damage is dealt
+    // Just mark that this ability is active
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    if (sourceImg) {
+      sourceImg.dataset.flipPreventDamage = 'true';
+      console.log('[flip_prevent_damage] Ability active for', sourceImg.alt);
+    }
+  },
+  
+  // Reduce all damage taken
+  reduce_all_damage: async (s, pk, { param1 }, ctx) => {
+    // param1: "20" (reduction amount)
+    const reduction = parseInt10(param1, 20);
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) return;
+    
+    // Store reduction on the Pokemon
+    sourceImg.dataset.damageReduction = String(reduction);
+    console.log(`[reduce_all_damage] ${sourceImg.alt} reduces all damage by ${reduction}`);
+  },
+  
+  // Reduce energy cost of attacks
+  reduce_energy_cost: async (s, pk, { param1 }, ctx) => {
+    // param1: "1" (reduction amount)
+    const reduction = parseInt10(param1, 1);
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) return;
+    
+    // Store reduction on the Pokemon
+    sourceImg.dataset.energyCostReduction = String(reduction);
+    console.log(`[reduce_energy_cost] ${sourceImg.alt} reduces attack costs by ${reduction}`);
+  },
+  
+  // Remove retreat cost
+  remove_retreat_cost: async (s, pk, { param1 }, ctx) => {
+    // This is checked in battle.html when calculating retreat cost
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) return;
+    
+    // Mark that this Pokemon has no retreat cost
+    sourceImg.dataset.noRetreatCost = 'true';
+    console.log('[remove_retreat_cost]', sourceImg.alt, 'has no retreat cost');
+  },
+  
+  // 🆕 A4 ABILITY EFFECTS - END
+
+  // ========================================
+  // 🆕 A4a NEW ABILITY EFFECTS START
+  // ========================================
+
+  // 1. Entei ex / Suicune ex / Raikou ex - Legendary Pulse: Draw card at end of turn if active
+  draw_card_end_of_turn: async (s, pk, p, context = {}) => {
+    // Entei ex / Suicune ex / Raikou ex - Legendary Pulse
+    // Draw a card at the end of your turn if this Pokémon is in the Active Spot
+    const abilityPokemon = context?.abilityPokemon || getActiveImg(pk);
+    
+    // Check if this Pokémon is still in the Active Spot
+    const currentActive = getActiveImg(pk);
+    if (abilityPokemon !== currentActive) {
+      console.log('[draw_card_end_of_turn] Pokémon is not in Active Spot, skipping');
+      return;
+    }
+    
+    // Draw 1 card and add to hand immediately
+    // Use the state object's deck/hand directly (s.p1 or s.p2)
+    const ownerKey = pk === 'p1' ? 'p1' : 'p2';
+    const ownerState = s?.[ownerKey];
+    
+    if (!ownerState || !ownerState.deck) {
+      console.error('[draw_card_end_of_turn] State not available for', ownerKey, 'falling back to drawCards');
+      // Fallback: use drawCards function if available
+      if (globalThis.drawCards) {
+        await globalThis.drawCards(s, pk, 1);
+        popup('Legendary Pulse: Drew 1 card.');
+        return;
+      }
+      popup('Legendary Pulse: Unable to draw card.');
+      return;
+    }
+    
+    if (ownerState.deck.length > 0) {
+      const drawnCard = ownerState.deck.shift();
+      if (!ownerState.hand) ownerState.hand = [];
+      ownerState.hand.push(drawnCard);
+      
+      // Update UI immediately
+      if (globalThis.updateDeckBubbles) globalThis.updateDeckBubbles();
+      if (globalThis.renderAllHands) globalThis.renderAllHands();
+      
+      popup('Legendary Pulse: Drew 1 card.');
+      console.log('[draw_card_end_of_turn] Drew 1 card at end of turn');
+    } else {
+      popup('Legendary Pulse: No cards in deck.');
+    }
+  },
+
+  // 2. Galarian Cursola - Perish Body: Flip to KO attacker when KO'd
+  flip_ko_attacker_on_ko: async (s, pk, p, context = {}) => {
+    // This is handled in handleKnockOut in battle.html
+    // Store flag on the Pokémon
+    const img = getActiveImg(pk);
+    if (img) {
+      img.dataset.flipKoAttackerOnKo = 'true';
+      console.log('[flip_ko_attacker_on_ko] Flag set - will flip on KO');
+    }
+  },
+
+  // 3. Zoroark - Illusive Trickery: Prevent damage and effects next turn after KO
+  prevent_damage_and_effects_next_turn: async (s, pk, p, context = {}) => {
+    // This is handled when a KO occurs from this Pokémon's attack
+    // Store flag to be checked in battle.html
+    const img = getActiveImg(pk);
+    if (img) {
+      img.dataset.preventDamageAndEffectsNextTurn = 'true';
+      console.log('[prevent_damage_and_effects_next_turn] Flag set - will prevent damage/effects after KO');
+    }
+  },
+
+  // ========================================
+  // 🆕 A4a NEW ABILITY EFFECTS END
+  // ========================================
+
   // Passive placeholders
-  ,counter_on_hit: async () => {},
-  reduce_incoming_damage: async () => {},
+  counter_on_hit: async () => {},
   block_supporters: async () => {}
 };
 
@@ -7253,8 +10777,14 @@ globalThis.clearTurnEffects = function(state, pk) {
   }
   
   // Clear special effects for opponent (they were affected during this turn)
+  // BUT preserve attackLock - it needs to persist until the locked turn ends
   const oppPk = pk === 'p1' ? 'p2' : 'p1';
+  const attackLock = globalThis.__specialEffects?.[oppPk]?.attackLock;
   globalThis.clearSpecialEffects(oppPk);
+  // Restore attackLock if it exists (it should persist until the locked turn ends)
+  if (attackLock && globalThis.__specialEffects?.[oppPk]) {
+    globalThis.__specialEffects[oppPk].attackLock = attackLock;
+  }
   
   // Clear damage reduction for opponent (Blue supporter effect)
   if (globalThis.state?.damageReduction?.[oppPk]) {
@@ -7347,7 +10877,6 @@ globalThis.cachePokemonTypes = async function(img) {
     const meta = await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
     if (meta.types) {
       img.dataset.pokemonTypes = meta.types.map(t => t.toLowerCase()).join(',');
-      console.log(`[cache-types] Cached for ${img.alt}: ${img.dataset.pokemonTypes}`);
     }
   } catch (e) {
     console.error('[cache-types] Failed to cache types:', e);
@@ -7365,7 +10894,6 @@ globalThis.cacheAllPokemonTypes = async function() {
     await globalThis.cachePokemonTypes(img);
   }
   
-  console.log('[cache-types] Cached types for all Pokemon in play');
 };
 
 // 🆕 AUTO-CACHE: Watch for Pokemon images being added to the DOM
@@ -7460,5 +10988,3 @@ if (document.readyState === 'loading') {
     }
   })();
 }
-
-console.log('[effects.js] ready - ALL A1 + A1a EFFECTS IMPLEMENTED ✅ (14 new effects added)');

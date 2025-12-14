@@ -1,2 +1,6 @@
 {
+    "python.defaultInterpreterPath": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+    "python.analysis.extraPaths": [
+        "/Users/c29216e/Library/Python/3.12/lib/python/site-packages"
+    ]
 }

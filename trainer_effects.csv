@@ -110,3 +110,49 @@ A3b-069,Penny,Supporter,copy_random_opponent_supporter,,,Look at a random Suppor
 A3b-085,Hau,Supporter,boost_damage_type_targets,30,"Decidueye ex,Incineroar ex,Primarina ex",During this turn attacks used by your Decidueye ex Incineroar ex or Primarina ex do +30 damage to your opponent's Active Pokémon.
 A3b-086,Penny,Supporter,copy_random_opponent_supporter,,,Look at a random Supporter card that's not Penny from your opponent's deck and shuffle it back into their deck. Use the effect of that card as the effect of this card.
 A3b-107,Eevee Bag,Item,eevee_boost_or_heal,10,20,Choose 1: During this turn attacks used by your Pokémon that evolve from Eevee do +10 damage to your opponent's Active Pokémon. Heal 20 damage from each of your Pokémon that evolves from Eevee.
+A4-151,Elemental Switch,Item,move_energy_type_multiple,fire;water;lightning,,"Move a {R}, {W}, or {L} Energy from 1 of your Benched Pokémon to your Active Pokémon."
+A4-152,Squirt Bottle,Item,discard_energy_type_from_opponent,fire,,Discard a {R} Energy from your opponent's Active Pokémon.
+A4-153,Steel Apron,Tool,reduce_incoming_damage,10,,"The {M} Pokémon this card is attached to takes −10 damage from attacks from your opponent's Pokémon, recovers from all Special Conditions, and can't be affected by any Special Conditions."
+A4-154,Dark Pendant,Tool,shuffle_opponent_hand,,,"If the {D} Pokémon this card is attached to is in the Active Spot and is damaged by an attack from your opponent's Pokémon, your opponent reveals a random card from their hand and shuffles it into their deck."
+A4-155,Rescue Scarf,Tool,rescue_to_hand,,,"If the Pokémon this card is attached to is Knocked Out by damage from an attack from your opponent's Pokémon, put it into your hand instead of the discard pile."
+A4-156,Will,Supporter,guarantee_coin_flip,heads,,"The next time you flip any number of coins for the effect of an attack, Ability, or Trainer card after using this card on this turn, the first coin flip will definitely be heads."
+A4-157,Lyra,Supporter,switch_active,,,Switch your Active Pokémon that has damage on it with 1 of your Benched Pokémon.
+A4-158,Silver,Supporter,shuffle_opponent_hand,,,Your opponent reveals their hand. Choose a Supporter card you find there and shuffle it into your opponent's deck.
+A4-159,Fisher,Supporter,flip_revive_from_discard,3,water,"Flip 3 coins. For each heads, a {W} Pokémon is chosen at random from your discard pile and put into your hand."
+A4-160,Jasmine,Supporter,reduce_all_incoming_damage_next_turn,50,,"During your opponent's next turn, all of your Steelix and Skarmory ex take −50 damage from attacks from your opponent's Pokémon."
+A4-161,Hiker,Supporter,view_top_deck,,,"For each of your {F} Pokémon in play, look at that many cards from the top of your deck and put them back in any order."
+A4-196,Will,Supporter,guarantee_coin_flip,heads,,"The next time you flip any number of coins for the effect of an attack, Ability, or Trainer card after using this card on this turn, the first coin flip will definitely be heads."
+A4-197,Lyra,Supporter,switch_active,,,Switch your Active Pokémon that has damage on it with 1 of your Benched Pokémon.
+A4-198,Silver,Supporter,shuffle_opponent_hand,,,Your opponent reveals their hand. Choose a Supporter card you find there and shuffle it into your opponent's deck.
+A4-199,Fisher,Supporter,flip_revive_from_discard,3,water,"Flip 3 coins. For each heads, a {W} Pokémon is chosen at random from your discard pile and put into your hand."
+A4-200,Jasmine,Supporter,reduce_all_incoming_damage_next_turn,50,,"During your opponent's next turn, all of your Steelix and Skarmory ex take −50 damage from attacks from your opponent's Pokémon."
+A4-201,Hiker,Supporter,view_top_deck,,,"For each of your {F} Pokémon in play, look at that many cards from the top of your deck and put them back in any order."
+A4a-067,Inflatable Boat,Tool,reduce_retreat_cost,w,1.0,The Retreat Cost of the {W} Pokémon this card is attached to is 1 less.
+A4a-068,Memory Light,Tool,use_previous_evolution_attacks,,,The Pokémon this card is attached to can use any attack from its previous Evolutions. (You still need the necessary Energy to use each attack.)
+A4a-069,Whitney,Supporter,heal_and_remove_status,60,,"Heal 60 damage from 1 of your Miltank, and it recovers from being Asleep, Paralyzed, and Confused."
+A4a-070,Traveling Merchant,Supporter,search_tools_into_hand,4,,Look at the top 4 cards of your deck. Put all Pokémon Tool cards you find there into your hand. Shuffle the other cards back into your deck.
+A4a-071,Morty,Supporter,reorder_opponent_deck,,,"For each of your {P} Pokémon in play, look at that many cards from the top of your opponent's deck and put them back in any order."
+A4a-083,Whitney,Supporter,heal_and_remove_status,60,,"Heal 60 damage from 1 of your Miltank, and it recovers from being Asleep, Paralyzed, and Confused."
+A4a-084,Traveling Merchant,Supporter,search_tools_into_hand,4,,Look at the top 4 cards of your deck. Put all Pokémon Tool cards you find there into your hand. Shuffle the other cards back into your deck.
+A4a-085,Morty,Supporter,reorder_opponent_deck,,,"For each of your {P} Pokémon in play, look at that many cards from the top of your opponent's deck and put them back in any order."
+B1-213,Prank Spinner,Item,shuffle_random_from_both_hands,,,"A card from among both player's hands is chosen at random, revealed to the other player, and shuffled into its owner's deck."
+B1-214,Plume Fossil,Item,summon_fossil_pokemon,40,Tirtouga,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+B1-215,Hitting Hammer,Item,flip_discard_energy_double_heads,,,"Flip 2 coins. If both of them are heads, discard a random Energy from your opponent's Active Pokémon."
+B1-216,Cover Fossil,Item,summon_fossil_pokemon,40,Tirtouga,"Play this card as if it were a 40-HP Basic {C} Pokémon. At any time during your turn, you may discard this card from play. This card can't retreat."
+B1-217,Flame Patch,Item,attach_from_discard_to_active,fire,1,Attach a {R} Energy from your discard pile to your Active {R} Pokémon.
+B1-218,Sitrus Berry,Tool,heal_if_half_hp_tool,30,,"At the end of each turn, if the Pokémon this card is attached to has half of its maximum HP or less remaining, heal 30 damage from it. If you do, discard this card."
+B1-219,Heavy Helmet,Tool,reduce_incoming_damage_if_high_retreat,20,,"If the Pokémon this card is attached to has a Retreat Cost of 3 or more, it takes −20 damage from attacks from your opponent's Pokémon."
+B1-220,Lucky Mittens,Tool,draw_on_ko_tool,,,Whenever your opponent's Pokémon is Knocked Out by damage from an attack used by the Pokémon this card is attached to, draw a card.
+B1-221,Marlon,Supporter,heal_named,70,"Carracosta,Jellicent",Heal 70 damage from 1 of your Carracosta or Jellicent.
+B1-222,Hala,Supporter,flip_avoid_ko_named,10,"Hariyama,Crabominable","During your opponent's next turn, if your Hariyama or Crabominable would be Knocked Out by damage from an attack, it is not Knocked Out and its remaining HP becomes 10."
+B1-223,May,Supporter,search_pokemon_then_shuffle,2,,"Put 2 random Pokémon from your deck into your hand. For each Pokémon you put into your hand in this way, choose a Pokémon to shuffle from your hand into your deck."
+B1-224,Fantina,Supporter,attach_energy_to_named,psychic,1,"Drifblim,Mismagius",Take a {P} Energy from your Energy Zone and attach it to each of your Drifblim and Mismagius.
+B1-225,Copycat,Supporter,shuffle_hand_draw_match_opponent,,,Shuffle your hand into your deck. Draw a card for each card in your opponent's hand.
+B1-226,Lisia,Supporter,search_basic_pokemon_hp_limit,2,50,Put 2 random Basic Pokémon with 50 HP or less from your deck into your hand.
+B1-266,Marlon,Supporter,heal_named,70,"Carracosta,Jellicent",Heal 70 damage from 1 of your Carracosta or Jellicent.
+B1-267,Hala,Supporter,flip_avoid_ko_named,10,"Hariyama,Crabominable","During your opponent's next turn, if your Hariyama or Crabominable would be Knocked Out by damage from an attack, it is not Knocked Out and its remaining HP becomes 10."
+B1-268,May,Supporter,search_pokemon_then_shuffle,2,,"Put 2 random Pokémon from your deck into your hand. For each Pokémon you put into your hand in this way, choose a Pokémon to shuffle from your hand into your deck."
+B1-269,Fantina,Supporter,attach_energy_to_named,psychic,1,"Drifblim,Mismagius",Take a {P} Energy from your Energy Zone and attach it to each of your Drifblim and Mismagius.
+B1-270,Copycat,Supporter,shuffle_hand_draw_match_opponent,,,Shuffle your hand into your deck. Draw a card for each card in your opponent's hand.
+B1-271,Lisia,Supporter,search_basic_pokemon_hp_limit,2,50,Put 2 random Basic Pokémon with 50 HP or less from your deck into your hand.
+B1-331,Flame Patch,Item,attach_from_discard_to_active,fire,1,Attach a {R} Energy from your discard pile to your Active {R} Pokémon.

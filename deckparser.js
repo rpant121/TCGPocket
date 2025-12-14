@@ -2,12 +2,28 @@
 // Parses Pokémon TCG Pocket deck text and fetches card images from TCGdex
 
 let pocketSets = new Set();
+let pocketSetsLoaded = false;
+let pocketSetsLoading = null;
 
 /** Load all valid Pocket sets from the tcgp series */
 export async function loadPocketSets() {
-  const res = await fetch('https://api.tcgdex.net/v2/en/series/tcgp');
-  const data = await res.json();
-  pocketSets = new Set(data.sets.map((s) => s.id));}
+  // Return existing promise if already loading
+  if (pocketSetsLoading) return pocketSetsLoading;
+  
+  // Return immediately if already loaded
+  if (pocketSetsLoaded && pocketSets.size > 0) return;
+  
+  // Create and cache the loading promise
+  pocketSetsLoading = (async () => {
+    const res = await fetch('https://api.tcgdex.net/v2/en/series/tcgp');
+    const data = await res.json();
+    pocketSets = new Set(data.sets.map((s) => s.id));
+    pocketSetsLoaded = true;
+    pocketSetsLoading = null;
+  })();
+  
+  return pocketSetsLoading;
+}
 
 /** Parse Limitless-style text into structured objects */
 export function parseDecklist(text) {
@@ -16,8 +32,11 @@ export function parseDecklist(text) {
   const cards = [];
 
   for (const line of lines) {
-    const trimmed = line.trim();
+    let trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
+    if (trimmed.includes(":")) {
+      trimmed = trimmed.replace(":", "");
+    }
     const match = trimmed.match(pattern);
     if (match) {
       const [_, qty, name, set, num] = match;
