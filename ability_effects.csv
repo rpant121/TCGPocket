@@ -214,5 +214,4 @@ B1,306,Hypno,Sleep Pendulum,active,flip_inflict_status,asleep,,"Once during your
 B1,324,Passimian ex,Offload Pass,passive,move_energy_on_knockout,fighting,,"If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, move all {F} Energy from this Pokémon to 1 of your Benched Pokémon."
 B1,328,Arceus ex,Fabled Luster,passive,immune_to_special_conditions,,,This Pokémon can't be affected by any Special Conditions.
 B1,329,Lilligant,Toughness Aroma,passive,increase_max_hp_type,20,grass,Each of your {G} Pokémon gets +20 HP.
-B1,330,Klefki,Dismantling Keys,active,discard_tools_opponent_self,,,"Once during your turn, if this Pokémon is on your Bench, you may discard all Pokémon Tools from your opponent's Active Pokémon. If you do, discard this Pokémon.
-"
+B1,330,Klefki,Dismantling Keys,active,discard_tools_opponent_self,,,"Once during your turn, if this Pokémon is on your Bench, you may discard all Pokémon Tools from your opponent's Active Pokémon. If you do, discard this Pokémon."

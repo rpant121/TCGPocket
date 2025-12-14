@@ -4158,6 +4158,416 @@ const TRAINER_EFFECTS = {
   // ========================================
   // 🆕 A4a NEW TRAINER EFFECTS END
   // ========================================
+
+  // ========================================
+  // 🆕 NEW TRAINER EFFECTS - BATCH 1
+  // ========================================
+
+  // Attach energy to named Pokemon
+  attach_energy_to_named: async (state, pk, { param1, param2 }) => {
+    const energyType = (param1 || 'psychic').toLowerCase();
+    const count = parseInt10(param2, 1);
+    const targetNames = (param2 || '').split(',').map(n => n.trim().toLowerCase());
+    
+    // Find all Pokemon with matching names
+    const allPokemon = getAllPokemonImgs(pk);
+    const targets = [];
+    
+    for (const img of allPokemon) {
+      const name = (img.alt || '').toLowerCase();
+      if (targetNames.some(tn => name.includes(tn))) {
+        targets.push(img);
+      }
+    }
+    
+    if (targets.length === 0) {
+      popup(`No matching Pokémon found (${targetNames.join(', ')})`);
+      return;
+    }
+    
+    // Attach energy to all matching Pokemon
+    for (const target of targets) {
+      for (let i = 0; i < count; i++) {
+        attachEnergy(target, energyType);
+      }
+    }
+    
+    popup(`Attached ${count} ${energyType} Energy to ${targets.length} Pokémon!`);
+  },
+
+  // Attach from discard to active
+  attach_from_discard_to_active: async (state, pk, { param1, param2 }) => {
+    const energyType = (param1 || 'fire').toLowerCase();
+    const count = parseInt10(param2, 1);
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) {
+      popup('No Active Pokémon.');
+      return;
+    }
+    
+    // Check if active is the right type
+    try {
+      const meta = await globalThis.fetchCardMeta(activeImg.dataset.set, activeImg.dataset.num);
+      const hasType = meta.types?.some(t => t.toLowerCase() === energyType);
+      
+      if (!hasType) {
+        popup(`Active Pokémon is not ${energyType} type.`);
+        return;
+      }
+    } catch {
+      popup('Could not verify Active Pokémon type.');
+      return;
+    }
+    
+    // Check discard pile
+    const owner = pk === 'p1' ? 'player1' : 'player2';
+    const energyCounts = globalThis.playerState?.[owner]?.discard?.energyCounts || {};
+    
+    if (!energyCounts[energyType] || energyCounts[energyType] < count) {
+      popup(`Not enough ${energyType} Energy in discard pile.`);
+      return;
+    }
+    
+    // Attach energy
+    for (let i = 0; i < count; i++) {
+      attachEnergy(activeImg, energyType);
+      energyCounts[energyType]--;
+    }
+    
+    // Update discard UI
+    if (globalThis.renderDiscard) {
+      globalThis.renderDiscard(owner);
+    }
+    
+    popup(`Flame Patch: Attached ${count} ${energyType} Energy from discard!`);
+  },
+
+  // Draw on KO tool
+  draw_on_ko_tool: async (state, pk, { param1 }, context = {}) => {
+    // This is handled when a KO occurs
+    // The tool card should mark the Pokemon with a flag
+    // When KO happens, check for this flag and draw
+    const toolPokemon = context?.toolPokemon;
+    if (toolPokemon) {
+      toolPokemon.dataset.drawOnKo = 'true';
+      console.log('[draw_on_ko_tool] Lucky Mittens active - will draw on KO');
+    }
+  },
+
+  // Evolve basic to stage 2
+  evolve_basic_to_stage2: async (state, pk, { param1, param2 }) => {
+    // Rare Candy - evolve basic to stage 2
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) {
+      popup('No Active Pokémon.');
+      return;
+    }
+    
+    // Check if active is Basic
+    try {
+      const meta = await globalThis.fetchCardMeta(activeImg.dataset.set, activeImg.dataset.num);
+      if (meta.stage?.toLowerCase() !== 'basic') {
+        popup('Active Pokémon is not Basic.');
+        return;
+      }
+      
+      // Find Stage 2 evolution in hand
+      const hand = state[pk]?.hand || [];
+      const stage2Cards = [];
+      
+      for (const card of hand) {
+        try {
+          const cardMeta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+          if (cardMeta.category === 'Pokemon' && 
+              (cardMeta.stage?.toLowerCase() === 'stage2' || cardMeta.stage?.toLowerCase() === 'stage 2')) {
+            const evolvesFrom = (cardMeta.evolvesFrom || '').toLowerCase();
+            const currentName = (activeImg.alt || '').toLowerCase();
+            if (evolvesFrom === currentName || currentName.includes(evolvesFrom)) {
+              stage2Cards.push(card);
+            }
+          }
+        } catch {}
+      }
+      
+      if (stage2Cards.length === 0) {
+        popup('No Stage 2 evolution in hand.');
+        return;
+      }
+      
+      // Let player choose
+      popup('Rare Candy: Choose a Stage 2 evolution.');
+      // For now, pick first one
+      const chosen = stage2Cards[0];
+      
+      // Remove from hand
+      const handIndex = hand.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
+      if (handIndex !== -1) {
+        hand.splice(handIndex, 1);
+      }
+      
+      // Evolve
+      if (globalThis.evolvePokemon) {
+        globalThis.evolvePokemon(activeImg, chosen);
+        popup(`Rare Candy: Evolved into ${chosen.name}!`);
+      }
+    } catch (e) {
+      console.error('[evolve_basic_to_stage2] Error:', e);
+      popup('Evolution failed.');
+    }
+  },
+
+  // Flip avoid KO named
+  flip_avoid_ko_named: async (state, pk, { param1, param2 }) => {
+    const hpAmount = parseInt10(param1, 10);
+    const targetNames = (param2 || '').split(',').map(n => n.trim().toLowerCase());
+    
+    // Find matching Pokemon
+    const allPokemon = getAllPokemonImgs(pk);
+    const targets = [];
+    
+    for (const img of allPokemon) {
+      const name = (img.alt || '').toLowerCase();
+      if (targetNames.some(tn => name.includes(tn))) {
+        targets.push(img);
+      }
+    }
+    
+    if (targets.length === 0) {
+      popup(`No matching Pokémon found (${targetNames.join(', ')})`);
+      return;
+    }
+    
+    // Mark them for flip avoid KO
+    for (const target of targets) {
+      target.dataset.flipAvoidKo = String(hpAmount);
+      target.dataset.flipAvoidKoNames = targetNames.join(',');
+    }
+    
+    popup(`Hala: ${targets.length} Pokémon will flip to avoid KO (survive with ${hpAmount} HP)!`);
+  },
+
+  // Flip discard energy double heads
+  flip_discard_energy_double_heads: async (state, pk, { param1, param2 }) => {
+    const oppActive = getActiveImg(oppPk(pk));
+    if (!oppActive) {
+      popup('No opponent Active Pokémon.');
+      return;
+    }
+    
+    const flip1 = await flipCoin(pk);
+    const flip2 = await flipCoin(pk);
+    
+    if (flip1 === 'heads' && flip2 === 'heads') {
+      const removed = removeEnergy(oppActive, null, 1);
+      if (removed > 0) {
+        popup('Hitting Hammer: Both heads → Discarded Energy!');
+      } else {
+        popup('Hitting Hammer: Both heads → No Energy to discard.');
+      }
+    } else {
+      popup(`Hitting Hammer: ${flip1}, ${flip2} → No effect.`);
+    }
+  },
+
+  // Heal named Pokemon
+  heal_named: async (state, pk, { param1, param2 }) => {
+    const amount = parseInt10(param1, 70);
+    const targetNames = (param2 || '').split(',').map(n => n.trim().toLowerCase());
+    
+    // Find matching Pokemon
+    const allPokemon = getAllPokemonImgs(pk);
+    const targets = [];
+    
+    for (const img of allPokemon) {
+      const name = (img.alt || '').toLowerCase();
+      if (targetNames.some(tn => name.includes(tn))) {
+        targets.push(img);
+      }
+    }
+    
+    if (targets.length === 0) {
+      popup(`No matching Pokémon found (${targetNames.join(', ')})`);
+      return;
+    }
+    
+    // Let player choose which one to heal
+    popup(`Marlon: Choose a Pokémon to heal ${amount} damage.`);
+    const chosen = await awaitSelection(targets);
+    
+    if (chosen && healImg(chosen, amount)) {
+      popup(`Healed ${amount} damage from ${chosen.alt}!`);
+    } else if (chosen) {
+      popup('No damage to heal on that Pokémon.');
+    }
+  },
+
+  // Reduce incoming damage if high retreat
+  reduce_incoming_damage_if_high_retreat: async (state, pk, { param1 }, context = {}) => {
+    const reduction = parseInt10(param1, 20);
+    const toolPokemon = context?.toolPokemon;
+    
+    if (toolPokemon) {
+      toolPokemon.dataset.reduceDamageIfHighRetreat = String(reduction);
+      console.log(`[reduce_incoming_damage_if_high_retreat] Heavy Helmet active - reduces damage by ${reduction} if retreat cost >= 3`);
+    }
+  },
+
+  // Shuffle random from both hands
+  shuffle_random_from_both_hands: async (state, pk) => {
+    const p1Hand = state.p1?.hand || [];
+    const p2Hand = state.p2?.hand || [];
+    
+    if (p1Hand.length === 0 && p2Hand.length === 0) {
+      popup('Both players have no cards in hand.');
+      return;
+    }
+    
+    // Pick random player
+    const players = [];
+    if (p1Hand.length > 0) players.push({ pk: 'p1', hand: p1Hand, owner: 'player1' });
+    if (p2Hand.length > 0) players.push({ pk: 'p2', hand: p2Hand, owner: 'player2' });
+    
+    const chosenPlayer = players[Math.floor(Math.random() * players.length)];
+    const randomIndex = Math.floor(Math.random() * chosenPlayer.hand.length);
+    const card = chosenPlayer.hand.splice(randomIndex, 1)[0];
+    
+    // Add to deck and shuffle
+    const deck = state[chosenPlayer.pk]?.deck || [];
+    deck.push(card);
+    
+    if (globalThis.shuffleDeckAndAnimate) {
+      globalThis.shuffleDeckAndAnimate(state, chosenPlayer.pk);
+    }
+    
+    popup(`Prank Spinner: Shuffled ${card.name || 'a card'} from ${chosenPlayer.owner}'s hand into their deck!`);
+  },
+
+  // Search Pokemon then shuffle
+  search_pokemon_then_shuffle: async (state, pk, { param1, param2 }) => {
+    const count = parseInt10(param1, 2);
+    const deck = state[pk]?.deck || [];
+    
+    if (deck.length === 0) {
+      popup('Deck is empty.');
+      return;
+    }
+    
+    // Find Pokemon cards
+    const pokemonCards = [];
+    for (const card of deck) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta.category === 'Pokemon') {
+          pokemonCards.push(card);
+        }
+      } catch {}
+    }
+    
+    if (pokemonCards.length === 0) {
+      popup('No Pokémon in deck.');
+      return;
+    }
+    
+    // Pick random Pokemon
+    const chosen = [];
+    for (let i = 0; i < Math.min(count, pokemonCards.length); i++) {
+      const randomIndex = Math.floor(Math.random() * pokemonCards.length);
+      chosen.push(pokemonCards.splice(randomIndex, 1)[0]);
+    }
+    
+    // Remove from deck and add to hand
+    for (const card of chosen) {
+      const deckIndex = deck.findIndex(c => c.set === card.set && (c.number || c.num) === (card.number || card.num));
+      if (deckIndex !== -1) {
+        deck.splice(deckIndex, 1);
+        state[pk].hand = state[pk].hand || [];
+        state[pk].hand.push(card);
+      }
+    }
+    
+    // For each Pokemon added, shuffle one from hand back
+    const hand = state[pk]?.hand || [];
+    if (hand.length > chosen.length) {
+      popup(`May: Choose ${chosen.length} card(s) from hand to shuffle back.`);
+      // For now, shuffle random cards back
+      for (let i = 0; i < chosen.length && hand.length > 0; i++) {
+        const randomIndex = Math.floor(Math.random() * hand.length);
+        const cardToShuffle = hand.splice(randomIndex, 1)[0];
+        deck.push(cardToShuffle);
+      }
+    }
+    
+    shuffleDeckAndAnimate(state, pk);
+    if (globalThis.renderAllHands) globalThis.renderAllHands();
+    if (globalThis.updateDeckBubbles) globalThis.updateDeckBubbles();
+    
+    popup(`May: Added ${chosen.length} Pokémon to hand!`);
+  },
+
+  // Search basic Pokemon with HP limit
+  search_basic_pokemon_hp_limit: async (state, pk, { param1, param2 }) => {
+    const count = parseInt10(param1, 2);
+    const maxHp = parseInt10(param2, 50);
+    const deck = state[pk]?.deck || [];
+    
+    if (deck.length === 0) {
+      popup('Deck is empty.');
+      return;
+    }
+    
+    // Find Basic Pokemon with HP <= maxHp
+    const eligibleCards = [];
+    for (const card of deck) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta.category === 'Pokemon' && 
+            meta.stage?.toLowerCase() === 'basic' &&
+            meta.hp && parseInt10(meta.hp) <= maxHp) {
+          eligibleCards.push(card);
+        }
+      } catch {}
+    }
+    
+    if (eligibleCards.length === 0) {
+      popup(`No Basic Pokémon with ${maxHp} HP or less in deck.`);
+      return;
+    }
+    
+    // Pick random cards
+    const chosen = [];
+    for (let i = 0; i < Math.min(count, eligibleCards.length); i++) {
+      const randomIndex = Math.floor(Math.random() * eligibleCards.length);
+      chosen.push(eligibleCards.splice(randomIndex, 1)[0]);
+    }
+    
+    // Remove from deck and add to hand
+    for (const card of chosen) {
+      const deckIndex = deck.findIndex(c => c.set === card.set && (c.number || c.num) === (card.number || card.num));
+      if (deckIndex !== -1) {
+        deck.splice(deckIndex, 1);
+        state[pk].hand = state[pk].hand || [];
+        state[pk].hand.push(card);
+      }
+    }
+    
+    shuffleDeckAndAnimate(state, pk);
+    if (globalThis.renderAllHands) globalThis.renderAllHands();
+    if (globalThis.updateDeckBubbles) globalThis.updateDeckBubbles();
+    
+    popup(`Lisia: Added ${chosen.length} Basic Pokémon (≤${maxHp} HP) to hand!`);
+  },
+
+  // Heal if half HP tool
+  heal_if_half_hp_tool: async (state, pk, { param1 }, context = {}) => {
+    const amount = parseInt10(param1, 30);
+    const toolPokemon = context?.toolPokemon;
+    
+    if (toolPokemon) {
+      toolPokemon.dataset.healIfHalfHp = String(amount);
+      console.log(`[heal_if_half_hp_tool] Sitrus Berry active - will heal ${amount} at end of turn if HP <= half`);
+    }
+  },
 };
 
 globalThis.TRAINER_EFFECTS = TRAINER_EFFECTS;
@@ -8424,6 +8834,521 @@ const MOVE_HANDLERS = {
   // 🆕 A4a NEW MOVE EFFECTS END
   // ========================================
 
+  // ========================================
+  // 🆕 NEW MOVE EFFECTS - BATCH 1
+  // ========================================
+
+  // Attach multiple energy from zone with self damage
+  attach_multiple_energy_from_zone_self: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const energyType = (param1 || 'darkness').toLowerCase();
+    const count = parseInt10(param2, 2);
+    const selfDamage = parseInt10(ctx?.selfDamage || 30, 30);
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) return;
+    
+    // Attach energy
+    for (let i = 0; i < count; i++) {
+      attachEnergy(activeImg, energyType);
+    }
+    
+    // Deal self damage
+    if (selfDamage > 0) {
+      damageImg(activeImg, selfDamage);
+    }
+    
+    popup(`Attached ${count} ${energyType} Energy, took ${selfDamage} damage!`);
+  },
+
+  // Attach multiple energy to bench one
+  attach_multiple_energy_to_bench_one: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const energyType = (param1 || 'water').toLowerCase();
+    const count = parseInt10(param2, 2);
+    const benchImgs = getBenchImgs(pk);
+    
+    if (benchImgs.length === 0) {
+      popup('No benched Pokémon.');
+      return;
+    }
+    
+    popup(`Choose a benched Pokémon to attach ${count} ${energyType} Energy.`);
+    const chosen = await awaitSelection(benchImgs);
+    
+    if (chosen) {
+      for (let i = 0; i < count; i++) {
+        attachEnergy(chosen, energyType);
+      }
+      popup(`Attached ${count} ${energyType} Energy to ${chosen.alt}!`);
+    }
+  },
+
+  // Auto evolve random
+  auto_evolve_random: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    // Find evolution in deck
+    const deck = s[pk]?.deck || [];
+    const evolutionCards = [];
+    
+    for (const card of deck) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta.category === 'Pokemon' && meta.evolvesFrom) {
+          const evolvesFrom = meta.evolvesFrom.toLowerCase();
+          const currentName = (activeImg.alt || '').toLowerCase();
+          if (evolvesFrom === currentName || currentName.includes(evolvesFrom)) {
+            evolutionCards.push(card);
+          }
+        }
+      } catch {}
+    }
+    
+    if (evolutionCards.length === 0) {
+      popup('No evolution available.');
+      return;
+    }
+    
+    // Pick random evolution
+    const chosen = evolutionCards[Math.floor(Math.random() * evolutionCards.length)];
+    
+    // Remove from deck
+    const index = deck.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
+    if (index !== -1) deck.splice(index, 1);
+    
+    // Evolve
+    if (globalThis.evolvePokemon) {
+      globalThis.evolvePokemon(activeImg, chosen);
+      popup(`Auto-evolved into ${chosen.name}!`);
+    }
+  },
+
+  // Bench damage all self
+  bench_damage_all_self: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const dmg = parseInt10(param1);
+    const benchImgs = getBenchImgs(pk);
+    
+    for (const img of benchImgs) {
+      damageImg(img, dmg);
+    }
+    
+    popup(`Dealt ${dmg} to all your benched Pokémon.`);
+  },
+
+  // Bench damage opponent with energy
+  bench_damage_opponent_with_energy: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const dmg = parseInt10(param1);
+    const energyType = (param2 || '').toLowerCase();
+    const oppBench = getBenchImgs(oppPk(pk));
+    
+    // Only damage Pokemon with the specified energy type
+    const targets = [];
+    for (const img of oppBench) {
+      if (countEnergy(img, energyType) > 0) {
+        targets.push(img);
+      }
+    }
+    
+    if (targets.length === 0) {
+      popup(`No opponent benched Pokémon with ${energyType} Energy.`);
+      return;
+    }
+    
+    for (const img of targets) {
+      damageImg(img, dmg);
+    }
+    
+    popup(`Dealt ${dmg} to ${targets.length} opponent benched Pokémon with ${energyType} Energy.`);
+  },
+
+  // Bench damage per energy on target
+  bench_damage_per_energy_on_target: async (s, pk, { param1, param2 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const dmgPerEnergy = parseInt10(param1);
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (!oppActive) return;
+    
+    const energyCount = countEnergy(oppActive);
+    const totalDmg = energyCount * dmgPerEnergy;
+    
+    if (totalDmg > 0) {
+      damageImg(oppActive, totalDmg);
+      popup(`Dealt ${totalDmg} damage (${energyCount} Energy × ${dmgPerEnergy})!`);
+    }
+  },
+
+  // Bench damage to damaged only
+  bench_damage_to_damaged_only: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const dmg = parseInt10(param1);
+    const oppBench = getBenchImgs(oppPk(pk));
+    
+    // Only damage Pokemon that already have damage
+    const targets = [];
+    for (const img of oppBench) {
+      const { base, cur } = getHpFromImg(img);
+      if (cur < base) {
+        targets.push(img);
+      }
+    }
+    
+    if (targets.length === 0) {
+      popup('No damaged benched Pokémon.');
+      return;
+    }
+    
+    for (const img of targets) {
+      damageImg(img, dmg);
+    }
+    
+    popup(`Dealt ${dmg} to ${targets.length} damaged benched Pokémon.`);
+  },
+
+  // Bonus damage during next turn
+  bonus_damage_during_next_turn: async (s, pk, { param1 }, ctx) => {
+    if (!ctx.isFinal) return;
+    
+    const bonus = parseInt10(param1);
+    const activeImg = getActiveImg(pk);
+    const instanceId = activeImg?.dataset.instanceId;
+    
+    if (instanceId) {
+      if (!globalThis.state) globalThis.state = {};
+      if (!globalThis.state.damageBoost) globalThis.state.damageBoost = {};
+      if (!globalThis.state.damageBoost[pk]) globalThis.state.damageBoost[pk] = {};
+      
+      globalThis.state.damageBoost[pk][instanceId] = {
+        amount: bonus,
+        duration: 'next_turn'
+      };
+      popup(`Next turn: +${bonus} damage!`);
+    }
+  },
+
+  // Bonus damage if benched
+  bonus_damage_if_benched: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const activeImg = getActiveImg(pk);
+    const isBench = activeImg?.closest('.bench');
+    
+    if (isBench) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (benched)!`);
+    }
+  },
+
+  // Bonus damage if evolved this turn
+  bonus_damage_if_evolved_this_turn: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) return;
+    
+    const evolvedTurn = parseInt(activeImg.dataset.evolvedTurn || '0', 10);
+    if (evolvedTurn === globalThis.turnNumber) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (evolved this turn)!`);
+    }
+  },
+
+  // Bonus damage if hand count
+  bonus_damage_if_hand_count: async (s, pk, { param1, param2 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const condition = param2?.toLowerCase() || 'more';
+    const handSize = s[pk]?.hand?.length || 0;
+    
+    let conditionMet = false;
+    if (condition === 'more') {
+      conditionMet = handSize > 4; // Default: more than 4
+    } else if (condition === 'less') {
+      conditionMet = handSize < 4; // Default: less than 4
+    } else if (condition.includes('>')) {
+      const threshold = parseInt10(condition.replace('>', ''), 4);
+      conditionMet = handSize > threshold;
+    } else if (condition.includes('<')) {
+      const threshold = parseInt10(condition.replace('<', ''), 4);
+      conditionMet = handSize < threshold;
+    }
+    
+    if (conditionMet) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (hand size: ${handSize})!`);
+    }
+  },
+
+  // Bonus damage if last move name used
+  bonus_damage_if_last_move_name_used: async (s, pk, { param1, param2 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const moveName = (param2 || '').toLowerCase();
+    const lastMove = globalThis.lastMoveUsed?.[pk];
+    
+    if (lastMove && lastMove.toLowerCase() === moveName) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (last move was ${moveName})!`);
+    }
+  },
+
+  // Bonus damage if low HP
+  bonus_damage_if_low_hp: async (s, pk, { param1, param2 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const threshold = parseInt10(param2, 50); // Default: 50 HP or less
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) return;
+    
+    const { cur } = getHpFromImg(activeImg);
+    if (cur <= threshold) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (HP ≤ ${threshold})!`);
+    }
+  },
+
+  // Bonus damage if multiple energy types
+  bonus_damage_if_multiple_energy_types: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) return;
+    
+    const slot = getSlotFromImg(activeImg);
+    const pips = slot?.querySelectorAll('.energy-pip') || [];
+    const types = new Set();
+    
+    for (const pip of pips) {
+      types.add(pip.dataset.type);
+    }
+    
+    if (types.size >= 2) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (${types.size} energy types)!`);
+    }
+  },
+
+  // Bonus damage if named bench
+  bonus_damage_if_named_bench: async (s, pk, { param1, param2 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const name = (param2 || '').toLowerCase();
+    const benchImgs = getBenchImgs(pk);
+    
+    const hasNamed = benchImgs.some(img => (img.alt || '').toLowerCase().includes(name));
+    if (hasNamed) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (${name} on bench)!`);
+    }
+  },
+
+  // Bonus damage if named opponent
+  bonus_damage_if_named_opponent: async (s, pk, { param1, param2 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const name = (param2 || '').toLowerCase();
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (oppActive && (oppActive.alt || '').toLowerCase().includes(name)) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (opponent is ${name})!`);
+    }
+  },
+
+  // Bonus damage if opponent has ability
+  bonus_damage_if_opponent_has_ability: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (!oppActive) return;
+    
+    try {
+      const abilityRow = await globalThis.getAbilityRowForCard?.(oppActive.dataset.set, oppActive.dataset.num);
+      if (abilityRow) {
+        ctx.addBonus(bonus);
+        popup(`+${bonus} damage (opponent has ability)!`);
+      }
+    } catch {}
+  },
+
+  // Bonus damage if opponent has more HP
+  bonus_damage_if_opponent_has_more_hp: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const activeImg = getActiveImg(pk);
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (!activeImg || !oppActive) return;
+    
+    const { base: myHp } = getHpFromImg(activeImg);
+    const { base: oppHp } = getHpFromImg(oppActive);
+    
+    if (oppHp > myHp) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (opponent has more HP)!`);
+    }
+  },
+
+  // Bonus damage if opponent has status
+  bonus_damage_if_opponent_has_status: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (oppActive?.dataset.status) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (opponent has status)!`);
+    }
+  },
+
+  // Bonus damage if opponent type
+  bonus_damage_if_opponent_type: async (s, pk, { param1, param2 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const targetType = (param2 || '').toLowerCase();
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (!oppActive) return;
+    
+    try {
+      const meta = await globalThis.fetchCardMeta(oppActive.dataset.set, oppActive.dataset.num);
+      if (meta.types?.some(t => t.toLowerCase() === targetType)) {
+        ctx.addBonus(bonus);
+        popup(`+${bonus} damage (opponent is ${targetType}-type)!`);
+      }
+    } catch {}
+  },
+
+  // Bonus damage if own bench damaged
+  bonus_damage_if_own_bench_damaged: async (s, pk, { param1 }, ctx) => {
+    const bonus = parseInt10(param1);
+    const benchImgs = getBenchImgs(pk);
+    
+    const hasDamaged = benchImgs.some(img => {
+      const { base, cur } = getHpFromImg(img);
+      return cur < base;
+    });
+    
+    if (hasDamaged) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (own bench damaged)!`);
+    }
+  },
+
+  // Bonus damage per ability opponent
+  bonus_damage_per_ability_opponent: async (s, pk, { param1 }, ctx) => {
+    const bonusPerAbility = parseInt10(param1);
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (!oppActive) return;
+    
+    try {
+      const abilityRow = await globalThis.getAbilityRowForCard?.(oppActive.dataset.set, oppActive.dataset.num);
+      if (abilityRow) {
+        ctx.addBonus(bonusPerAbility);
+        popup(`+${bonusPerAbility} damage (opponent has ability)!`);
+      }
+    } catch {}
+  },
+
+  // Bonus damage per energy attached
+  bonus_damage_per_energy_attached: async (s, pk, { param1 }, ctx) => {
+    const bonusPerEnergy = parseInt10(param1);
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) return;
+    
+    const energyCount = countEnergy(activeImg);
+    const bonus = energyCount * bonusPerEnergy;
+    
+    if (bonus > 0) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (${energyCount} Energy × ${bonusPerEnergy})!`);
+    }
+  },
+
+  // Bonus damage per energy on opponent all
+  bonus_damage_per_energy_on_opponent_all: async (s, pk, { param1 }, ctx) => {
+    const bonusPerEnergy = parseInt10(param1);
+    const allOpponent = getAllPokemonImgs(oppPk(pk));
+    
+    let totalEnergy = 0;
+    for (const img of allOpponent) {
+      totalEnergy += countEnergy(img);
+    }
+    
+    const bonus = totalEnergy * bonusPerEnergy;
+    if (bonus > 0) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (${totalEnergy} total Energy × ${bonusPerEnergy})!`);
+    }
+  },
+
+  // Bonus damage per evolution bench
+  bonus_damage_per_evolution_bench: async (s, pk, { param1 }, ctx) => {
+    const bonusPerEvolution = parseInt10(param1);
+    const benchImgs = getBenchImgs(pk);
+    
+    let evolutionCount = 0;
+    for (const img of benchImgs) {
+      try {
+        const meta = await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
+        const stage = meta.stage?.toLowerCase();
+        if (stage === 'stage1' || stage === 'stage2' || stage === 'vmax' || stage === 'vstar') {
+          evolutionCount++;
+        }
+      } catch {}
+    }
+    
+    const bonus = evolutionCount * bonusPerEvolution;
+    if (bonus > 0) {
+      ctx.addBonus(bonus);
+      popup(`+${bonus} damage (${evolutionCount} evolutions × ${bonusPerEvolution})!`);
+    }
+  },
+
+  // Bonus damage per retreat cost
+  bonus_damage_per_retreat_cost: async (s, pk, { param1 }, ctx) => {
+    const bonusPerRetreat = parseInt10(param1);
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (!oppActive) return;
+    
+    try {
+      const meta = await globalThis.fetchCardMeta(oppActive.dataset.set, oppActive.dataset.num);
+      const retreatCost = parseInt10(meta.retreatCost, 0);
+      const bonus = retreatCost * bonusPerRetreat;
+      
+      if (bonus > 0) {
+        ctx.addBonus(bonus);
+        popup(`+${bonus} damage (retreat cost: ${retreatCost} × ${bonusPerRetreat})!`);
+      }
+    } catch {}
+  },
+
+  // Bonus damage per retreat cost reveal
+  bonus_damage_per_retreat_cost_reveal: async (s, pk, { param1 }, ctx) => {
+    const bonusPerRetreat = parseInt10(param1);
+    const oppActive = getActiveImg(oppPk(pk));
+    
+    if (!oppActive) return;
+    
+    try {
+      const meta = await globalThis.fetchCardMeta(oppActive.dataset.set, oppActive.dataset.num);
+      const retreatCost = parseInt10(meta.retreatCost, 0);
+      const bonus = retreatCost * bonusPerRetreat;
+      
+      if (bonus > 0) {
+        ctx.addBonus(bonus);
+        popup(`+${bonus} damage (retreat cost: ${retreatCost} × ${bonusPerRetreat})!`);
+      }
+    } catch {}
+  },
+
 };
 
 globalThis.MOVE_EFFECT_HANDLERS = MOVE_HANDLERS;
@@ -10665,6 +11590,568 @@ const ABILITY_HANDLERS = {
   // ========================================
   // 🆕 A4a NEW ABILITY EFFECTS END
   // ========================================
+
+  // ========================================
+  // 🆕 NEW ABILITY EFFECTS - BATCH 1
+  // ========================================
+
+  // Attach energy to bench on hit
+  attach_energy_to_bench_on_hit: async (s, pk, { param1, param2 }, ctx) => {
+    // This is triggered when Pokemon is damaged
+    const energyType = (param1 || 'water').toLowerCase();
+    const count = parseInt10(param2, 1);
+    const abilityPokemon = ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!abilityPokemon) return;
+    
+    const benchImgs = getBenchImgs(pk);
+    if (benchImgs.length === 0) {
+      popup('No benched Pokémon to attach energy to.');
+      return;
+    }
+    
+    popup(`Bouncy Body: Choose a benched Pokémon to attach ${count} ${energyType} Energy.`);
+    const chosen = await awaitSelection(benchImgs);
+    
+    if (chosen) {
+      for (let i = 0; i < count; i++) {
+        attachEnergy(chosen, energyType);
+      }
+      popup(`Attached ${count} ${energyType} Energy to ${chosen.alt}!`);
+    }
+  },
+
+  // Attach energy from zone with self damage
+  attach_energy_from_zone_self_damage: async (s, pk, { param1, param2 }, ctx) => {
+    const energyType = (param1 || 'darkness').toLowerCase();
+    const count = parseInt10(param2, 2);
+    const selfDamage = parseInt10(ctx?.selfDamage || 30, 30);
+    const abilityPokemon = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!abilityPokemon) {
+      popup('Could not identify which Pokemon to attach energy to.');
+      return;
+    }
+    
+    // Attach energy
+    for (let i = 0; i < count; i++) {
+      attachEnergy(abilityPokemon, energyType);
+    }
+    
+    // Deal self damage
+    if (selfDamage > 0) {
+      damageImg(abilityPokemon, selfDamage);
+    }
+    
+    popup(`Roar in Unison: Attached ${count} ${energyType} Energy, took ${selfDamage} damage!`);
+  },
+
+  // Counter inflict status
+  counter_inflict_status: async (s, pk, { param1 }, ctx) => {
+    // This is triggered when Pokemon is damaged
+    const status = (param1 || 'poisoned').toLowerCase();
+    const attacker = ctx?.attacker || getActiveImg(oppPk(pk));
+    
+    if (attacker) {
+      applyStatus(oppPk(pk), status);
+      popup(`Poison Point: ${attacker.alt} is now ${status}!`);
+    }
+  },
+
+  // Counter on KO (alias for counter_on_knockout)
+  counter_on_ko: async (s, pk, { param1 }, ctx) => {
+    return ABILITY_HANDLERS.counter_on_knockout(s, pk, { param1 }, ctx);
+  },
+
+  // Discard tools from opponent/self
+  discard_tools_opponent_self: async (s, pk, { param1, param2 }, ctx) => {
+    const abilityPokemon = ctx?.sourceImg || ctx?.abilityPokemon;
+    if (!abilityPokemon) return;
+    
+    // Check if on bench
+    const isBench = abilityPokemon.closest('.bench');
+    if (!isBench) {
+      popup('This ability can only be used from the Bench.');
+      return;
+    }
+    
+    // Get opponent's active Pokemon
+    const oppActive = getActiveImg(oppPk(pk));
+    if (!oppActive) {
+      popup('No opponent Active Pokémon.');
+      return;
+    }
+    
+    // Discard all tools from opponent's active
+    const oppSlot = getSlotFromImg(oppActive);
+    const tools = oppSlot?.querySelectorAll('.tool-attachment') || [];
+    let discarded = 0;
+    
+    for (const tool of tools) {
+      tool.remove();
+      discarded++;
+    }
+    
+    if (discarded > 0) {
+      // Discard this Pokemon
+      const owner = pk === 'p1' ? 'player1' : 'player2';
+      if (globalThis.pushCardToDiscard) {
+        globalThis.pushCardToDiscard(owner, abilityPokemon);
+      }
+      const slot = getSlotFromImg(abilityPokemon);
+      if (slot) slot.remove();
+      
+      popup(`Dismantling Keys: Discarded ${discarded} tool(s) and this Pokémon!`);
+    } else {
+      popup('No tools to discard.');
+    }
+  },
+
+  // Discard top of opponent deck
+  discard_top_opponent_deck: async (s, pk, { param1 }, ctx) => {
+    const count = parseInt10(param1, 1);
+    const opp = oppPk(pk);
+    const deck = s[opp]?.deck || [];
+    
+    if (deck.length === 0) {
+      popup('Opponent deck is empty.');
+      return;
+    }
+    
+    const discarded = deck.splice(0, count);
+    popup(`Slow Sear: Discarded ${discarded.length} card(s) from opponent's deck!`);
+    console.log('[Slow Sear] Discarded:', discarded.map(c => c.name));
+  },
+
+  // Flip force switch opponent basic
+  flip_force_switch_opponent_basic: async (s, pk) => {
+    if ((await flipCoin(pk)) === 'heads') {
+      return ABILITY_HANDLERS.force_switch_opponent_basic(s, pk);
+    } else {
+      popup('TAILS → No effect.');
+    }
+  },
+
+  // Flip KO attacker on KO
+  flip_ko_attacker_on_ko: async (s, pk, p, ctx) => {
+    // This is handled in handleKnockOut in battle.html
+    // Store flag on the Pokémon
+    const img = getActiveImg(pk);
+    if (img) {
+      img.dataset.flipKoAttackerOnKo = 'true';
+      console.log('[flip_ko_attacker_on_ko] Flag set - will flip on KO');
+    }
+  },
+
+  // Flip no points on KO
+  flip_no_points_on_ko: async (s, pk, p, ctx) => {
+    // This is handled in handleKnockOut in battle.html
+    // Store flag on the Pokémon
+    const img = getActiveImg(pk);
+    if (img) {
+      img.dataset.flipNoPointsOnKo = 'true';
+      console.log('[flip_no_points_on_ko] Flag set - will flip on KO');
+    }
+  },
+
+  // Increase max HP for type
+  increase_max_hp_type: async (s, pk, { param1, param2 }, ctx) => {
+    const amount = parseInt10(param1, 20);
+    const type = (param2 || 'grass').toLowerCase();
+    
+    // Get all Pokemon of the specified type
+    const allPokemon = getAllPokemonImgs(pk);
+    let updated = 0;
+    
+    for (const img of allPokemon) {
+      try {
+        const meta = await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
+        if (meta.types?.some(t => t.toLowerCase() === type)) {
+          const slot = getSlotFromImg(img);
+          if (slot) {
+            const baseHp = parseInt10(img.dataset.hp);
+            const newMaxHp = baseHp + amount;
+            slot.dataset.maxHp = String(newMaxHp);
+            
+            // Update HP display
+            const { cur } = getHpFromImg(img);
+            setHpOnImg(img, baseHp, cur);
+            updated++;
+          }
+        }
+      } catch {}
+    }
+    
+    if (updated > 0) {
+      popup(`Toughness Aroma: ${updated} ${type}-type Pokémon got +${amount} HP!`);
+    }
+  },
+
+  // Increase opponent cost
+  increase_opponent_cost: async (s, pk, { param1 }, ctx) => {
+    // Passive - handled in attack cost calculation
+    // Just mark that this ability is active
+    const amount = parseInt10(param1, 1);
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.opponentCostIncrease) globalThis.state.opponentCostIncrease = {};
+    globalThis.state.opponentCostIncrease[pk] = amount;
+    console.log(`[increase_opponent_cost] ${pk} increases opponent cost by ${amount}`);
+  },
+
+  // Inflict status on energy attach
+  inflict_status_on_energy_attach: async (s, pk, { param1 }, ctx) => {
+    const status = (param1 || 'asleep').toLowerCase();
+    const abilityPokemon = ctx?.targetImg || ctx?.abilityPokemon;
+    
+    if (!abilityPokemon) return;
+    
+    // Check if this Pokemon is in active spot
+    const isActive = abilityPokemon.closest('.active');
+    if (!isActive) return;
+    
+    // Inflict status on self
+    if (globalThis.setStatus) {
+      setTimeout(() => {
+        globalThis.setStatus(abilityPokemon, status);
+        popup(`Comatose: ${abilityPokemon.alt} is now ${status}!`);
+        console.log(`[Comatose] Self-inflicted ${status}`);
+      }, 100);
+    }
+  },
+
+  // Move all energy type (ability version - different from trainer)
+  move_all_energy_type: async (s, pk, { param1 }, ctx) => {
+    const type = (param1 || 'psychic').toLowerCase();
+    const abilityPokemon = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!abilityPokemon) {
+      popup('Could not identify which Pokemon to move energy to.');
+      return;
+    }
+    
+    // Get bench Pokemon with this type of energy
+    const benchImgs = getBenchImgs(pk);
+    const eligible = [];
+    
+    for (const img of benchImgs) {
+      const slot = getSlotFromImg(img);
+      const energyBox = slot?.querySelector('.energy-pips');
+      if (!energyBox) continue;
+      
+      const pips = energyBox.querySelectorAll('.energy-pip');
+      const hasType = Array.from(pips).some(p => p.dataset.type === type);
+      if (hasType) eligible.push(img);
+    }
+    
+    if (!eligible.length) {
+      popup(`No benched Pokémon with ${type} energy.`);
+      return;
+    }
+    
+    popup(`Psychic Connect: Choose a benched Pokémon to move ALL ${type} energy from.`);
+    const chosen = await awaitSelection(eligible);
+    if (!chosen) return;
+    
+    // Move ALL energy of this type to active
+    const activeImg = getActiveImg(pk);
+    if (!activeImg) return;
+    
+    const srcSlot = getSlotFromImg(chosen);
+    const srcBox = srcSlot?.querySelector('.energy-pips');
+    if (!srcBox) return;
+    
+    const pips = Array.from(srcBox.querySelectorAll('.energy-pip'));
+    const typePips = pips.filter(p => p.dataset.type === type);
+    
+    // Move each pip
+    for (const pip of typePips) {
+      pip.remove();
+    }
+    
+    // Attach to active
+    const destSlot = getSlotFromImg(activeImg);
+    let destBox = destSlot?.querySelector('.energy-pips');
+    if (!destBox) {
+      destBox = document.createElement('div');
+      destBox.className = 'energy-pips';
+      destSlot.appendChild(destBox);
+    }
+    
+    for (let i = 0; i < typePips.length; i++) {
+      const pip = document.createElement('div');
+      pip.className = 'energy-pip';
+      pip.dataset.type = type;
+      pip.style.backgroundImage = `url('${ENERGY_ICONS[type] || ''}')`;
+      destBox.appendChild(pip);
+    }
+    
+    popup(`Psychic Connect: Moved ${typePips.length} ${type} energy to ${activeImg.alt}!`);
+  },
+
+  // Prevent damage and effects next turn
+  prevent_damage_and_effects_next_turn: async (s, pk, p, ctx) => {
+    // This is handled when a KO occurs from this Pokémon's attack
+    // Store flag to be checked in battle.html
+    const img = getActiveImg(pk);
+    if (img) {
+      img.dataset.preventDamageAndEffectsNextTurn = 'true';
+      console.log('[prevent_damage_and_effects_next_turn] Flag set - will prevent damage/effects after KO');
+    }
+  },
+
+  // Prevent damage from ex
+  prevent_damage_from_ex: async (s, pk, { param1 }, ctx) => {
+    // Passive - handled in damage calculation
+    // Just mark that this ability is active
+    const abilityPokemon = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    if (abilityPokemon) {
+      abilityPokemon.dataset.preventDamageFromEx = 'true';
+      console.log('[prevent_damage_from_ex] Safeguard active');
+    }
+  },
+
+  // Prevent status
+  prevent_status: async (s, pk, { param1 }, ctx) => {
+    const status = (param1 || 'sleep').toLowerCase();
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) return;
+    
+    // Mark this Pokemon as protected from this status
+    if (!sourceImg.dataset.statusProtected) {
+      sourceImg.dataset.statusProtected = status;
+      console.log(`[prevent_status] ${sourceImg.alt} is protected from ${status}`);
+    }
+  },
+
+  // Reduce all damage
+  reduce_all_damage: async (s, pk, { param1 }, ctx) => {
+    const reduction = parseInt10(param1, 10);
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) return;
+    
+    // Store reduction on the Pokemon
+    sourceImg.dataset.damageReduction = String(reduction);
+    console.log(`[reduce_all_damage] ${sourceImg.alt} reduces all damage by ${reduction}`);
+  },
+
+  // Reduce incoming damage if full HP
+  reduce_incoming_damage_if_full_hp: async (s, pk, { param1 }, ctx) => {
+    const reduction = parseInt10(param1, 40);
+    const sourceImg = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    
+    if (!sourceImg) return;
+    
+    // Store reduction and condition
+    sourceImg.dataset.damageReductionIfFullHp = String(reduction);
+    console.log(`[reduce_incoming_damage_if_full_hp] ${sourceImg.alt} reduces damage by ${reduction} if full HP`);
+  },
+
+  // Reduce opponent damage
+  reduce_opponent_damage: async (s, pk, { param1 }, ctx) => {
+    // Passive - handled in damage calculation
+    // Just mark that this ability is active
+    const reduction = parseInt10(param1, 20);
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.opponentDamageReduction) globalThis.state.opponentDamageReduction = {};
+    globalThis.state.opponentDamageReduction[pk] = reduction;
+    console.log(`[reduce_opponent_damage] ${pk} reduces opponent damage by ${reduction}`);
+  },
+
+  // Remove retreat cost if named
+  remove_retreat_cost_if_named: async (s, pk, { param1 }, ctx) => {
+    // Passive - handled in retreat cost calculation
+    // param1: name of Pokemon that should have zero retreat
+    const namedPokemon = (param1 || '').toLowerCase();
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.zeroRetreatNamed) globalThis.state.zeroRetreatNamed = {};
+    globalThis.state.zeroRetreatNamed[pk] = namedPokemon;
+    console.log(`[remove_retreat_cost_if_named] ${pk} active ${namedPokemon} has no retreat cost`);
+  },
+
+  // Reveal opponent hand
+  reveal_opponent_hand: async (s, pk) => {
+    const opp = oppPk(pk);
+    const hand = s[opp]?.hand || [];
+    
+    if (hand.length === 0) {
+      popup('Opponent has no cards in hand.');
+      return;
+    }
+    
+    const cardNames = hand.map(c => c.name || 'Unknown').join(', ');
+    popup(`Infiltrating Inspection: Opponent's hand: ${cardNames}`);
+    console.log('[Infiltrating Inspection] Opponent hand:', hand);
+  },
+
+  // Search supporter from discard on evolution
+  search_supporter_from_discard_on_evolution: async (s, pk, p, ctx) => {
+    const abilityPokemon = ctx?.sourceImg || ctx?.abilityPokemon;
+    if (!abilityPokemon) return;
+    
+    // Get discard pile
+    const owner = pk === 'p1' ? 'player1' : 'player2';
+    const discard = globalThis.playerState?.[owner]?.discard?.cards || [];
+    
+    // Find supporter cards
+    const supporters = [];
+    for (const card of discard) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta.category === 'Trainer' && meta.trainerType === 'Supporter') {
+          supporters.push(card);
+        }
+      } catch {}
+    }
+    
+    if (supporters.length === 0) {
+      popup('No Supporter cards in discard pile.');
+      return;
+    }
+    
+    // Pick random supporter
+    const chosen = supporters[Math.floor(Math.random() * supporters.length)];
+    
+    // Remove from discard and add to hand
+    const index = discard.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
+    if (index !== -1) {
+      discard.splice(index, 1);
+      s[pk].hand = s[pk].hand || [];
+      s[pk].hand.push(chosen);
+      
+      if (globalThis.renderAllHands) globalThis.renderAllHands();
+      
+      popup(`Search for Friends: Found ${chosen.name}!`);
+    }
+  },
+
+  // Switch type with bench
+  switch_type_with_bench: async (s, pk, { param1 }, ctx) => {
+    const type = (param1 || 'water').toLowerCase();
+    const activeImg = getActiveImg(pk);
+    
+    if (!activeImg) {
+      popup('No Active Pokémon.');
+      return;
+    }
+    
+    // Check if active is the right type
+    try {
+      const meta = await globalThis.fetchCardMeta(activeImg.dataset.set, activeImg.dataset.num);
+      const hasType = meta.types?.some(t => t.toLowerCase() === type);
+      
+      if (!hasType) {
+        popup(`Active Pokémon is not ${type} type.`);
+        return;
+      }
+    } catch {
+      popup('Could not verify Active Pokémon type.');
+      return;
+    }
+    
+    // Get bench Pokemon
+    const benchImgs = getBenchImgs(pk);
+    if (benchImgs.length === 0) {
+      popup('No benched Pokémon to switch with.');
+      return;
+    }
+    
+    popup(`Shifting Stream: Choose a benched Pokémon to switch with.`);
+    const chosen = await awaitSelection(benchImgs);
+    
+    if (chosen) {
+      // Perform the swap
+      try {
+        const owner = pk === 'p1' ? 'player1' : 'player2';
+        const activeDiv = globalThis.activeFor(owner);
+        const activeSlot = activeDiv?.querySelector('.card-slot');
+        const benchSlot = chosen.closest('.card-slot');
+        
+        if (!activeSlot || !benchSlot) {
+          popup('Error: Could not find slots');
+          return;
+        }
+        
+        // Use game's attachment functions
+        const activePack = globalThis.detachAttachments(activeSlot);
+        const benchPack = globalThis.detachAttachments(benchSlot);
+        
+        // Swap the Pokemon images
+        activeSlot.removeChild(activeImg);
+        benchSlot.removeChild(chosen);
+        
+        activeSlot.appendChild(chosen);
+        benchSlot.appendChild(activeImg);
+        
+        // Reattach attachments
+        globalThis.attachAttachments(activeSlot, benchPack);
+        globalThis.attachAttachments(benchSlot, activePack);
+        
+        // Update slot markers
+        if (typeof globalThis.markSlot === 'function') {
+          globalThis.markSlot(activeSlot, true);
+          globalThis.markSlot(benchSlot, true);
+        }
+        
+        popup(`Shifting Stream: Switched ${activeImg.alt} with ${chosen.alt}!`);
+      } catch (err) {
+        console.error('[Shifting Stream] Swap failed:', err);
+        popup('Switch failed. Please try again.');
+      }
+    }
+  },
+
+  // Zero retreat first turn
+  zero_retreat_first_turn: async (s, pk, { param1 }, ctx) => {
+    // Only active during first 2 turns
+    if (globalThis.turnNumber && globalThis.turnNumber <= 2) {
+      console.log('[Wimp Out] Zero retreat cost (first turn)');
+      return -999; // Signal zero retreat
+    }
+    return 0;
+  },
+
+  // Allow evolution first turn
+  allow_evolution_first_turn: async (s, pk, { param1 }, ctx) => {
+    // Passive - handled in evolution logic
+    // Just mark that this ability is active
+    const abilityPokemon = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
+    if (abilityPokemon) {
+      abilityPokemon.dataset.allowEvolutionFirstTurn = 'true';
+      console.log('[allow_evolution_first_turn] Boosted Evolution active');
+    }
+  },
+
+  // Boost type damage multiple
+  boost_type_damage_multiple: async (s, pk, { param1, param2 }, ctx) => {
+    // Passive - handled in damage calculation
+    // param1: damage boost amount
+    // param2: types (semicolon-separated)
+    const boost = parseInt10(param1, 30);
+    const types = (param2 || '').split(';').map(t => t.trim().toLowerCase());
+    
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.typeDamageBoost) globalThis.state.typeDamageBoost = {};
+    if (!globalThis.state.typeDamageBoost[pk]) globalThis.state.typeDamageBoost[pk] = {};
+    
+    for (const type of types) {
+      globalThis.state.typeDamageBoost[pk][type] = boost;
+    }
+    
+    console.log(`[boost_type_damage_multiple] ${pk} boosts ${types.join(', ')} damage by ${boost}`);
+  },
+
+  // Damage on opponent energy attach
+  damage_on_opponent_energy_attach: async (s, pk, { param1 }, ctx) => {
+    // Passive - handled when opponent attaches energy
+    // Just mark that this ability is active
+    const damage = parseInt10(param1, 20);
+    if (!globalThis.state) globalThis.state = {};
+    if (!globalThis.state.damageOnOpponentEnergyAttach) globalThis.state.damageOnOpponentEnergyAttach = {};
+    globalThis.state.damageOnOpponentEnergyAttach[pk] = damage;
+    console.log(`[damage_on_opponent_energy_attach] ${pk} deals ${damage} when opponent attaches energy`);
+  },
 
   // Passive placeholders
   counter_on_hit: async () => {},
