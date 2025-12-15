@@ -236,6 +236,12 @@ function attachEnergy(img, type) {
   pip.dataset.type = k;
   pip.style.backgroundImage = `url('${ENERGY_ICONS[k] || ENERGY_ICONS.colorless}')`;
   box.appendChild(pip);
+  
+  // 🆕 B1 PASSIVE ABILITY - Jolteon ex Electromagnetic Wall (damage on ANY energy attach)
+  // Trigger after energy is attached
+  if (typeof globalThis.triggerElectromagneticWall === 'function') {
+    globalThis.triggerElectromagneticWall(img);
+  }
 }
 
 function removeEnergy(img, type, count) {
@@ -468,13 +474,21 @@ function awaitSelection(candidates, glowClass = 'heal-glow') {
     isSelectionActive = true;
     globalThis.__selectionActive = true;
     
+    // Check if hand card selection is allowed (Silver, Darkness Claw, etc.)
+    const allowHandCards = globalThis.__silverSelectionActive || globalThis.__darknessClawSelectionActive;
+    
     // Filter out cards in hand - only allow Pokémon in play (active/bench)
+    // UNLESS hand card selection is explicitly allowed
     const validCandidates = candidates.filter(img => {
       // Check if the image is in the hand
       const inHand = img.closest('.hand');
-      if (inHand) {
+      if (inHand && !allowHandCards) {
         console.log('[awaitSelection] Filtered out card in hand:', img.alt);
         return false;
+      }
+      // If hand cards are allowed, accept them
+      if (inHand && allowHandCards) {
+        return true;
       }
       // Only allow images that are in active or bench areas
       const inActive = img.closest('.active');
@@ -505,9 +519,9 @@ function awaitSelection(candidates, glowClass = 'heal-glow') {
     };
     
     const clickHandler = e => {
-      // Block clicks on hand cards immediately
+      // Block clicks on hand cards immediately UNLESS hand card selection is allowed
       const clickedInHand = e.target.closest('.hand');
-      if (clickedInHand) {
+      if (clickedInHand && !allowHandCards) {
         console.log('[awaitSelection] Blocked click on card in hand');
         e.stopPropagation();
         e.preventDefault();
@@ -2180,41 +2194,55 @@ const TRAINER_EFFECTS = {
     
     console.log('[Rare Candy] Checking', allPokemon.length, 'Pokemon');
     
-    for (const img of allPokemon) {
+    // 🆕 OPTIMIZATION: Batch fetch all metadata in parallel
+    const metaPromises = allPokemon.map(async (img) => {
       try {
         const playedTurn = parseInt(img.dataset.playedTurn || '0', 10);
-        
-        // 🆕 Check if this is a fossil (trainer card acting as Pokemon)
         const isFossil = img.dataset.isFossil === 'true';
         
-        let stage = '';
         if (isFossil) {
-          // Fossils act as Basic Pokemon
-          stage = 'basic';
-          console.log(`[Rare Candy] ${img.alt}: FOSSIL (treating as basic), playedTurn=${playedTurn}, currentTurn=${globalThis.turnNumber}`);
+          return {
+            img,
+            meta: { name: img.alt, stage: 'Basic', hp: img.dataset.hp },
+            isFossil: true,
+            playedTurn,
+            stage: 'basic'
+          };
         } else {
-          // Normal Pokemon - fetch metadata
           const meta = await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
-          stage = (meta.stage || '').toLowerCase();
-          console.log(`[Rare Candy] ${img.alt}: stage=${stage}, playedTurn=${playedTurn}, currentTurn=${globalThis.turnNumber}`);
-        }
-        
-        // Must be basic AND not played this turn
-        if (stage === 'basic' && playedTurn !== globalThis.turnNumber) {
-          // For fossils, create a pseudo-meta object
-          const meta = isFossil ? {
-            name: img.alt,
-            stage: 'Basic',
-            hp: img.dataset.hp
-          } : await globalThis.fetchCardMeta(img.dataset.set, img.dataset.num);
-          
-          eligibleBasics.push({ img, meta, isFossil });
-          console.log(`[Rare Candy] ✓ ${img.alt} is eligible${isFossil ? ' (fossil)' : ''}`);
-        } else if (stage === 'basic' && playedTurn === globalThis.turnNumber) {
-          console.log(`[Rare Candy] ✗ ${img.alt} was played this turn`);
+          return {
+            img,
+            meta,
+            isFossil: false,
+            playedTurn,
+            stage: (meta.stage || '').toLowerCase()
+          };
         }
       } catch (e) {
         console.warn('[Rare Candy] Failed to fetch meta for:', img.alt, e);
+        return null;
+      }
+    });
+    
+    const metaResults = await Promise.all(metaPromises);
+    
+    for (const result of metaResults) {
+      if (!result) continue;
+      
+      const { img, meta, isFossil, playedTurn, stage } = result;
+      
+      if (isFossil) {
+        console.log(`[Rare Candy] ${img.alt}: FOSSIL (treating as basic), playedTurn=${playedTurn}, currentTurn=${globalThis.turnNumber}`);
+      } else {
+        console.log(`[Rare Candy] ${img.alt}: stage=${stage}, playedTurn=${playedTurn}, currentTurn=${globalThis.turnNumber}`);
+      }
+      
+      // Must be basic AND not played this turn
+      if (stage === 'basic' && playedTurn !== globalThis.turnNumber) {
+        eligibleBasics.push({ img, meta, isFossil });
+        console.log(`[Rare Candy] ✓ ${img.alt} is eligible${isFossil ? ' (fossil)' : ''}`);
+      } else if (stage === 'basic' && playedTurn === globalThis.turnNumber) {
+        console.log(`[Rare Candy] ✗ ${img.alt} was played this turn`);
       }
     }
     
@@ -2232,17 +2260,28 @@ const TRAINER_EFFECTS = {
     
     console.log('[Rare Candy] Checking', hand.length, 'cards in hand');
     
-    for (const handCard of hand) {
+    // 🆕 OPTIMIZATION: Batch fetch all hand card metadata in parallel
+    const handMetaPromises = hand.map(async (handCard) => {
       try {
         const cardMeta = await globalThis.fetchCardMeta(handCard.set, handCard.number || handCard.num);
         const cardStage = (cardMeta.stage || '').toLowerCase();
         
         if (cardStage === 'stage2') {
-          stage2InHand.push({ handCard, cardMeta });
-          console.log(`[Rare Candy] Found Stage 2 in hand: ${cardMeta.name}`);
+          return { handCard, cardMeta };
         }
+        return null;
       } catch (e) {
         console.warn('[Rare Candy] Failed to fetch meta for hand card', e);
+        return null;
+      }
+    });
+    
+    const handMetaResults = await Promise.all(handMetaPromises);
+    
+    for (const result of handMetaResults) {
+      if (result) {
+        stage2InHand.push(result);
+        console.log(`[Rare Candy] Found Stage 2 in hand: ${result.cardMeta.name}`);
       }
     }
     
@@ -2276,7 +2315,7 @@ const TRAINER_EFFECTS = {
         }
         
         // Check if Stage 2's Stage 1 matches the fossil's evolution
-        const stage1Name = normStr(stage2Meta.evolveFrom || '');
+        const stage1Name = normStr(stage2Meta.evolveFrom || stage2Meta.evolvesFrom || '');
         
         console.log(`[Rare Candy] Stage 2 "${stage2Name}" evolves from Stage 1: "${stage1Name}"`);
         
@@ -2292,7 +2331,7 @@ const TRAINER_EFFECTS = {
         const stage1Meta = await globalThis.fetchCardMeta(stage1Card.set, stage1Card.num);
         if (!stage1Meta) return false;
         
-        const stage1EvolveFrom = normStr(stage1Meta.evolveFrom || '');
+        const stage1EvolveFrom = normStr(stage1Meta.evolveFrom || stage1Meta.evolvesFrom || '');
         
         console.log(`[Rare Candy] Stage 1 "${stage1Name}" evolves from: "${stage1EvolveFrom}"`);
         
@@ -2343,7 +2382,7 @@ const TRAINER_EFFECTS = {
       
       // SLOW PATH: Verify through Stage 1 lookup
       console.log(`[Rare Candy] Names don't match, checking Stage 1...`);
-      const stage1Name = normStr(stage2Meta.evolveFrom || '');
+      const stage1Name = normStr(stage2Meta.evolveFrom || stage2Meta.evolvesFrom || '');
       
       if (!stage1Name) return false;
       
@@ -2353,7 +2392,7 @@ const TRAINER_EFFECTS = {
       const stage1Meta = await globalThis.fetchCardMeta(stage1Card.set, stage1Card.num);
       if (!stage1Meta) return false;
       
-      const stage1EvolveFrom = normStr(stage1Meta.evolveFrom || '');
+      const stage1EvolveFrom = normStr(stage1Meta.evolveFrom || stage1Meta.evolvesFrom || '');
       console.log(`[Rare Candy] Stage 1 "${stage1Name}" evolves from: "${stage1EvolveFrom}"`);
       console.log(`[Rare Candy] Basic: "${basicName}"`);
       
@@ -2365,7 +2404,7 @@ const TRAINER_EFFECTS = {
     // Find card by name in database
     async function findCardByName(cardName) {
       const normalizedName = normStr(cardName);
-      const commonSets = ['A1', 'A1a', 'A2', 'A2a', 'A2b', 'A3'];
+      const commonSets = ['A1', 'A1a', 'A2', 'A2a', 'A2b', 'A3', 'A3a', 'A3b', 'A4', 'A4a', 'B1'];
       
       for (const set of commonSets) {
         try {
@@ -2393,13 +2432,26 @@ const TRAINER_EFFECTS = {
     
     console.log('[Rare Candy] Checking evolution combinations...');
     
+    // 🆕 OPTIMIZATION: Check all combinations in parallel
+    const pairChecks = [];
     for (const { img: basicImg, meta: basicMeta, isFossil } of eligibleBasics) {
       for (const { handCard, cardMeta: stage2Meta } of stage2InHand) {
-        const canEvolve = await canRareCandyEvolve(basicImg, basicMeta, stage2Meta, isFossil);
-        if (canEvolve) {
-          validPairs.push({ basicImg, basicMeta, handCard, stage2Meta });
-          console.log(`[Rare Candy] ✓ Valid: ${basicImg.alt} → ${stage2Meta.name}`);
-        }
+        pairChecks.push(canRareCandyEvolve(basicImg, basicMeta, stage2Meta, isFossil).then(canEvolve => ({
+          canEvolve,
+          basicImg,
+          basicMeta,
+          handCard,
+          stage2Meta
+        })));
+      }
+    }
+    
+    const pairResults = await Promise.all(pairChecks);
+    
+    for (const { canEvolve, basicImg, basicMeta, handCard, stage2Meta } of pairResults) {
+      if (canEvolve) {
+        validPairs.push({ basicImg, basicMeta, handCard, stage2Meta });
+        console.log(`[Rare Candy] ✓ Valid: ${basicImg.alt} → ${stage2Meta.name}`);
       }
     }
     
@@ -4389,6 +4441,7 @@ const TRAINER_EFFECTS = {
   search_pokemon_then_shuffle: async (state, pk, { param1, param2 }) => {
     const count = parseInt10(param1, 2);
     const deck = state[pk]?.deck || [];
+    const owner = pk === 'p1' ? 'player1' : 'player2';
     
     if (deck.length === 0) {
       popup('Deck is empty.');
@@ -4428,23 +4481,103 @@ const TRAINER_EFFECTS = {
       }
     }
     
-    // For each Pokemon added, shuffle one from hand back
+    // Update global state
+    if (globalThis.playerState?.[owner]) {
+      globalThis.playerState[owner].hand = state[pk].hand;
+      globalThis.playerState[owner].deck = deck;
+    }
+    
+    // Update UI to show the new cards in hand
+    if (globalThis.renderAllHands) globalThis.renderAllHands();
+    if (globalThis.updateDeckBubbles) globalThis.updateDeckBubbles();
+    
+    popup(`May: Added ${chosen.length} Pokémon to hand!`);
+    
+    // Wait a moment for UI to update
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Now ask user to choose which Pokemon to shuffle back
     const hand = state[pk]?.hand || [];
-    if (hand.length > chosen.length) {
-      popup(`May: Choose ${chosen.length} card(s) from hand to shuffle back.`);
-      // For now, shuffle random cards back
-      for (let i = 0; i < chosen.length && hand.length > 0; i++) {
-        const randomIndex = Math.floor(Math.random() * hand.length);
-        const cardToShuffle = hand.splice(randomIndex, 1)[0];
+    
+    if (hand.length < count) {
+      // Not enough cards in hand to shuffle back
+      popup(`May: Not enough cards in hand to shuffle back.`);
+      return;
+    }
+    
+    // Find all Pokemon in hand
+    const pokemonInHand = [];
+    for (const card of hand) {
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (meta.category === 'Pokemon') {
+          pokemonInHand.push(card);
+        }
+      } catch {}
+    }
+    
+    if (pokemonInHand.length < count) {
+      popup(`May: Not enough Pokémon in hand to shuffle back.`);
+      return;
+    }
+    
+    popup(`May: Choose ${count} Pokémon from hand to shuffle back into deck.`);
+    
+    // Set up selection system similar to Pokemon Communication
+    globalThis.__maySelectionActive = true;
+    globalThis.__maySelection = {
+      pk,
+      owner,
+      hand,
+      pokemonInHand,
+      count,
+      selected: []
+    };
+    
+    // Render hand to show glowing cards
+    if (globalThis.renderAllHands) {
+      globalThis.renderAllHands();
+    }
+    
+    // Wait for user to select cards
+    const selectedCards = await new Promise((resolve) => {
+      globalThis.__mayResolve = resolve;
+    });
+    
+    // Clean up
+    globalThis.__maySelectionActive = false;
+    globalThis.__maySelection = null;
+    globalThis.__mayResolve = null;
+    
+    if (!selectedCards || selectedCards.length !== count) {
+      popup(`May: Selection cancelled or incomplete.`);
+      // Re-render hand to remove glow
+      if (globalThis.renderAllHands) globalThis.renderAllHands();
+      return;
+    }
+    
+    // Shuffle selected cards back into deck
+    for (const card of selectedCards) {
+      const handIndex = hand.findIndex(c => 
+        c.set === card.set && (c.number || c.num) === (card.number || card.num)
+      );
+      if (handIndex !== -1) {
+        const cardToShuffle = hand.splice(handIndex, 1)[0];
         deck.push(cardToShuffle);
       }
+    }
+    
+    // Update global state
+    if (globalThis.playerState?.[owner]) {
+      globalThis.playerState[owner].hand = hand;
+      globalThis.playerState[owner].deck = deck;
     }
     
     shuffleDeckAndAnimate(state, pk);
     if (globalThis.renderAllHands) globalThis.renderAllHands();
     if (globalThis.updateDeckBubbles) globalThis.updateDeckBubbles();
     
-    popup(`May: Added ${chosen.length} Pokémon to hand!`);
+    popup(`May: Shuffled ${selectedCards.length} Pokémon back into deck!`);
   },
 
   // Search basic Pokemon with HP limit
@@ -4509,6 +4642,74 @@ const TRAINER_EFFECTS = {
       toolPokemon.dataset.healIfHalfHp = String(amount);
       console.log(`[heal_if_half_hp_tool] Sitrus Berry active - will heal ${amount} at end of turn if HP <= half`);
     }
+  },
+
+  // Shuffle hand, draw equal to opponent's hand (Copycat)
+  shuffle_hand_draw_match_opponent: async (state, pk, { param1, param2 }) => {
+    const opp = oppPk(pk);
+    const owner = pk === 'p1' ? 'player1' : 'player2';
+    const oppOwner = opp === 'p1' ? 'player1' : 'player2';
+    
+    // Get opponent's hand size from playerState (the actual game state) - get it fresh
+    const oppHandSize = (globalThis.playerState?.[oppOwner]?.hand || []).length;
+    
+    console.log(`[Copycat] Opponent hand size: ${oppHandSize}`);
+    
+    // Get your hand and deck from playerState
+    const myHand = [...(globalThis.playerState?.[owner]?.hand || [])]; // Copy array
+    const myDeck = globalThis.playerState?.[owner]?.deck || [];
+    
+    if (myHand.length === 0) {
+      popup('No cards in hand to shuffle.');
+      return;
+    }
+    
+    // Add all hand cards to deck
+    for (const card of myHand) {
+      myDeck.push(card);
+    }
+    
+    // Clear hand
+    globalThis.playerState[owner].hand = [];
+    
+    // Shuffle deck using shuffleArray function
+    shuffleArray(myDeck);
+    
+    // Trigger shuffle animation
+    if (globalThis.animateDeckShuffle) {
+      globalThis.animateDeckShuffle(owner);
+    }
+    
+    // Update state references BEFORE drawing (so drawCards sees the updated deck)
+    state[pk].hand = globalThis.playerState[owner].hand;
+    state[pk].deck = globalThis.playerState[owner].deck;
+    
+    // Draw cards equal to opponent's hand size
+    if (globalThis.drawCards) {
+      console.log(`[Copycat] Calling drawCards with count: ${oppHandSize}`);
+      await globalThis.drawCards(state, pk, oppHandSize);
+      console.log(`[Copycat] After drawCards, hand size: ${globalThis.playerState[owner].hand.length}`);
+    } else {
+      // Manual draw
+      for (let i = 0; i < oppHandSize && myDeck.length > 0; i++) {
+        const card = myDeck.shift();
+        if (card) {
+          globalThis.playerState[owner].hand.push(card);
+        }
+      }
+    }
+    
+    // Update state references again (for consistency)
+    state[pk].hand = globalThis.playerState[owner].hand;
+    state[pk].deck = globalThis.playerState[owner].deck;
+    state[opp].hand = globalThis.playerState[oppOwner].hand;
+    
+    const actualDrawn = globalThis.playerState[owner].hand.length;
+    popup(`Copycat: Shuffled hand into deck, drew ${actualDrawn} card(s) (opponent has ${oppHandSize} cards)!`);
+    
+    // Update UI
+    if (globalThis.renderAllHands) globalThis.renderAllHands();
+    if (globalThis.updateDeckBubbles) globalThis.updateDeckBubbles();
   },
 };
 
@@ -4671,6 +4872,11 @@ const MOVE_HANDLERS = {
         popup("Opponent can't use Supporters next turn!");
         break;
         
+      case 'block_items':
+        globalThis.__specialEffects[opp].itemBlock = true;
+        popup("Opponent can't use Item cards next turn!");
+        break;
+        
       case 'retreat_lock':
         globalThis.__specialEffects[opp].retreatLock = true;
         popup("Opponent can't retreat next turn!");
@@ -4803,12 +5009,42 @@ const MOVE_HANDLERS = {
   },
   
   bonus_damage_for_each_bench: async (s, pk, { param1 }, ctx) => {
-    // Count both player's and opponent's BENCHED Pokémon only (for Suicune ex - Crystal Waltz)
-    // getBenchImgs() only returns images from the bench div, not active
-    const ownBench = getBenchImgs(pk).length;
-    const oppBench = getBenchImgs(oppPk(pk)).length;
-    const totalBench = ownBench + oppBench;
-    ctx.addBonus(totalBench * parseInt10(param1));
+    // Check if this is Suicune ex Crystal Waltz (counts both benches) or other attacks (count only own bench)
+    // Suicune ex has base damage of 0 and effect text mentions "both", while others like Mega Altaria have non-zero base damage
+    const img = getActiveImg(pk);
+    let moveRow = null;
+    if (img && ctx?.moveName) {
+      await loadMoveEffects();
+      moveRow = getMoveRow(img.alt, ctx.moveName);
+    }
+    const effectText = (moveRow?.effect_text || moveRow?.text || ctx?.moveRowText || '').toLowerCase();
+    
+    // If effect text mentions "both", count both benches (Suicune ex - Crystal Waltz)
+    // Otherwise, count only own bench (Mega Altaria ex - Mega Harmony, etc.)
+    const countBoth = effectText.includes('both');
+    
+    if (countBoth) {
+      // Count both player's and opponent's BENCHED Pokémon (for Suicune ex - Crystal Waltz)
+      const ownBench = getBenchImgs(pk).length;
+      const oppBench = getBenchImgs(oppPk(pk)).length;
+      const totalBench = ownBench + oppBench;
+      ctx.addBonus(totalBench * parseInt10(param1));
+      console.log(`[bonus_damage_for_each_bench] Suicune ex: ${totalBench} total bench × ${param1} = +${totalBench * parseInt10(param1)}`);
+    } else {
+      // Count only own benched Pokémon (for Mega Altaria ex - Mega Harmony, etc.)
+      // Filter to only count actual Pokemon images (those with set/num attributes)
+      const benchImgs = getBenchImgs(pk).filter(img => 
+        img && 
+        img.alt && 
+        img.dataset.set && 
+        img.dataset.num
+      );
+      const ownBench = benchImgs.length;
+      const bonus = ownBench * parseInt10(param1);
+      ctx.addBonus(bonus);
+      console.log(`[bonus_damage_for_each_bench] Own bench only: ${ownBench} bench × ${param1} = +${bonus}`);
+      console.log(`[bonus_damage_for_each_bench] Bench Pokemon:`, benchImgs.map(img => img.alt));
+    }
   },
   
   bonus_damage_for_each_typed_bench: async (s, pk, { param1, param2 }, ctx) => {
@@ -5301,14 +5537,24 @@ const MOVE_HANDLERS = {
     const candidates = [];
     const opp = oppPk(pk);
     
+    // Check if the move description specifies "Benched Pokémon" (bench-only targeting)
+    const moveRow = ctx?.moveRow;
+    const effectText = (moveRow?.effect_text || moveRow?.text || ctx?.moveRowText || '').toLowerCase();
+    const isBenchOnly = effectText.includes('benched') || effectText.includes('bench');
+    
     // In Pokemon TCG Pocket, attacks that say "1 of your opponent's Pokémon"
-    // can target BOTH active and bench Pokemon
+    // can target BOTH active and bench Pokemon UNLESS the text specifically says "Benched Pokémon"
     if (mode === 'opponent') {
-      // Include active Pokemon
-      const activeImg = getActiveImg(opp);
-      if (activeImg) candidates.push(activeImg);
-      // Include bench Pokemon
-      candidates.push(...getBenchImgs(opp));
+      if (isBenchOnly) {
+        // Explicit bench-only targeting (e.g., Absol's "Leap Over")
+        candidates.push(...getBenchImgs(opp));
+      } else {
+        // Include active Pokemon
+        const activeImg = getActiveImg(opp);
+        if (activeImg) candidates.push(activeImg);
+        // Include bench Pokemon
+        candidates.push(...getBenchImgs(opp));
+      }
     } else if (mode === 'active') {
       // Explicit active-only targeting
       const img = getActiveImg(opp);
@@ -6285,9 +6531,20 @@ const MOVE_HANDLERS = {
     const moveName = ctx.moveName || 'Attack';
     popup(`${moveName} hit: ${summary}`);
     
-    // Set damage to 0 since all damage is applied directly to random targets
-    // No damage should be applied to the active Pokemon through normal flow
-    ctx.setOverride(0);
+    // Check if this attack has base damage that should go to active Pokemon
+    // If base damage is 0 (like Draco Meteor), override to 0
+    // If base damage > 0 (like Mega Ampharos ex), preserve it for active Pokemon
+    // Reuse moveRow that was already fetched earlier in the function
+    const csvBaseDamage = parseInt(moveRow?.damageBase || moveRow?.damage || '0', 10);
+    if (csvBaseDamage === 0) {
+      // Set damage to 0 since all damage is applied directly to random targets
+      // No damage should be applied to the active Pokemon through normal flow
+      ctx.setOverride(0);
+    } else {
+      // Preserve base damage for active Pokemon (e.g., Mega Ampharos ex has 100 base)
+      // The base damage will be applied to active Pokemon in the normal damage flow
+      console.log(`[random_multi_target_damage] Preserving base damage ${csvBaseDamage} for active Pokemon`);
+    }
   },
   
   // Aerodactyl's Primal Wingbeat - NOW IMPLEMENTED ✅
@@ -8835,6 +9092,8 @@ const MOVE_HANDLERS = {
     const activeImg = getActiveImg(pk);
     if (!activeImg) return;
     
+    const owner = pk === 'p1' ? 'player1' : 'player2';
+    
     // Find evolution in deck
     const deck = s[pk]?.deck || [];
     const evolutionCards = [];
@@ -8842,11 +9101,13 @@ const MOVE_HANDLERS = {
     for (const card of deck) {
       try {
         const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
-        if (meta.category === 'Pokemon' && meta.evolvesFrom) {
-          const evolvesFrom = meta.evolvesFrom.toLowerCase();
+        // Check both evolveFrom and evolvesFrom (API might use either)
+        const evolveFrom = (meta.evolveFrom || meta.evolvesFrom || '').toLowerCase();
+        if (meta.category === 'Pokemon' && evolveFrom) {
           const currentName = (activeImg.alt || '').toLowerCase();
-          if (evolvesFrom === currentName || currentName.includes(evolvesFrom)) {
-            evolutionCards.push(card);
+          // Check if this card evolves from the current Pokemon
+          if (evolveFrom === currentName || currentName.includes(evolveFrom) || evolveFrom.includes(currentName)) {
+            evolutionCards.push({ card, meta });
           }
         }
       } catch {}
@@ -8859,15 +9120,34 @@ const MOVE_HANDLERS = {
     
     // Pick random evolution
     const chosen = evolutionCards[Math.floor(Math.random() * evolutionCards.length)];
+    const chosenCard = chosen.card;
+    const chosenMeta = chosen.meta;
     
     // Remove from deck
-    const index = deck.findIndex(c => c.set === chosen.set && (c.number || c.num) === (chosen.number || chosen.num));
+    const index = deck.findIndex(c => c.set === chosenCard.set && (c.number || c.num) === (chosenCard.number || chosenCard.num));
     if (index !== -1) deck.splice(index, 1);
     
-    // Evolve
-    if (globalThis.evolvePokemon) {
-      globalThis.evolvePokemon(activeImg, chosen);
-      popup(`Auto-evolved into ${chosen.name}!`);
+    // Update both local state and global state
+    if (s[pk]) {
+      s[pk].deck = deck;
+    }
+    if (globalThis.playerState?.[owner]) {
+      globalThis.playerState[owner].deck = deck;
+    }
+    
+    // Evolve using evolveCard function (same as manual evolution)
+    if (globalThis.evolveCard) {
+      await globalThis.evolveCard(
+        activeImg,
+        chosenMeta,
+        chosenCard,
+        owner,
+        chosenCard.set,
+        chosenCard.number || chosenCard.num
+      );
+      popup(`Auto-evolved into ${chosenMeta.name}!`);
+    } else {
+      popup('Evolution function not available.');
     }
   },
 
@@ -9731,6 +10011,7 @@ const MOVE_HANDLERS = {
     
     const count = parseInt10(param1, 1);
     const opp = oppPk(pk);
+    const oppOwner = opp === 'p1' ? 'player1' : 'player2';
     const deck = s[opp]?.deck || [];
     
     if (deck.length === 0) {
@@ -9739,7 +10020,65 @@ const MOVE_HANDLERS = {
     }
     
     const discarded = deck.splice(0, count);
+    
+    // Add discarded cards to opponent's discard pile
+    for (const card of discarded) {
+      // Get card metadata to ensure we have name and src
+      let cardName = card.name;
+      let cardSrc = card.src;
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (!cardName) cardName = meta.name || 'Unknown';
+        if (!cardSrc) {
+          const padded = String(card.number || card.num).padStart(3, '0');
+          cardSrc = `https://assets.tcgdx.net/en/tcgp/${card.set}/${padded}/high.png`;
+        }
+      } catch (e) {
+        console.error('[discard_top_opponent_deck] Error fetching meta for discarded card:', e);
+        if (!cardName) cardName = 'Unknown';
+        if (!cardSrc) {
+          const padded = String(card.number || card.num).padStart(3, '0');
+          cardSrc = `https://assets.tcgdx.net/en/tcgp/${card.set}/${padded}/high.png`;
+        }
+      }
+      
+      // Create discard card object with all required properties
+      const discardCard = {
+        set: card.set,
+        num: card.number || card.num,
+        number: card.number || card.num,
+        name: cardName,
+        src: cardSrc
+      };
+      
+      // Add to discard pile
+      if (s[opp]) {
+        if (!s[opp].discard) s[opp].discard = { cards: [] };
+        if (!s[opp].discard.cards) s[opp].discard.cards = [];
+        s[opp].discard.cards.push(discardCard);
+      }
+      
+      if (globalThis.playerState?.[oppOwner]) {
+        if (!globalThis.playerState[oppOwner].discard) {
+          globalThis.playerState[oppOwner].discard = { cards: [], energyCounts: {} };
+        }
+        if (!globalThis.playerState[oppOwner].discard.cards) {
+          globalThis.playerState[oppOwner].discard.cards = [];
+        }
+        globalThis.playerState[oppOwner].discard.cards.push(discardCard);
+      }
+    }
+    
+    // Update UI
+    if (globalThis.renderDiscard) {
+      globalThis.renderDiscard(oppOwner);
+    }
+    if (globalThis.updateDeckBubbles) {
+      globalThis.updateDeckBubbles();
+    }
+    
     popup(`Discarded ${discarded.length} card(s) from opponent's deck!`);
+    console.log('[discard_top_opponent_deck] Discarded', discarded.length, 'cards to', oppOwner, 'discard pile');
   },
 
   // ========================================
@@ -10603,28 +10942,221 @@ const MOVE_HANDLERS = {
   reveal_discard_supporter: async (s, pk, { param1 }, ctx) => {
     if (!ctx.isFinal) return;
     
-    const owner = pk === 'p1' ? 'player1' : 'player2';
-    const discard = globalThis.playerState?.[owner]?.discard?.cards || [];
+    // This effect reveals the OPPONENT's hand and discards a Supporter from there
+    // (e.g., Mega Absol ex's "Darkness Claw")
+    const opp = oppPk(pk);
+    const oppOwner = opp === 'p1' ? 'player1' : 'player2';
     
-    // Find supporter cards
+    // Try to get hand from both state object and globalThis.playerState
+    let hand = s[opp]?.hand || globalThis.playerState?.[oppOwner]?.hand || [];
+    
+    console.log('[reveal_discard_supporter] Opponent hand size:', hand.length);
+    console.log('[reveal_discard_supporter] Opponent:', opp, 'Owner:', oppOwner);
+    
+    if (hand.length === 0) {
+      popup('Opponent has no cards in hand.');
+      return;
+    }
+    
+    // Find supporter cards in opponent's hand
     const supporters = [];
-    for (const card of discard) {
+    for (const card of hand) {
       try {
         const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
         if (meta.category === 'Trainer' && meta.trainerType === 'Supporter') {
           supporters.push(card);
         }
-      } catch {}
+      } catch (e) {
+        console.error('[reveal_discard_supporter] Error fetching meta for card:', card, e);
+      }
     }
     
     if (supporters.length === 0) {
-      popup('No Supporter cards in discard pile.');
+      popup('Opponent has no Supporter cards in hand.');
       return;
     }
     
-    // Show supporters
-    const names = supporters.map(c => c.name || 'Unknown').join(', ');
-    popup(`Revealed Supporters: ${names}`);
+    // Reveal opponent's hand temporarily by rendering it without hiding
+    const oppHandDivId = oppOwner === 'player1' ? 'p1Hand' : 'p2Hand';
+    const oppHandDiv = document.getElementById(oppHandDivId);
+    
+    // Store original hide state
+    const originalHide = oppOwner === 'player1' ? 
+      (typeof currentPlayer !== 'undefined' && currentPlayer === 'player2') :
+      (typeof currentPlayer !== 'undefined' && currentPlayer === 'player1');
+    
+    // Temporarily reveal the opponent's hand
+    if (oppHandDiv && globalThis.renderHand) {
+      globalThis.renderHand(oppHandDiv, hand, false, false);
+      // Remove disable-clicks class to allow clicking
+      oppHandDiv.classList.remove('disable-clicks');
+    }
+    
+    // Show popup
+    popup(`Opponent's hand revealed. Choose a Supporter card to discard.`);
+    
+    // Wait a moment for the hand to render
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Create temporary card elements for selection (only Supporters)
+    const supporterElements = [];
+    if (oppHandDiv) {
+      const allCards = oppHandDiv.querySelectorAll('.card-img');
+      console.log(`[Darkness Claw] Found ${allCards.length} cards in opponent's hand`);
+      for (const cardEl of allCards) {
+        const cardSet = cardEl.dataset.set;
+        const cardNum = cardEl.dataset.num;
+        console.log(`[Darkness Claw] Checking card: ${cardSet}-${cardNum}`);
+        // Check if this card is a Supporter
+        const isSupporter = supporters.some(c => 
+          c.set === cardSet && String(c.number || c.num) === String(cardNum)
+        );
+        if (isSupporter) {
+          supporterElements.push(cardEl);
+          cardEl.classList.add('heal-glow'); // Highlight Supporter cards
+          console.log(`[Darkness Claw] Added Supporter to selection: ${cardSet}-${cardNum}`);
+        }
+      }
+    }
+    
+    console.log(`[Darkness Claw] Found ${supporterElements.length} Supporter elements to select from`);
+    
+    if (supporterElements.length === 0) {
+      // Fallback: if we can't find the elements, try to use renderAllHands and try again
+      if (globalThis.renderAllHands) {
+        globalThis.renderAllHands();
+        await new Promise(resolve => setTimeout(resolve, 200));
+        const allCards = oppHandDiv?.querySelectorAll('.card-img') || [];
+        for (const cardEl of allCards) {
+          const cardSet = cardEl.dataset.set;
+          const cardNum = cardEl.dataset.num;
+          const isSupporter = supporters.some(c => 
+            c.set === cardSet && String(c.number || c.num) === String(cardNum)
+          );
+          if (isSupporter) {
+            supporterElements.push(cardEl);
+            cardEl.classList.add('heal-glow');
+          }
+        }
+      }
+      
+      if (supporterElements.length === 0) {
+        popup(`No Supporter cards found in opponent's hand.`);
+        // Re-hide opponent's hand
+        if (oppHandDiv && globalThis.renderHand) {
+          globalThis.renderHand(oppHandDiv, hand, originalHide, false);
+        } else if (globalThis.renderAllHands) {
+          globalThis.renderAllHands();
+        }
+        return;
+      }
+    }
+    
+    // Set a flag to allow clicking opponent's hand during selection
+    globalThis.__darknessClawSelectionActive = true;
+    
+    // Let player choose a Supporter card
+    const chosenEl = await awaitSelection(supporterElements, 'heal-glow');
+    
+    // Clear the flag
+    globalThis.__darknessClawSelectionActive = false;
+    
+    // Re-hide opponent's hand and restore disable-clicks
+    if (oppHandDiv && globalThis.renderHand) {
+      globalThis.renderHand(oppHandDiv, hand, originalHide, false);
+      // Restore disable-clicks if it should be disabled
+      const shouldDisable = oppOwner === 'player1' ? 
+        (typeof currentPlayer !== 'undefined' && currentPlayer === 'player2') :
+        (typeof currentPlayer !== 'undefined' && currentPlayer === 'player1');
+      if (shouldDisable) {
+        oppHandDiv.classList.add('disable-clicks');
+      }
+    } else if (globalThis.renderAllHands) {
+      globalThis.renderAllHands();
+    }
+    
+    if (!chosenEl) {
+      popup('No Supporter chosen.');
+      return;
+    }
+    
+    // Find the card in the hand array
+    const chosenSet = chosenEl.dataset.set;
+    const chosenNum = chosenEl.dataset.num;
+    const handIndex = hand.findIndex(c => 
+      c.set === chosenSet && String(c.number || c.num) === String(chosenNum)
+    );
+    
+    if (handIndex === -1) {
+      popup('Error: Could not find chosen card.');
+      return;
+    }
+    
+    // Remove chosen Supporter from hand
+    const removed = hand.splice(handIndex, 1)[0];
+    
+    // Get card metadata to ensure we have name and src
+    let cardName = removed.name;
+    let cardSrc = removed.src;
+    try {
+      const meta = await globalThis.fetchCardMeta(removed.set, removed.number || removed.num);
+      if (!cardName) cardName = meta.name || 'Unknown';
+      if (!cardSrc) {
+        const padded = String(removed.number || removed.num).padStart(3, '0');
+        cardSrc = `https://assets.tcgdx.net/en/tcgp/${removed.set}/${padded}/high.png`;
+      }
+    } catch (e) {
+      console.error('[reveal_discard_supporter] Error fetching meta for discarded card:', e);
+      if (!cardName) cardName = 'Unknown';
+      if (!cardSrc) {
+        const padded = String(removed.number || removed.num).padStart(3, '0');
+        cardSrc = `https://assets.tcgdx.net/en/tcgp/${removed.set}/${padded}/high.png`;
+      }
+    }
+    
+    // Create discard card object with all required properties
+    const discardCard = {
+      set: removed.set,
+      num: removed.number || removed.num,
+      number: removed.number || removed.num,
+      name: cardName,
+      src: cardSrc
+    };
+    
+    // Update both state object and globalThis.playerState
+    if (s[opp]) {
+      s[opp].hand = hand;
+      if (!s[opp].discard) s[opp].discard = { cards: [] };
+      if (!s[opp].discard.cards) s[opp].discard.cards = [];
+      s[opp].discard.cards.push(discardCard);
+    }
+    
+    if (globalThis.playerState?.[oppOwner]) {
+      globalThis.playerState[oppOwner].hand = hand;
+      // Ensure discard structure exists
+      if (!globalThis.playerState[oppOwner].discard) {
+        globalThis.playerState[oppOwner].discard = { cards: [], energyCounts: {} };
+      }
+      if (!globalThis.playerState[oppOwner].discard.cards) {
+        globalThis.playerState[oppOwner].discard.cards = [];
+      }
+      globalThis.playerState[oppOwner].discard.cards.push(discardCard);
+    }
+    
+    // Update UI
+    if (globalThis.renderAllHands) {
+      globalThis.renderAllHands();
+    }
+    if (globalThis.renderDiscard) {
+      globalThis.renderDiscard(oppOwner);
+    }
+    if (globalThis.updateDeckBubbles) {
+      globalThis.updateDeckBubbles();
+    }
+    
+    popup(`Discarded ${cardName} from opponent's hand!`);
+    console.log('[reveal_discard_supporter] Successfully discarded:', cardName);
+    console.log('[reveal_discard_supporter] Discard pile now has', globalThis.playerState[oppOwner].discard.cards.length, 'cards');
   },
 
   // Reveal hand shuffle card
@@ -11040,10 +11572,17 @@ async function applyMoveEffect(state, pk, attackName, baseDamage, ctx = {}) {
   const multiplier = ctx.multiplier || 1;
   let totalBonuses = 0; // Track bonuses separately for multiplicative attacks
   
-  // 🆕 For attacks that only do damage based on benched Pokémon (bonus_damage_for_each_bench), base damage should be 0
+  // 🆕 For attacks that only do damage based on benched Pokémon (bonus_damage_for_each_bench), 
+  // base damage should be 0 ONLY if the CSV shows base damage of 0 (like Suicune ex)
+  // Mega Altaria ex has base damage of 40, so we should preserve it
   // This must be checked BEFORE setting damage = baseDamage to prevent the CSV's damageBase from being used
   if (row?.effect_type === 'bonus_damage_for_each_bench') {
-    baseDamage = 0;
+    const csvBaseDamage = parseInt10(row?.damageBase || row?.damage || 0);
+    // Only set to 0 if CSV shows 0 base damage (Suicune ex case)
+    if (csvBaseDamage === 0) {
+      baseDamage = 0;
+    }
+    // Otherwise, preserve the base damage (Mega Altaria ex has 40 base)
   }
   
   // For Energy Crush (bonus_damage_per_energy_on_opponent_all), base damage should be 0
@@ -11051,10 +11590,17 @@ async function applyMoveEffect(state, pk, attackName, baseDamage, ctx = {}) {
     baseDamage = 0;
   }
   
-  // For random_multi_target_damage (Draco Meteor), base damage should be 0
-  // All damage is applied directly to random targets, not the active Pokemon
+  // For random_multi_target_damage, check CSV damageBase
+  // Draco Meteor has 0 base damage (all damage to random targets)
+  // Mega Ampharos ex has 100 base damage (100 to active + 20x3 to random benched)
   if (row?.effect_type === 'random_multi_target_damage') {
-    baseDamage = 0;
+    const csvBaseDamage = parseInt(row?.damageBase || row?.damage || '0', 10);
+    if (csvBaseDamage === 0) {
+      baseDamage = 0; // Attacks like Draco Meteor have 0 base damage
+    } else {
+      // Preserve base damage from CSV (e.g., Mega Ampharos ex has 100 base)
+      baseDamage = csvBaseDamage;
+    }
   }
   
   let damage = baseDamage;
@@ -11127,6 +11673,7 @@ async function applyMoveEffect(state, pk, attackName, baseDamage, ctx = {}) {
     damage,  // 🆕 Add damage to context for new A3a/A3b effects
     moveName: attackName,  // 🆕 Add move name for tracking effects
     moveRowText: row?.effect_text || row?.text || '',  // 🆕 Add move row text for cant_attack_next_turn handler (CSV field is effect_text)
+    moveRow: row,  // 🆕 Add move row for handlers that need CSV data
     isFinal,
     rawCtx: ctx,
     isMultiplicative: isMultiplicative,  // 🆕 Pass multiplicative flag to handlers
@@ -13260,8 +13807,21 @@ const ABILITY_HANDLERS = {
   // Attach energy from zone with self damage
   attach_energy_from_zone_self_damage: async (s, pk, { param1, param2 }, ctx) => {
     const energyType = (param1 || 'darkness').toLowerCase();
-    const count = parseInt10(param2, 2);
-    const selfDamage = parseInt10(ctx?.selfDamage || 30, 30);
+    // param2 is the damage amount (30), not the count
+    // The count should be parsed from the ability description or default to 2
+    // For "Roar in Unison", it always attaches 2 energy
+    const abilityRow = ctx?.abilityRow;
+    const abilityText = (abilityRow?.effect_text || abilityRow?.text || ctx?.abilityText || '').toLowerCase();
+    
+    // Try to parse count from text (e.g., "take 2 {D} Energy")
+    let count = 2; // Default to 2 for Roar in Unison
+    const countMatch = abilityText.match(/take\s+(\d+)\s+/i) || abilityText.match(/(\d+)\s+energy/i);
+    if (countMatch) {
+      count = parseInt10(countMatch[1], 2);
+    }
+    
+    // param2 is the damage amount
+    const selfDamage = parseInt10(param2 || ctx?.selfDamage || 30, 30);
     const abilityPokemon = ctx?.sourceImg || ctx?.abilityPokemon || getActiveImg(pk);
     
     if (!abilityPokemon) {
@@ -13347,6 +13907,7 @@ const ABILITY_HANDLERS = {
   discard_top_opponent_deck: async (s, pk, { param1 }, ctx) => {
     const count = parseInt10(param1, 1);
     const opp = oppPk(pk);
+    const oppOwner = opp === 'p1' ? 'player1' : 'player2';
     const deck = s[opp]?.deck || [];
     
     if (deck.length === 0) {
@@ -13355,8 +13916,65 @@ const ABILITY_HANDLERS = {
     }
     
     const discarded = deck.splice(0, count);
+    
+    // Add discarded cards to opponent's discard pile
+    for (const card of discarded) {
+      // Get card metadata to ensure we have name and src
+      let cardName = card.name;
+      let cardSrc = card.src;
+      try {
+        const meta = await globalThis.fetchCardMeta(card.set, card.number || card.num);
+        if (!cardName) cardName = meta.name || 'Unknown';
+        if (!cardSrc) {
+          const padded = String(card.number || card.num).padStart(3, '0');
+          cardSrc = `https://assets.tcgdx.net/en/tcgp/${card.set}/${padded}/high.png`;
+        }
+      } catch (e) {
+        console.error('[Slow Sear] Error fetching meta for discarded card:', e);
+        if (!cardName) cardName = 'Unknown';
+        if (!cardSrc) {
+          const padded = String(card.number || card.num).padStart(3, '0');
+          cardSrc = `https://assets.tcgdx.net/en/tcgp/${card.set}/${padded}/high.png`;
+        }
+      }
+      
+      // Create discard card object with all required properties
+      const discardCard = {
+        set: card.set,
+        num: card.number || card.num,
+        number: card.number || card.num,
+        name: cardName,
+        src: cardSrc
+      };
+      
+      // Add to discard pile
+      if (s[opp]) {
+        if (!s[opp].discard) s[opp].discard = { cards: [] };
+        if (!s[opp].discard.cards) s[opp].discard.cards = [];
+        s[opp].discard.cards.push(discardCard);
+      }
+      
+      if (globalThis.playerState?.[oppOwner]) {
+        if (!globalThis.playerState[oppOwner].discard) {
+          globalThis.playerState[oppOwner].discard = { cards: [], energyCounts: {} };
+        }
+        if (!globalThis.playerState[oppOwner].discard.cards) {
+          globalThis.playerState[oppOwner].discard.cards = [];
+        }
+        globalThis.playerState[oppOwner].discard.cards.push(discardCard);
+      }
+    }
+    
+    // Update UI
+    if (globalThis.renderDiscard) {
+      globalThis.renderDiscard(oppOwner);
+    }
+    if (globalThis.updateDeckBubbles) {
+      globalThis.updateDeckBubbles();
+    }
+    
     popup(`Slow Sear: Discarded ${discarded.length} card(s) from opponent's deck!`);
-    console.log('[Slow Sear] Discarded:', discarded.map(c => c.name));
+    console.log('[Slow Sear] Discarded:', discarded.map(c => c.name || 'Unknown'));
   },
 
   // Flip force switch opponent basic
@@ -13811,7 +14429,9 @@ async function applyAbilityEffect(state, pk, row, context = {}) {
   if (!handler) { popup(`"${row.abilityName}" not implemented.`); return; }
   
   try {
-    const result = await handler(state, pk, { param1: row.param1, param2: row.param2 }, context);
+    // Pass the ability row in the context so handlers can access effect_text, etc.
+    const handlerContext = { ...context, abilityRow: row, abilityText: row.effect_text || row.text || '' };
+    const result = await handler(state, pk, { param1: row.param1, param2: row.param2 }, handlerContext);
     const img = context.abilityPokemon || getActiveImg(pk);
     globalThis.addLog?.(pk, `used <b>${row.abilityName}</b>`, img?.src, { name: img?.alt });
     return result;  // Return result from handler
@@ -13823,6 +14443,7 @@ async function applyAbilityEffect(state, pk, row, context = {}) {
 }
 
 globalThis.applyAbilityEffectFromCsv = applyAbilityEffect;
+globalThis.damageImg = damageImg;
 globalThis.ensureAbilityEffectsLoaded = loadAbilityEffects;
 globalThis.getAbilityRowForCard = getAbilityRow;
 globalThis.ABILITY_EFFECT_ROWS = abilityEffectRows;
@@ -13900,13 +14521,61 @@ globalThis.clearTurnEffects = function(state, pk) {
   }
   
   // Clear special effects for opponent (they were affected during this turn)
-  // BUT preserve attackLock - it needs to persist until the locked turn ends
+  // BUT preserve effects that should persist until the opponent's next turn ends:
+  // - attackLock: persists until the locked turn ends
+  // - itemBlock: persists until opponent's next turn ends (Chingling, etc.)
+  // - supporterBlock: persists until opponent's next turn ends
+  // - retreatLock: persists until opponent's next turn ends
+  // 
+  // IMPORTANT: When clearTurnEffects(pk) is called, pk is the player whose turn JUST ENDED.
+  // So if pk='p1', that means P1's turn just ended, and we're clearing effects for P2 (the opponent).
+  // We should preserve itemBlock/supporterBlock/retreatLock for P2 because their turn hasn't happened yet.
+  // These will be cleared when clearTurnEffects('p2') is called (at the end of P2's turn).
   const oppPk = pk === 'p1' ? 'p2' : 'p1';
   const attackLock = globalThis.__specialEffects?.[oppPk]?.attackLock;
+  const itemBlock = globalThis.__specialEffects?.[oppPk]?.itemBlock;
+  const supporterBlock = globalThis.__specialEffects?.[oppPk]?.supporterBlock;
+  const retreatLock = globalThis.__specialEffects?.[oppPk]?.retreatLock;
+  
+  // Always preserve itemBlock, supporterBlock, and retreatLock here
+  // They will be cleared when clearTurnEffects(oppPk) is called (at the end of opponent's turn)
+  if (itemBlock || supporterBlock || retreatLock) {
+    console.log(`[turn-cleanup] Preserving opponent effects for ${oppPk} (will be active during their next turn):`, { itemBlock, supporterBlock, retreatLock });
+  }
+  
   globalThis.clearSpecialEffects(oppPk);
-  // Restore attackLock if it exists (it should persist until the locked turn ends)
-  if (attackLock && globalThis.__specialEffects?.[oppPk]) {
-    globalThis.__specialEffects[oppPk].attackLock = attackLock;
+  
+  // Restore effects that should persist
+  if (globalThis.__specialEffects?.[oppPk]) {
+    if (attackLock) {
+      globalThis.__specialEffects[oppPk].attackLock = attackLock;
+    }
+    // Always preserve itemBlock, supporterBlock, and retreatLock here
+    // They will be cleared when the opponent's turn ends (in clearTurnEffects when oppPk's turn ends)
+    if (itemBlock) {
+      globalThis.__specialEffects[oppPk].itemBlock = itemBlock;
+    }
+    if (supporterBlock) {
+      globalThis.__specialEffects[oppPk].supporterBlock = supporterBlock;
+    }
+    if (retreatLock) {
+      globalThis.__specialEffects[oppPk].retreatLock = retreatLock;
+    }
+  }
+  
+  // 🆕 Clear itemBlock, supporterBlock, and retreatLock for the CURRENT player (pk)
+  // These were active during their turn, now clear them at the end of their turn
+  const currentItemBlock = globalThis.__specialEffects?.[pk]?.itemBlock;
+  const currentSupporterBlock = globalThis.__specialEffects?.[pk]?.supporterBlock;
+  const currentRetreatLock = globalThis.__specialEffects?.[pk]?.retreatLock;
+  
+  if (currentItemBlock || currentSupporterBlock || currentRetreatLock) {
+    console.log(`[turn-cleanup] Clearing effects for ${pk} (their turn ended):`, { itemBlock: currentItemBlock, supporterBlock: currentSupporterBlock, retreatLock: currentRetreatLock });
+    if (globalThis.__specialEffects?.[pk]) {
+      delete globalThis.__specialEffects[pk].itemBlock;
+      delete globalThis.__specialEffects[pk].supporterBlock;
+      delete globalThis.__specialEffects[pk].retreatLock;
+    }
   }
   
   // Clear damage reduction for opponent (Blue supporter effect)

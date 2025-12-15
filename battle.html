@@ -9402,24 +9402,48 @@ function clearGlow(){
 }
 
 async function evolveCard(target,meta,handCard,owner,set,num){
-  if(globalThis.turnNumber<=2){
-    showPopup('You can’t evolve during the first two turns.');
-    clearGlow();
-    return;
-  }
-  const playedTurn=parseInt(target.dataset.playedTurn||'0',10);
-  if(playedTurn===globalThis.turnNumber){
-    showPopup('Can’t evolve the turn it was played.');
-    clearGlow();
-    return;
-  }
-
-  // 🆕 A3a - Check if Aerodactyl ex is blocking evolution of active Pokemon
   const pk = owner === 'player1' ? 'p1' : 'p2';
   const oppPk = pk === 'p1' ? 'p2' : 'p1';
   const activeDiv = owner === 'player1' ? p1Active : p2Active;
   const activeImg = activeDiv?.querySelector('img');
   const isTargetActive = target === activeImg;
+  
+  // 🆕 B1 Eevee - Boosted Evolution: Check if this Pokemon has the ability and is in active slot
+  let hasBoostedEvolution = false;
+  if (isTargetActive) {
+    const cacheKey = `${target.dataset.set}-${target.dataset.num}`;
+    const numPadded = String(target.dataset.num || '').padStart(3, '0');
+    const numUnpadded = String(parseInt(target.dataset.num || '0', 10));
+    const abilityRow = globalThis.abilityCache?.[cacheKey] || 
+                      globalThis.abilityCache?.[`${target.dataset.set}-${numPadded}`] || 
+                      globalThis.abilityCache?.[`${target.dataset.set}-${numUnpadded}`];
+    
+    if (abilityRow?.effect_type === 'allow_evolution_first_turn') {
+      hasBoostedEvolution = true;
+      console.log('[evolveCard] Boosted Evolution detected - bypassing evolution restrictions');
+    }
+  }
+  
+  // Check first two turns restriction (bypass if Boosted Evolution in active)
+  if(globalThis.turnNumber<=2){
+    if (!hasBoostedEvolution) {
+      showPopup('You cannot evolve during the first two turns.');
+      clearGlow();
+      return;
+    }
+  }
+  
+  // Check same turn restriction (bypass if Boosted Evolution in active)
+  const playedTurn=parseInt(target.dataset.playedTurn||'0',10);
+  if(playedTurn===globalThis.turnNumber){
+    if (!hasBoostedEvolution) {
+      showPopup('Cannot evolve the turn it was played.');
+      clearGlow();
+      return;
+    }
+  }
+
+  // 🆕 A3a - Check if Aerodactyl ex is blocking evolution of active Pokemon
   
   if (isTargetActive) {
     // Check if opponent has Aerodactyl ex with Primeval Law
@@ -9636,6 +9660,73 @@ function handFind(owner,set,num){
   return playerState[owner].hand.find(c=>c.set===set&&String(c.number||c.num)===String(num))||null;
 }
 
+// Function to trigger Jolteon ex's Electromagnetic Wall ability
+// This should be called whenever energy is attached to ANY Pokemon (active or bench)
+async function triggerElectromagneticWall(targetImg) {
+  if (!targetImg) return;
+  
+  try {
+    // Determine which player owns the Pokemon that received energy
+    const owner = targetImg.closest('#player1') ? 'player1' : 'player2';
+    const pk = owner === 'player1' ? 'p1' : 'p2';
+    const oppPk = pk === 'p1' ? 'p2' : 'p1';
+    
+    // Check if opponent has Jolteon ex in active spot
+    const oppActive = oppPk === 'p1' ? p1Active : p2Active;
+    const oppActiveImg = oppActive?.querySelector('img');
+    
+    if (oppActiveImg) {
+      // Try multiple cache key formats (padded and unpadded)
+      const set = oppActiveImg.dataset.set;
+      const num = oppActiveImg.dataset.num;
+      const numPadded = String(num || '').padStart(3, '0');
+      const numUnpadded = String(parseInt(num || '0', 10));
+      const cacheKey1 = `${set}-${numPadded}`;
+      const cacheKey2 = `${set}-${numUnpadded}`;
+      const cacheKey3 = `${set}-${num}`;
+      const abilityRow = globalThis.abilityCache?.[cacheKey1] || 
+                        globalThis.abilityCache?.[cacheKey2] || 
+                        globalThis.abilityCache?.[cacheKey3];
+      
+      if (abilityRow?.effect_type === 'damage_on_opponent_energy_attach') {
+        const damage = parseInt(abilityRow.param1 || '20', 10);
+        console.log(`[Electromagnetic Wall] ${oppActiveImg.alt} deals ${damage} damage to ${targetImg.alt}`);
+        
+        // Deal damage to the Pokemon that received the energy
+        const damageFn = globalThis.damageImg || window.damageImg || (typeof damageImg !== 'undefined' ? damageImg : null);
+        if (damageFn && typeof damageFn === 'function') {
+          const result = damageFn(targetImg, damage);
+          showPopup(`Electromagnetic Wall: ${oppActiveImg.alt} deals ${damage} damage to ${targetImg.alt}!`);
+          
+          // Check for knockout - ALWAYS handle knockout if HP reaches 0
+          if (result && result.knocked) {
+            console.log(`[Electromagnetic Wall] ${targetImg.alt} was knocked out!`);
+            // Check if the damaged Pokemon is active
+            const activeDiv = owner === 'player1' ? p1Active : p2Active;
+            const activeImg = activeDiv?.querySelector('img');
+            const wasActive = targetImg === activeImg;
+            
+            // Handle knockout
+            if (typeof handleKnockOut === 'function') {
+              const gameEnded = await handleKnockOut(owner, targetImg, wasActive);
+              if (!gameEnded && wasActive && typeof beginPromotionFlow === 'function') {
+                await beginPromotionFlow(owner);
+              }
+            }
+          }
+        } else {
+          console.warn('[Electromagnetic Wall] damageImg function not found');
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Electromagnetic Wall] Failed to trigger ability:', err);
+  }
+}
+
+// Expose globally
+globalThis.triggerElectromagneticWall = triggerElectromagneticWall;
+
 function attachEnergyToSlot(owner,slot,energyKey){
   if(!slot||!energyKey)return;
   const img=slot.querySelector('img');
@@ -9692,6 +9783,9 @@ function attachEnergyToSlot(owner,slot,energyKey){
         console.warn('[Komala] Failed to trigger ability:', err);
       }
     })();
+    
+    // 🆕 B1 PASSIVE ABILITY - Jolteon ex Electromagnetic Wall (damage on ANY energy attach)
+    triggerElectromagneticWall(img);
     
     hasAttachedEnergyThisTurn=true;
     renderEnergyZone();

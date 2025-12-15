@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Opening Hand Tester - Pokémon TCG Pocket</title>
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/768px-Pok%C3%A9_Ball_icon.svg.png?20161023215848"/>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: radial-gradient(circle at top, #2b2f34, #1c1f24);
+  background-attachment: fixed;
+  color: #e5e7eb;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle animated background particles */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(227, 53, 13, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(0, 116, 217, 0.1) 0%, transparent 50%);
+  animation: backgroundPulse 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+h1 {
+  text-align: center;
+  margin: 0;
+  padding: 1rem 0;
+  background: linear-gradient(135deg, #e3350d, #0074d9);
+  color: #fff;
+  font-weight: 600;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #2a2f36;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  padding: 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  color: #9ca3af;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.input-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #1e2227;
+  border-radius: 8px;
+  border: 1px solid #3f444b;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #facc15;
+}
+
+textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  background: #1e2227;
+  color: #e5e7eb;
+  border: 1px solid #3f444b;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #0074d9;
+  box-shadow: 0 0 8px rgba(0, 116, 217, 0.3);
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+input[type="number"] {
+  width: 150px;
+  padding: 10px;
+  background: #1e2227;
+  color: #e5e7eb;
+  border: 1px solid #3f444b;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: #0074d9;
+  box-shadow: 0 0 8px rgba(0, 116, 217, 0.3);
+}
+
+button {
+  display: block;
+  margin: 0.75rem auto;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #e3350d, #0074d9);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transform: translateY(0) scale(1);
+}
+
+button:hover:not(:disabled) {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,116,217,0.6), 0 8px 20px rgba(227,53,13,0.6), 0 0 30px rgba(255,255,255,0.1);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98) translateY(-1px);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.status {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status.info {
+  background: rgba(0, 116, 217, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(0, 116, 217, 0.3);
+}
+
+.status.error {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status.success {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.results-section {
+  margin-top: 30px;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e2227;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  border: 1px solid #3f444b;
+}
+
+.results-table thead {
+  background: linear-gradient(135deg, #e3350d, #0074d9);
+  color: white;
+}
+
+.results-table th,
+.results-table td {
+  padding: 12px;
+  text-align: left;
+  color: #e5e7eb;
+}
+
+.results-table th {
+  font-weight: 600;
+}
+
+.results-table tbody tr:nth-child(even) {
+  background: #2a2f36;
+}
+
+.results-table tbody tr:hover {
+  background: #3f444b;
+}
+
+.hand-combination {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.hand-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.card-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-image {
+  width: 60px;
+  height: 84px;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  background: #1e2227;
+  border: 1px solid #3f444b;
+}
+
+.card-count {
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.count {
+  text-align: center;
+  font-weight: 600;
+}
+
+.percentage {
+  text-align: center;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #1e2227;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+  border: 1px solid #3f444b;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e3350d 0%, #0074d9 100%);
+  transition: width 0.3s ease;
+  width: 0%;
+  box-shadow: 0 0 8px rgba(0, 116, 217, 0.5);
+}
+
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: #1e2227;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #3f444b;
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: 700;
+  color: #facc15;
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+}
+
+.stat-label {
+  color: #9ca3af;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div style="text-align: center; margin-bottom: 10px;">
+    <button onclick="window.location.href='index.html'" style="margin: 0; padding: 8px 16px; font-size: 14px;">← Back to Main</button>
+  </div>
+  <h1>Opening Hand Tester</h1>
+  <p class="subtitle">Test your deck's opening hand probabilities</p>
+
+  <div class="input-section">
+    <div class="input-group">
+      <label for="deckInput">Deck List (Limitless format):</label>
+      <textarea id="deckInput" placeholder="1 Pikachu A1 25
+2 Charizard A1 6
+3 Energy A1 1
+..."></textarea>
+    </div>
+    
+    <div class="input-group">
+      <label for="testCount">Number of Tests:</label>
+      <input type="number" id="testCount" value="1000" min="1" max="100000" />
+    </div>
+
+    <button id="runTests">Run Tests</button>
+    <div id="status" class="status" style="display: none;"></div>
+    <div class="progress-bar" id="progressBar" style="display: none;">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="results-section" id="resultsSection" style="display: none;">
+    <div class="results-header">
+      <h2>Results</h2>
+      <button id="exportResults">Export CSV</button>
+    </div>
+    
+    <div class="stats-summary" id="statsSummary"></div>
+    
+    <div style="overflow-x: auto;">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Hand Combination</th>
+            <th>Count</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// Inline deckparser functions to avoid CORS issues
+let pocketSets = new Set();
+let pocketSetsLoaded = false;
+let pocketSetsLoading = null;
+
+async function loadPocketSets() {
+  if (pocketSetsLoading) return pocketSetsLoading;
+  if (pocketSetsLoaded && pocketSets.size > 0) return;
+  
+  pocketSetsLoading = (async () => {
+    const res = await fetch('https://api.tcgdex.net/v2/en/series/tcgp');
+    const data = await res.json();
+    pocketSets = new Set(data.sets.map((s) => s.id));
+    pocketSetsLoaded = true;
+    pocketSetsLoading = null;
+  })();
+  
+  return pocketSetsLoading;
+}
+
+function parseDecklist(text) {
+  const pattern = /^(\d+)\s+([\wÉé'\-\s]+)\s+([A-Za-z0-9\-]+)\s+(\d+)$/;
+  const lines = text.split(/\r?\n/);
+  const cards = [];
+
+  for (const line of lines) {
+    let trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    if (trimmed.includes(":")) {
+      trimmed = trimmed.replace(":", "");
+    }
+    const match = trimmed.match(pattern);
+    if (match) {
+      const [_, qty, name, set, num] = match;
+      cards.push({
+        quantity: Number(qty),
+        name: name.trim(),
+        set: set.trim(),
+        number: num.trim(),
+      });
+    }
+  }
+  return cards;
+}
+
+// Cache for Basic Pokemon checks
+const basicPokemonCache = new Map();
+
+// Shuffle function (Fisher-Yates) - modifies array in place
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Check if a card is a Basic Pokemon (with caching)
+async function isBasicPokemon(set, num) {
+  const cacheKey = `${set}-${num}`;
+  if (basicPokemonCache.has(cacheKey)) {
+    return basicPokemonCache.get(cacheKey);
+  }
+  
+  try {
+    const response = await fetch(`https://api.tcgdex.net/v2/en/sets/${set}/${num}`);
+    if (!response.ok) {
+      basicPokemonCache.set(cacheKey, false);
+      return false;
+    }
+    const data = await response.json();
+    const isBasic = String(data.category || '').toLowerCase() === 'pokemon' &&
+                    String(data.stage || '').toLowerCase() === 'basic';
+    basicPokemonCache.set(cacheKey, isBasic);
+    return isBasic;
+  } catch {
+    basicPokemonCache.set(cacheKey, false);
+    return false;
+  }
+}
+
+// Expand deck (convert quantity-based to individual cards)
+function expandDeck(deckList) {
+  const expanded = [];
+  for (const card of deckList) {
+    const quantity = Number(card.quantity) || 1;
+    for (let i = 0; i < quantity; i++) {
+      expanded.push({
+        name: card.name,
+        set: card.set,
+        number: card.number,
+        num: card.number
+      });
+    }
+  }
+  return expanded;
+}
+
+// Generate a starting hand (simplified version without DOM)
+async function generateStartingHand(deck) {
+  if (deck.length < 5) {
+    throw new Error('Deck too small');
+  }
+
+  let tries = 0;
+  let hand = [];
+  let hasBasic = false;
+
+  // Create a working copy of the deck (deep copy to avoid reference issues)
+  const workingDeck = deck.map(c => ({ ...c }));
+
+  while (tries < 10) {
+    tries++;
+    // Shuffle modifies the array in place
+    shuffle(workingDeck);
+    hand = workingDeck.slice(0, 5);
+
+    const flags = await Promise.all(
+      hand.map(c => isBasicPokemon(c.set, c.number || c.num))
+    );
+
+    hasBasic = flags.some(Boolean);
+    if (hasBasic) break;
+  }
+
+  return hand;
+}
+
+// Normalize hand for comparison (sort by card identifier and count occurrences)
+function normalizeHand(hand) {
+  // Create a map of card -> count
+  const cardMap = new Map();
+  for (const card of hand) {
+    const key = `${card.name} (${card.set}-${card.number || card.num})`;
+    cardMap.set(key, (cardMap.get(key) || 0) + 1);
+  }
+  
+  // Convert to sorted array of [card, count] pairs
+  const sorted = Array.from(cardMap.entries()).sort();
+  
+  // Create normalized string with counts
+  return sorted.map(([card, count]) => count > 1 ? `${card} x${count}` : card).join(', ');
+}
+
+// Get card image URL
+function getCardImageUrl(card) {
+  const padded = String(card.number || card.num).padStart(3, '0');
+  return `https://assets.tcgdex.net/en/tcgp/${card.set}/${padded}/high.png`;
+}
+
+// Format hand for display with images
+function formatHandForDisplay(hand) {
+  // Group by card and count
+  const cardMap = new Map();
+  for (const card of hand) {
+    const key = `${card.set}-${card.number || card.num}`;
+    if (!cardMap.has(key)) {
+      cardMap.set(key, { card, count: 0 });
+    }
+    cardMap.get(key).count++;
+  }
+  
+  return Array.from(cardMap.values());
+}
+
+// Update UI
+const deckInput = document.getElementById('deckInput');
+const testCountInput = document.getElementById('testCount');
+const runTestsBtn = document.getElementById('runTests');
+const statusDiv = document.getElementById('status');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+const resultsSection = document.getElementById('resultsSection');
+const resultsBody = document.getElementById('resultsBody');
+const statsSummary = document.getElementById('statsSummary');
+const exportBtn = document.getElementById('exportResults');
+
+let currentResults = null;
+
+function showStatus(message, type = 'info') {
+  statusDiv.textContent = message;
+  statusDiv.className = `status ${type}`;
+  statusDiv.style.display = 'block';
+}
+
+function hideStatus() {
+  statusDiv.style.display = 'none';
+}
+
+function updateProgress(current, total) {
+  const percentage = (current / total) * 100;
+  progressFill.style.width = `${percentage}%`;
+}
+
+runTestsBtn.addEventListener('click', async () => {
+  const deckText = deckInput.value.trim();
+  const testCount = parseInt(testCountInput.value, 10);
+
+  if (!deckText) {
+    showStatus('Please enter a deck list.', 'error');
+    return;
+  }
+
+  if (testCount < 1 || testCount > 100000) {
+    showStatus('Please enter a valid number of tests (1-100000).', 'error');
+    return;
+  }
+
+  // Disable button and show loading
+  runTestsBtn.disabled = true;
+  hideStatus();
+  progressBar.style.display = 'block';
+  progressFill.style.width = '0%';
+  resultsSection.style.display = 'none';
+
+  try {
+    // Clear cache for fresh run
+    basicPokemonCache.clear();
+    
+    showStatus('Loading Pocket sets...', 'info');
+    await loadPocketSets();
+
+    showStatus('Parsing deck list...', 'info');
+    const deckList = parseDecklist(deckText);
+    
+    if (deckList.length === 0) {
+      throw new Error('No valid cards found in deck list. Please check the format.');
+    }
+
+    showStatus('Expanding deck and checking card types...', 'info');
+    const expandedDeck = expandDeck(deckList);
+
+    if (expandedDeck.length < 5) {
+      throw new Error('Deck must have at least 5 cards.');
+    }
+
+    // Pre-cache Basic Pokemon checks for all unique cards in deck
+    const uniqueCards = new Map();
+    for (const card of expandedDeck) {
+      const key = `${card.set}-${card.number || card.num}`;
+      if (!uniqueCards.has(key)) {
+        uniqueCards.set(key, card);
+      }
+    }
+    
+    showStatus('Pre-loading card data...', 'info');
+    const cardChecks = Array.from(uniqueCards.values()).map(c => 
+      isBasicPokemon(c.set, c.number || c.num)
+    );
+    await Promise.all(cardChecks);
+
+    showStatus(`Running ${testCount} tests...`, 'info');
+    
+    const handCounts = new Map(); // key -> { count, sampleHand }
+    let totalHands = 0;
+    let failedHands = 0;
+
+    // Run tests with progress updates
+    for (let i = 0; i < testCount; i++) {
+      try {
+        // Create a fresh copy of the deck for each test
+        const freshDeck = expandedDeck.map(c => ({ ...c }));
+        const hand = await generateStartingHand(freshDeck);
+        const normalized = normalizeHand(hand);
+        
+        if (!handCounts.has(normalized)) {
+          handCounts.set(normalized, { count: 0, sampleHand: hand });
+        }
+        handCounts.get(normalized).count++;
+        totalHands++;
+      } catch (err) {
+        failedHands++;
+        console.warn('Failed to generate hand:', err);
+      }
+
+      // Update progress every 10 tests or at the end
+      if (i % 10 === 0 || i === testCount - 1) {
+        updateProgress(i + 1, testCount);
+        // Allow UI to update
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+    }
+
+    // Store results
+    currentResults = {
+      handCounts,
+      totalHands,
+      failedHands,
+      testCount
+    };
+
+    // Display results
+    displayResults(handCounts, totalHands, failedHands, testCount);
+    
+    showStatus(`Completed ${testCount} tests successfully!`, 'success');
+    progressBar.style.display = 'none';
+    resultsSection.style.display = 'block';
+
+  } catch (error) {
+    showStatus(`Error: ${error.message}`, 'error');
+    progressBar.style.display = 'none';
+  } finally {
+    runTestsBtn.disabled = false;
+  }
+});
+
+function displayResults(handCounts, totalHands, failedHands, testCount) {
+  // Convert to array and sort by count
+  const results = Array.from(handCounts.entries())
+    .map(([handKey, data]) => ({
+      handKey,
+      hand: data.sampleHand,
+      count: data.count,
+      percentage: (data.count / totalHands * 100).toFixed(2)
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  // Update stats summary
+  statsSummary.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-value">${testCount}</div>
+      <div class="stat-label">Total Tests</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalHands}</div>
+      <div class="stat-label">Valid Hands</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${results.length}</div>
+      <div class="stat-label">Unique Combinations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${failedHands}</div>
+      <div class="stat-label">Failed Attempts</div>
+    </div>
+  `;
+
+  // Update table
+  resultsBody.innerHTML = results
+    .map((result, index) => {
+      const cardGroups = formatHandForDisplay(result.hand);
+      const cardsHtml = cardGroups.map(({ card, count }) => `
+        <div class="card-display">
+          <img src="${getCardImageUrl(card)}" alt="${card.name}" class="card-image" 
+               onerror="this.style.display='none'">
+          ${count > 1 ? `<span class="card-count">x${count}</span>` : ''}
+        </div>
+      `).join('');
+      
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td>
+            <div class="hand-cards">${cardsHtml}</div>
+            <div class="hand-combination" style="margin-top: 8px; font-size: 11px; color: #718096;">
+              ${result.handKey}
+            </div>
+          </td>
+          <td class="count">${result.count}</td>
+          <td class="percentage">${result.percentage}%</td>
+        </tr>
+      `;
+    })
+    .join('');
+}
+
+exportBtn.addEventListener('click', () => {
+  if (!currentResults) return;
+
+  const results = Array.from(currentResults.handCounts.entries())
+    .map(([handKey, data]) => ({
+      handKey,
+      count: data.count,
+      percentage: (data.count / currentResults.totalHands * 100).toFixed(2)
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  // Create CSV
+  const csv = [
+    'Rank,Hand Combination,Count,Percentage',
+    ...results.map((r, i) => `${i + 1},"${r.handKey}",${r.count},${r.percentage}%`)
+  ].join('\n');
+
+  // Download
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `opening-hands-${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
+

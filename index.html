@@ -290,7 +290,10 @@ details.unparsed summary {cursor:pointer;color:#93c5fd;}
   </div>
 </div>
 
-<button id="startBattle">Start Battle</button>
+  <div style="text-align: center; margin: 1rem 0;">
+  <button id="startBattle">Start Battle</button>
+  <button id="handTester" style="margin-left: 1rem;">Opening Hand Tester</button>
+</div>
 
 <script type="module">
 import { parseDecklist, fetchCardData, loadPocketSets } from './deckParser.js';
@@ -446,6 +449,10 @@ document.getElementById('startBattle').onclick=()=>{
   if(count(p1)!==20||count(p2)!==20){alert(`Each deck must total 20 cards. Current: P1=${count(p1)}, P2=${count(p2)}`);return;}
 
   window.location.href='battle.html';
+};
+
+document.getElementById('handTester').onclick=()=>{
+  window.location.href='hand-tester.html';
 };
 
 // Pre-load Pocket sets on page load for better performance
